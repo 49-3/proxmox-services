@@ -1,5 +1,0 @@
----
-- hosts: samba
-  roles:
-    - { role: common, tags: all }
-    - { role: samba, tags: samba }

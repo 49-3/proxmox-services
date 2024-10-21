@@ -1,6 +1,0 @@
----
-- name: Start Radarr
-  systemd:
-    name: radarr
-    state: restarted
-    enabled: true

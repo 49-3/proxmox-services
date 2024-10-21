@@ -1,0 +1,12 @@
+---
+http:
+  routers:
+    to-reverse:
+      rule: "Host(`*.teleport.korporate.org`)"
+      service: reverse
+
+  services:
+    reverse:
+      loadBalancer:
+        servers:
+          - url: https://10.0.10.10:3080

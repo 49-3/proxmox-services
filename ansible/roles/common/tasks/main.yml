@@ -5,20 +5,14 @@
     upgrade: full
   tags: always
 
-- name: Install kitty-terminfo
+- name: Install curl
   ansible.builtin.apt:
     pkg:
-      - kitty-terminfo
+      - curl
     state: latest
 
-- name: Set XPS13 authorized key
+- name: Set SSH authorized key
   ansible.posix.authorized_key:
     user: root
-    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA6iDv3SIqB+4ycb9iuDNbxZ5Koz87LKTZG/QXuwBZgN brian@pop-os-2021-03-20"
-    state: present
-
-- name: Set Samsung_S20_FE authorized key
-  ansible.posix.authorized_key:
-    user: root
-    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK0hWDvdigGG+CV1P73mdjz6b7fXBGmfhg962pDEgT/9 brian@samsung_s20_fe-2022-08-19"
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDk9QtY9gB59lSUcs2Kl0uNX4WW0LWE69fZfRhqYQbtUgdg0CntShrsnFRO0+9DxXX1iL1rvakeQyHBz2I+nG+h5GrdyvphleQuRHO1kZ3KFXYhhZV9gbKMhGkA3vh6BYdVpcLxu/S/FQ8NdfeWpj8BXecRvU/A7/g19nwnOrEctDEFp31+HL7/92lESjqBNMGToXfUpvC8sJw6sBIzzPG2CcjC1fX2+xaGRuumrQieqB5TCd4y8Yu42ymcQVzIW9MLP9523DPQnOuZssT+//LfNLSNQHZ4kJ2E8Qw5MszlQeLXEPns8ui+HsnhlDF+6mW8tB4S3Ow3a1CWTQsNhkqJ0xoY6HsJEaIGVBcs29N1+RM8zsincuGfHOj/Q/RcWm8aSKllUSpkny6CbMyZ58Gqg7nxfSNSZP3SzazZeBz5HbEjKJhJ1KJ4aM6b+UzYA8JsArP/wezvBiolY/ipx8QRithAcdXNu0vZjIaKwT3SxdPkiJJFKBuNM3dWsJWvMnk= n43@rog"
     state: present

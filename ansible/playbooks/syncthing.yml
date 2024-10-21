@@ -1,5 +1,0 @@
----
-- hosts: syncthing
-  roles:
-    - { role: common, tags: all }
-    - { role: syncthing, tags: syncthing }

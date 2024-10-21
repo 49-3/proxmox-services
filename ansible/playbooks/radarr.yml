@@ -1,5 +1,0 @@
----
-- hosts: radarr
-  roles:
-    - { role: common, tags: all }
-    - { role: radarr, tags: radarr }

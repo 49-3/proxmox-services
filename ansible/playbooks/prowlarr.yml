@@ -1,5 +1,0 @@
----
-- hosts: prowlarr
-  roles:
-    - { role: common, tags: all }
-    - { role: prowlarr, tags: prowlarr }

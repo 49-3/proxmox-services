@@ -1,10 +1,10 @@
 ---
 - name: Include my vars
-  ansible.builtin.include_vars: /home/brian/dev/my-data/ansible_vars.yml
+  ansible.builtin.include_vars: /home/evil/proxmox-services/ansible/host_vars/ansible_vars.yml
 
 - name: Install Traefik
   ansible.builtin.unarchive:
-    src: https://github.com/traefik/traefik/releases/download/v3.1.6/traefik_v3.1.6_linux_amd64.tar.gz
+    src: https://github.com/traefik/traefik/releases/download/v3.2.0-rc2/traefik_v3.2.0-rc2_linux_amd64.tar.gz
     dest: /usr/local/bin
     remote_src: true
   notify:
@@ -37,6 +37,24 @@
   notify:
     - Restart Traefik
 
+- name: Copy Auth Credentials
+  ansible.builtin.copy:
+    src: basic_auth_credentials
+    dest: /etc/traefik/
+    mode: "0755"
+  notify:
+    - Restart Traefik
+
+- name: Copy Acme Token
+  ansible.builtin.copy:
+    src: acme/acme.json
+    dest: /etc/traefik/
+    owner: traefik
+    group: traefik
+    mode: "0600"
+  notify:
+    - Restart Traefik
+
 - name: Create Traefik config file
   ansible.builtin.template:
     src: traefik.yml.j2
@@ -44,6 +62,22 @@
     mode: "0644"
   notify:
     - Restart Traefik
+
+- name: Create Log Folder
+  ansible.builtin.file:
+    path: /var/log/traefik
+    state: directory
+    owner: traefik
+    group: traefik
+    mode: "0744"
+
+- name: Create Plugin-Folder
+  ansible.builtin.file:
+    path: /etc/traefik/plugins-storage
+    state: directory
+    owner: traefik
+    group: traefik
+    mode: "0744"
 
 - name: Copy systemd service file to server
   ansible.builtin.copy:

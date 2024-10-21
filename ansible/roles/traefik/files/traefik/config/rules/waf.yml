@@ -1,0 +1,20 @@
+http:
+    middlewares:
+        my-traefik-modsecurity-plugin:
+            plugin:
+                traefik-modsecurity-plugin:
+                    CacheConditionsMethods:
+                        - GET
+                    CacheConditionsNoBody: "true"
+                    CacheKeyHeaders:
+                        - User-Agent
+                        - Cache-Control
+                    CacheKeyIncludeHeaders: "true"
+                    CacheKeyIncludeHost: "true"
+                    CacheKeyIncludeMethod: "true"
+                    CacheKeyIncludeRemoteAddress: "true"
+                    CacheKeyIncludeRequestURI: "true"
+                    CacheKeyMatchAllHeaders: "true"
+                    MaxBodySize: "10485760"
+                    ModsecurityUrl: http://waf:80
+                    TimeoutMillis: "2000"

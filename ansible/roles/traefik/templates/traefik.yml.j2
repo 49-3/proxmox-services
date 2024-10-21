@@ -1,24 +1,62 @@
 ---
+api:
+  dashboard: true # Optional can be disabled
+  insecure: true # Optional can be disabled
+  debug: false # Optional can be Enabled if needed for troubleshooting 
 entryPoints:
   web:
-    address: :80
-
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
   websecure:
-    address: :443
-
+    address: ":443"
+    forwardedHeaders:
+      trustedIPs: {{ CLOUDFLARE_IPS }}, {{ LOCAL_IPS }}
+    http:
+      tls:
+        certResolver: "dns-cloudflare"
+        domains:
+          - main: "{{ DOMAINNAME }}"
+            sans:
+              - "*.{{ DOMAINNAME }}"
+serversTransport:
+  insecureSkipVerify: true
 providers:
   file:
     directory: /etc/traefik/config
     watch: true
-
-api:
-  dashboard: true
-  insecure: true
-
 certificatesResolvers:
-  letsencrypt:
+  dns-cloudflare:
     acme:
       email: "{{ acme_email }}"
-      storage: /traefik-config/acme.json
-      httpChallenge:
-        entryPoint: web
+      storage: /etc/traefik/acme.json
+      dnschallenge: true
+      caServer: https://acme-v02.api.letsencrypt.org/directory # production (default)
+      #caServer: https://acme-staging-v02.api.letsencrypt.org/directory # staging
+      dnsChallenge:
+        provider: cloudflare
+        resolvers: "1.1.1.1:53,1.0.0.1:53"
+        delayBeforeCheck: 90 #Optional to wait x second before checking with the DNS Server
+log:
+  filePath: "/var/log/traefik/traefik.log"
+  level: DEBUG
+accessLog:
+  filePath: "/var/log/traefik/access.log"
+  bufferingSize: 100
+  format: json
+  filters:
+    statusCodes:
+      - "204-299"
+      - "400-499"
+      - "500-599"
+    retryAttempts: true
+    minDuration: "10ms"
+experimental:
+  plugins:
+    traefik-modsecurity-plugin:
+      modulename: github.com/madebymode/traefik-modsecurity-plugin
+      version: v1.5.0

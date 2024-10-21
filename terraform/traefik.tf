@@ -1,9 +1,11 @@
 resource "proxmox_lxc" "traefik" {
   target_node     = "pve"
   hostname        = "traefik"
-  ostemplate      = "local:vztmpl/ubuntu-20.04-standard_20.04-1_amd64.tar.gz"
+  ostemplate      = "local:vztmpl/debian-12-standard_12.7-1_amd64.tar.zst"
+  password        = "evilP4ssw0rd"
   unprivileged    = true
-  ostype          = "ubuntu"
+  ostype          = "debian"
+  nameserver      = "10.0.10.254"
   ssh_public_keys = file(var.pub_ssh_key)
   start           = true
   onboot          = true
@@ -12,22 +14,13 @@ resource "proxmox_lxc" "traefik" {
   // Terraform will crash without rootfs defined
   rootfs {
     storage = "local-lvm"
-    size    = "4G"
-  }
-
-  mountpoint {
-    mp      = "/traefik-config"
-    size    = "8G"
-    slot    = 0
-    key     = "0"
-    storage = "/mnt/storage/appdata/traefik/config"
-    volume  = "/mnt/storage/appdata/traefik/config"
+    size    = "25G"
   }
 
   network {
     name   = "eth0"
-    bridge = "vmbr0"
-    gw     = var.gateway_ip
+    bridge = "vGate"
+    gw     = var.traefik_gateway
     ip     = var.traefik_ip
     ip6    = "auto"
     hwaddr = var.traefik_mac

@@ -1,0 +1,12 @@
+---
+http:
+  routers:
+    to-dev:
+      rule: "Host(`dev.korporate.org`)"
+      service: dev
+
+  services:
+    dev:
+      loadBalancer:
+        servers:
+          - url: http://10.0.60.250:80

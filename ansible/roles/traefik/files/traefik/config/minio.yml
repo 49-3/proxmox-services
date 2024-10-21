@@ -1,0 +1,28 @@
+---
+http:
+  routers:
+    to-minio:
+      rule: "Host(`minios.korporate.org`)"
+      service: minio
+    to-minio-secure:
+      rule: "Host(`minios.korporate.org`)"
+      service: minio
+      tls:
+        certResolver: letsencrypt
+    to-minio-console:
+      ruel: "Host(`minio.korporate.org`)"
+      service: minio-console
+
+  services:
+    minio:
+      loadBalancer:
+        servers:
+          - url: http://10.0.20.23:9000
+          - url: http://10.0.20.24:9000
+          - url: http://10.0.20.25:9000
+    minio-console:
+      loadBalancer:
+        servers:
+          - url: http://10.0.20.23:9001
+          - url: http://10.0.20.24:9001
+          - url: http://10.0.20.25:9001
