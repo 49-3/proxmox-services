@@ -1,12 +1,12 @@
 ---
 http:
   routers:
-    to-rancher:
-      rule: "Host(`rancher.korporate.org`)"
-      service: rancher
+    to-argocd:
+      rule: "Host(`argocd.korporate.org`)"
+      service: argocd
 
   services:
-    rancher:
+    argocd:
       loadBalancer:
         servers:
           - url: https://10.0.50.21:8443
