@@ -1,0 +1,14 @@
+---
+k9s_ver: 0.32.5
+k9s_platform: amd64
+k9s_mirror: https://github.com/derailed/k9s/releases/download
+
+k9s_checksums:
+  0.32.5:
+    Linux:
+      amd64: sha256:33c31bf5feba292b59b8dabe5547cb52ab565521ee5619b52eb4bd4bf226cea3
+
+k9s_overwrite_existing: false
+k9s_privilege_escalate: true
+k9s_install_dir: /usr/local/bin
+k9s_temp_dir: /tmp

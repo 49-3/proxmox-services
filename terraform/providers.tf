@@ -4,6 +4,7 @@ provider "proxmox" {
   pm_password = var.proxmox_password
   // Required when using self signed certs
   pm_tls_insecure = true
+  pm_otp = ""
   pm_log_enable = true
   pm_log_file   = "terraform-plugin-proxmox.log"
   pm_debug      = true

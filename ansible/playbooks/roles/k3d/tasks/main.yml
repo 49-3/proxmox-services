@@ -1,0 +1,12 @@
+---
+- name: Download k3d command line tool
+  ansible.builtin.uri:
+    url: https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh
+    return_content: true
+  register: k3d_installer
+
+- name: Install K3d
+  ansible.builtin.command:
+    cmd: bash
+    stdin: "{{ k3d_installer.content }}"
+  changed_when: new_chksum.rc != 0

@@ -1,0 +1,12 @@
+---
+http:
+  routers:
+    to-tpot:
+      rule: "Host(`tpot.korporate.org`)"
+      service: tpot
+
+  services:
+    tpot:
+      loadBalancer:
+        servers:
+          - url: 	https://10.0.60.250:64297

@@ -1,0 +1,9 @@
+---
+- name: Install github self hosted runners
+  hosts: k3d
+  roles:
+    - common
+    - kubectl
+    - helm
+    - k3d
+    - k9s

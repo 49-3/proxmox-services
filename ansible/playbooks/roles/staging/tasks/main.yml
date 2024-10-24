@@ -1,0 +1,136 @@
+---
+- name: Include my vars
+  ansible.builtin.include_vars: /home/evil/proxmox-services/ansible/host_vars/ansible_vars.yml
+
+- name: Check if cluster staging exist
+  shell: |
+    set -o pipefail
+    k3d cluster list | wc -l
+  args:
+    executable: /bin/bash
+  register: cluster_exist
+
+- name: Delete cluster if exist
+  ansible.builtin.command:
+    cmd: k3d cluster delete staging
+  when: cluster_exist.stdout != "1"
+
+- name: Install staging cluster
+  shell: k3d cluster create staging \
+        -p "8080:80@loadbalancer" \
+        -p "8443:443@loadbalancer" \
+        --api-port 6443 \
+        --agents 3 \
+        --verbose
+  args:
+    executable: /bin/bash
+
+- name: Creates kube folder
+  ansible.builtin.file:
+    path: /home/evil/.kube/
+    state: directory
+    owner: evil
+    group: evil
+    mode: 0775
+
+- name: Get kubeconfig
+  shell: k3d kubeconfig get staging > /home/evil/.kube/config
+  args:
+    executable: /bin/bash
+
+- name: Add rancher helm chart
+  shell: helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
+  args:
+    executable: /bin/bash
+
+- name: Add argocd helm chart
+  shell: helm repo add argo https://argoproj.github.io/argo-helm
+  args:
+    executable: /bin/bash
+
+- name: Helm repo update
+  shell: helm repo update
+  args:
+    executable: /bin/bash
+
+- name: Deploying Rancher
+  shell: helm install rancher rancher-latest/rancher \
+   --namespace cattle-system \
+   --create-namespace \
+   --set hostname=rancher-staging.korporate.org \
+   --set ingress.enabled=true \
+   --set tls=external \
+   --set replicas=1
+  args:
+    executable: /bin/bash
+
+- name: Create namespace argocd
+  ansible.builtin.command:
+    cmd: kubectl create namespace argocd
+
+- name: Create /etc/argocd Folder
+  ansible.builtin.file:
+    path: /etc/argocd/
+    state: directory
+    owner: root
+    group: root
+    mode: 0775
+    recurse: yes
+
+- name: Copy argoValues-Ingress.yml
+  ansible.builtin.copy:
+    src: argoValues-Ingress.yml
+    dest: /etc/argocd/
+    mode: "0755"
+
+- name: Copy argo-ingress.yml
+  ansible.builtin.copy:
+    src: argo-ingress.yml
+    dest: /etc/argocd/
+    mode: "0755"
+
+- name: Deploy argocd App
+  ansible.builtin.command:
+    cmd: helm install argocd argo/argo-cd -f /etc/argocd/argoValues-Ingress.yml -n argocd
+
+- name: Deploy argocd Ingress
+  ansible.builtin.command:
+    cmd: kubectl apply -f /etc/argocd/argo-ingress.yml
+
+- name: Check for argocd cli installation
+  become: yes
+  stat:
+    path: '{{ argocd_binary_path }}'
+  changed_when: false
+  register: argocd_binary
+
+- when: not argocd_binary.stat.exists or argocd_overwrite_existing
+  block:
+    - name: Resolve platform specific vars
+      include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+          - '{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml'
+          - '{{ ansible_distribution }}.yml'
+          - '{{ ansible_os_family }}.yml'
+          skip: true
+          paths:
+            - '{{ role_path }}/vars'
+            - '{{ role_path }}/defaults'
+
+    - name: Create target directory
+      become: '{{ argocd_privilege_escalate }}'
+      become_user: root
+      file:
+        path: '{{ argocd_install_dir }}'
+        state: directory
+        mode: '0755'
+
+    - name: Download argocd
+      become: '{{ argocd_privilege_escalate }}'
+      become_user: root
+      get_url:
+        url: '{{ argocd_url }}'
+        dest: '{{ argocd_install_dir }}/{{ argocd_bin }}'
+        checksum: '{{ argocd_checksum }}'
+        mode: '0555'

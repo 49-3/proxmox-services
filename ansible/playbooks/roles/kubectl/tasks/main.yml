@@ -1,0 +1,102 @@
+---
+- name: Check for kubectl binary in /tmp directory
+  stat:
+    path: /tmp/kubectl
+  register:
+    kubectl_binary_present
+
+- name: Check for kubectl checksum in /tmp directory
+  stat:
+    path: /home/kubectl.sha256
+  register:
+    kubectl_chksum_present
+
+- name: Delete kubectl binary from /tmp directory
+  file:
+    path: /tmp/kubectl
+    state: absent
+  when: kubectl_binary_present.stat.exists
+
+- name: Delete checksum file from /tmp directory
+  file:
+    path: /tmp/kubectl.sha256
+    state: absent
+  when: kubectl_chksum_present.stat.exists
+
+- name: Get latest kubectl version
+  uri:
+    url: https://dl.k8s.io/release/stable.txt
+    return_content: yes
+    status_code: 200, 304
+  register: version
+
+- name: Download the latest kubectl release
+  uri:
+    url: https://dl.k8s.io/release/{{ version.content }}/bin/linux/amd64/kubectl
+    dest: /tmp/kubectl
+    status_code: 200, 304
+  register: kubectl
+
+- name: Download the kubectl checksum file
+  uri:
+    url: https://dl.k8s.io/{{ version.content }}/bin/linux/amd64/kubectl.sha256
+    dest: /tmp/kubectl.sha256
+    status_code: 200, 304
+
+- name: Validate the kubectl binary against the checksum file
+  shell: echo "$(cat /tmp/kubectl.sha256)"
+  register: source_chksum
+  changed_when: source_chksum.rc != 0
+
+- name: Compute new checksum of kubectl binary
+  shell: |
+    set -o pipefail
+    sha256sum /tmp/kubectl | awk '{print $1}'
+  args:
+    executable: /bin/bash
+  register: new_chksum
+  changed_when: new_chksum.rc != 0
+
+- name: Assert that the kubectl binary is OK
+  vars:
+    expected: "kubectl: OK"
+  assert:
+    that:
+      - source_chksum.stdout == new_chksum.stdout
+    fail_msg: "Checksum does not match {{ source_chksum.stdout }} != {{ new_chksum.stdout }}"
+    success_msg: "Successfully validated"
+
+- name: Check if kubectl installed in /usr/local/bin
+  stat:
+    path: /usr/local/bin/kubectl
+  register: kubectl_binary_usr_local_bin
+
+- name: Delete kubectl binary from /usr/local/bin if it exists
+  file:
+    path: /usr/local/bin/kubectl
+    state: absent
+  when: kubectl_binary_usr_local_bin.stat.exists
+
+- name: Copy kubectl and change permissions
+  copy:
+    src: /tmp/kubectl
+    remote_src: yes
+    dest: /usr/local/bin/kubectl
+    owner: root
+    group: root
+    mode: "+x"
+
+- name: Check if kubectl is installed
+  command: kubectl version --client
+  register: client
+  changed_when: client.rc > 1
+
+- name: Remove downloaded binaries from tmp
+  file:
+    path: /tmp/kubectl
+    state: absent
+
+- name: Remove downloaded checksums from tmp
+  file:
+    path: /tmp/kubectl.sha256
+    state: absent

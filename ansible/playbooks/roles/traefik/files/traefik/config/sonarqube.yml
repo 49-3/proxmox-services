@@ -1,0 +1,12 @@
+---
+http:
+  routers:
+    to-sonarqube:
+      rule: "Host(`sonarqube.korporate.org`)"
+      service: sonarqube
+
+  services:
+    sonarqube:
+      loadBalancer:
+        servers:
+          - url: 	http://10.0.20.22:9001

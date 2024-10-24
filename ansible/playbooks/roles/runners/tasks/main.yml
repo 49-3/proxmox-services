@@ -1,0 +1,61 @@
+---
+- name: Include my vars
+  ansible.builtin.include_vars: /home/evil/proxmox-services/ansible/host_vars/ansible_vars.yml
+
+- name: Check if cluster runners exist
+  shell: |
+    set -o pipefail
+    k3d cluster list | wc -l
+  args:
+    executable: /bin/bash
+  register: cluster_exist
+
+- name: Delete cluster if exist
+  ansible.builtin.command:
+    cmd: k3d cluster delete runners
+  when: cluster_exist.stdout != "1"
+
+- name: Install runners cluster
+  shell: k3d cluster create runners \
+        -p "8080:80@loadbalancer" \
+        -p "8443:443@loadbalancer" \
+        --api-port 6443 \
+        --agents 3 \
+        --verbose
+  args:
+    executable: /bin/bash
+
+- name: Creates kube folder
+  ansible.builtin.file:
+    path: /home/evil/.kube/
+    state: directory
+    owner: evil
+    group: evil
+    mode: 0775
+
+- name: Get kubeconfig
+  shell: k3d kubeconfig get runners > /home/evil/.kube/config
+  args:
+    executable: /bin/bash
+
+- name: Add rancher helm chart
+  shell: helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
+  args:
+    executable: /bin/bash
+
+- name: Helm repo update
+  shell: helm repo update
+  args:
+    executable: /bin/bash
+
+- name: Deploying Rancher
+  shell: helm install rancher rancher-latest/rancher \
+   --namespace cattle-system \
+   --create-namespace \
+   --set hostname=rancher-runners.korporate.org \
+   --set ingress.enabled=true \
+   --set tls=external \
+   --set replicas=1
+  args:
+    executable: /bin/bash
+

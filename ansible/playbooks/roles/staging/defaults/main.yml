@@ -1,0 +1,14 @@
+---
+argocd_ver: 2.13.0-rc5
+argocd_os: linux
+argocd_platform: amd64
+argocd_mirror: https://github.com/argoproj/argo-cd/releases/download
+
+argocd_checksums:
+  2.13.0-rc5:
+    linux:
+      amd64: sha256:fbdf0923c846195576e1a7cdf792847b2393f8c8d799cd45d43e8a2ccabd4323
+
+argocd_overwrite_existing: false
+argocd_privilege_escalate: true
+argocd_install_dir: /usr/local/bin

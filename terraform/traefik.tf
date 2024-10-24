@@ -19,7 +19,7 @@ resource "proxmox_lxc" "traefik" {
 
   network {
     name   = "eth0"
-    bridge = "vGate"
+    bridge = var.traefik_bridge
     gw     = var.traefik_gateway
     ip     = var.traefik_ip
     ip6    = "auto"

@@ -1,0 +1,17 @@
+#cloud-config
+#
+# A common use-case for cloud-init is to bootstrap user and ssh
+# settings to be managed by a remote configuration management tool,
+# such as ansible.
+#
+# This example assumes a default Ubuntu cloud image, which should contain
+# the required software to be managed remotely by Ansible.
+#
+
+runcmd:
+  - perl -i -pe 's/disable_root: true/disable_root: false/' /etc/cloud/cloud.cfg
+  - perl -i -pe 's/#PermitRootLogin .*/PermitRootLogin without-password/' /etc/ssh/sshd_config
+  - perl -i -pe 's/.*(ssh-rsa .*)/\1/' /root/.ssh/authorized_keys
+  - /etc/init.d/ssh reload
+  - cp /root/.ssh/authorized_keys /home/evil/.ssh/authorized_keys
+  - chown evil:evil /home/evil/.ssh/authorized_keys

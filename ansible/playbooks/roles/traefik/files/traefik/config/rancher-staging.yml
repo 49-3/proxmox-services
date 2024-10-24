@@ -1,0 +1,12 @@
+---
+http:
+  routers:
+    to-rancher-staging:
+      rule: "Host(`rancher-staging.korporate.org`)"
+      service: rancher-staging
+
+  services:
+    rancher-staging:
+      loadBalancer:
+        servers:
+          - url: https://10.0.50.21:8443

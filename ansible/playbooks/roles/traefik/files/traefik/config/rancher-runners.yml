@@ -1,0 +1,12 @@
+---
+http:
+  routers:
+    to-rancher-runners:
+      rule: "Host(`rancher-runners.korporate.org`)"
+      service: rancher-runners
+
+  services:
+    rancher-runners:
+      loadBalancer:
+        servers:
+          - url: https://10.0.20.26:8443

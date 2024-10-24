@@ -1,0 +1,6 @@
+---
+argocd_bin: 'argocd'
+argocd_link: '{{ argocd_install_dir }}/argocd{{ argocd_suffix|default("") }}'
+argocd_checksum: '{{ argocd_checksums[argocd_ver][argocd_os][argocd_platform] }}'
+argocd_url: '{{ argocd_mirror }}/v{{ argocd_ver }}/{{ argocd_bin }}-{{argocd_os}}-{{argocd_platform}}'
+argocd_binary_path: '{{ argocd_install_dir }}/{{ argocd_bin }}'

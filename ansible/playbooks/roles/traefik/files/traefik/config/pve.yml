@@ -1,0 +1,12 @@
+---
+http:
+  routers:
+    to-proxmox:
+      rule: "Host(`pve.korporate.org`)"
+      service: proxmox
+
+  services:
+    proxmox:
+      loadBalancer:
+        servers:
+          - url: https://192.168.1.180:8006

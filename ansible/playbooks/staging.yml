@@ -1,0 +1,5 @@
+---
+- name: Install argocd on staging
+  hosts: staging
+  roles:
+    - staging

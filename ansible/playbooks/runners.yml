@@ -1,0 +1,5 @@
+---
+- name: Install runners cluster and github self hosted runners
+  hosts: runners
+  roles:
+    - runners

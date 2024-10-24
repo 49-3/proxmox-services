@@ -1,0 +1,12 @@
+---
+http:
+  routers:
+    to-harbor:
+      rule: "Host(`harbor.korporate.org`)"
+      service: harbor
+
+  services:
+    harbor:
+      loadBalancer:
+        servers:
+          - url: https://10.0.20.21:443

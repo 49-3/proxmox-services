@@ -31,7 +31,6 @@ variable "gateway_ip" {
 // Services variables
 //
 
-
 // Traefic
 
 variable "traefik_lxcid" {
@@ -44,6 +43,11 @@ variable "traefik_mac" {
   default = "B6:1A:E1:C6:86:03"
 }
 
+variable "traefik_bridge" {
+  type    = string
+  default = "vGate"
+}
+
 variable "traefik_ip" {
   type    = string
   default = "10.0.10.12/24"
@@ -53,4 +57,60 @@ variable "traefik_gateway" {
   description = "traefic gateway IP"
   type        = string
   default     = "10.0.10.254"
+}
+
+// Runners
+
+variable "runners_vm" {
+  type    = number
+  default = 2006
+}
+
+variable "runners_mac" {
+  type    = string
+  default = "B8:1A:E4:C6:88:03"
+}
+
+variable "runners_bridge" {
+  type    = string
+  default = "vMgt"
+}
+
+variable "runners_ip" {
+  type    = string
+  default = "10.0.20.26/24"
+}
+
+variable "runners_gateway" {
+  description = "runners gateway IP"
+  type        = string
+  default     = "10.0.20.254"
+}
+
+// Staging
+
+variable "staging_vm" {
+  type    = number
+  default = 5001
+}
+
+variable "staging_mac" {
+  type    = string
+  default = "BC:24:11:A6:0A:4F"
+}
+
+variable "staging_bridge" {
+  type    = string
+  default = "vStaging"
+}
+
+variable "staging_ip" {
+  type    = string
+  default = "10.0.50.21/24"
+}
+
+variable "staging_gateway" {
+  description = "staging gateway IP"
+  type        = string
+  default     = "10.0.50.254"
 }

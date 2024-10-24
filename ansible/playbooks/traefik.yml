@@ -1,5 +1,7 @@
 ---
-- hosts: traefik
+- name: Install traefik on lxc container
+  hosts: traefik
   roles:
-    - { role: common, tags: all }
-    - { role: traefik, tags: traefik }
+    - common
+    - traefik
+  tasks:
