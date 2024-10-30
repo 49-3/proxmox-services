@@ -1,0 +1,23 @@
+---
+http:
+  routers:
+    to-consul:
+      rule: "Host(`consul.korporate.org`)"
+      service: consul
+      middlewares:
+        - "chain-basic-auth"
+    to-consul-secure:
+      rule: "Host(`consul.korporate.org`)"
+      service: consul
+      middlewares:
+        - "chain-basic-auth"
+      tls:
+        certResolver: letsencrypt
+
+  services:
+    consul:
+      loadBalancer:
+        servers:
+          - url: http://10.0.20.1:8500
+          - url: http://10.0.20.2:8500
+          - url: http://10.0.20.3:8500

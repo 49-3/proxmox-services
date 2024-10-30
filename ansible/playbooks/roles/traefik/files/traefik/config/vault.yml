@@ -1,0 +1,22 @@
+---
+http:
+  routers:
+    to-vault:
+      rule: "Host(`vault.korporate.org`)"
+      service: vault
+      middlewares:
+        - "chain-basic-auth"
+    to-vault-secure:
+      rule: "Host(`vault.korporate.org`)"
+      service: vault
+      middlewares:
+        - "chain-basic-auth"
+      tls:
+        certResolver: letsencrypt
+
+  services:
+    vault:
+      loadBalancer:
+        servers:
+          - url: http://10.0.20.04:8200
+          - url: http://10.0.20.05:8200

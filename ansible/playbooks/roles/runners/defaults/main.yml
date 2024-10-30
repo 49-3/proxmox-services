@@ -1,9 +1,9 @@
 ---
-arc-controller_namespace: arc-systems
-arc-runners_namespace: arc-runners
+arc-controller-namespace: arc-systems
+arc-runners-namespace: arc-runners
 arc-runners-instalation-name: arc-runner-set
 arc-runners-github-config-url: https://github.com/<your_enterprise/org/repo>
 arc-runners-github-pat: <PAT>
 
-arc-runners_overwrite_existing: false
-arc-runners_privilege_escalate: true
+arc-runners-overwrite-existing: false
+arc-runners-privilege-escalate: true

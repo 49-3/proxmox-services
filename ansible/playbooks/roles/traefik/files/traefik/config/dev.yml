@@ -4,6 +4,8 @@ http:
     to-dev:
       rule: "Host(`dev.korporate.org`)"
       service: dev
+      middlewares:
+        - "chain-basic-auth"
 
   services:
     dev:

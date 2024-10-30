@@ -1,0 +1,14 @@
+---
+http:
+  routers:
+    to-staging:
+      rule: "Host(`staging.korporate.org`)"
+      service: staging
+      middlewares:
+        - "chain-basic-auth"
+
+  services:
+    staging:
+      loadBalancer:
+        servers:
+          - url: https://10.0.50.21:6443

@@ -4,6 +4,8 @@ http:
     to-prometheus:
       rule: "Host(`prometheus.korporate.org`)"
       service: prometheus
+      middlewares:
+        - "chain-basic-auth"
 
   services:
     prometheus:

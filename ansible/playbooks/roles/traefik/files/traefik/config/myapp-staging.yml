@@ -1,0 +1,14 @@
+---
+http:
+  routers:
+    to-argocd:
+      rule: "Host(`argocd-staging.korporate.org`)"
+      service: argocd
+      middlewares:
+        - "chain-basic-auth"
+
+  services:
+    argocd:
+      loadBalancer:
+        servers:
+          - url: https://10.0.50.21:8443

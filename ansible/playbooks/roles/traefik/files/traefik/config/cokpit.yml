@@ -4,6 +4,8 @@ http:
     to-cokpit:
       rule: "Host(`cokpit.korporate.org`)"
       service: cokpit
+      middlewares:
+        - "chain-basic-auth"
 
   services:
     cokpit:

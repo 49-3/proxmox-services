@@ -15,3 +15,5 @@ runcmd:
   - /etc/init.d/ssh reload
   - cp /root/.ssh/authorized_keys /home/evil/.ssh/authorized_keys
   - chown evil:evil /home/evil/.ssh/authorized_keys
+
+# sudo perl -i -pe 's/disable_root: true/disable_root: false/' /etc/cloud/cloud.cfg;sudo perl -i -pe 's/#PermitRootLogin .*/PermitRootLogin without-password/' /etc/ssh/sshd_config;sudo perl -i -pe 's/.*(ssh-rsa .*)/\1/' /root/.ssh/authorized_keys;sudo /etc/init.d/ssh reload;sudo cp /root/.ssh/authorized_keys /home/evil/.ssh/authorized_keys;sudo chown evil:evil /home/evil/.ssh/authorized_keys

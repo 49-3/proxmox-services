@@ -4,6 +4,8 @@ http:
     to-influxdb:
       rule: "Host(`influxdb.korporate.org`)"
       service: influxdb
+      middlewares:
+        - "chain-basic-auth"
 
   services:
     influxdb:

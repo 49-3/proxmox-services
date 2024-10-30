@@ -1,0 +1,24 @@
+---
+- file:
+    path: "{{ consul_local_tls_dir }}"
+    state: directory
+  delegate_to: localhost
+  run_once: true
+  become: no
+
+- name: generate root certificate for dc
+  shell: >-
+    openssl req
+    -newkey rsa:4096
+    -nodes -x509 -days 3650
+    -subj "{{ consul_root_cert_subj }}"
+    -out {{ consul_local_tls_dir }}/consul-root.cer
+    -keyout {{ consul_local_tls_dir }}/consul-root-key.pem
+  args:
+    chdir: "{{ consul_local_tls_dir }}"
+    creates: "{{ consul_local_tls_dir }}/consul-root.cer"
+  delegate_to: localhost
+  run_once: true
+  become: no
+
+

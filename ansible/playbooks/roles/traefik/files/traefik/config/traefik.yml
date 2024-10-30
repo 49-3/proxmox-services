@@ -4,3 +4,5 @@ http:
     api:
       rule: Host(`traefik.korporate.org`)
       service: api@internal
+      middlewares:
+        - "chain-basic-auth"

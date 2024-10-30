@@ -4,9 +4,13 @@ http:
     to-minio:
       rule: "Host(`minio.korporate.org`)"
       service: minio
+      middlewares:
+        - "chain-basic-auth"
     to-minio-secure:
       rule: "Host(`minio.korporate.org`)"
       service: minio
+      middlewares:
+        - "chain-basic-auth"
       tls:
         certResolver: letsencrypt
 

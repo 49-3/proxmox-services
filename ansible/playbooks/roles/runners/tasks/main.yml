@@ -59,3 +59,44 @@
   args:
     executable: /bin/bash
 
+- name: Check for arc namespace
+  shell: |
+    set -o pipefail
+    kubectl get namespace arc-system 2>&1 | head -1 | awk '{print $1}'
+  args:
+    executable: /bin/bash
+  register: arc_system_namespace
+
+- when: arc_system_namespace.stdout != "Error"
+  block:
+    - name: Resolve platform specific vars
+      include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+          - '{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml'
+          - '{{ ansible_distribution }}.yml'
+          - '{{ ansible_os_family }}.yml'
+          skip: true
+          paths:
+            - '{{ role_path }}/vars'
+            - '{{ role_path }}/defaults'
+    - name: Creates arc config folder
+      ansible.builtin.file:
+        path: /etc/arc/
+        state: directory
+        owner: root
+        group: root
+        mode: 0775
+    - name: Copy Traefik config
+      ansible.builtin.copy:
+        src: gha-runner-scale-set-controller-values.yaml
+        dest: /etc/arc/
+        mode: "0755"
+    - name: Helm install arc
+      shell: helm install arc \
+        --namespace {{ arc-controller-namespace }} \
+        --create-namespace \
+        oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
+        --values="/etc/arc/gha-runner-scale-set-controller-values.yaml"
+      args:
+        executable: /bin/bash

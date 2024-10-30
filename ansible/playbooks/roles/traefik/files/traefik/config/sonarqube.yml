@@ -4,6 +4,8 @@ http:
     to-sonarqube:
       rule: "Host(`sonarqube.korporate.org`)"
       service: sonarqube
+      middlewares:
+        - "chain-basic-auth"
 
   services:
     sonarqube:

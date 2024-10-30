@@ -31,6 +31,99 @@ variable "gateway_ip" {
 // Services variables
 //
 
+// Consul
+
+variable "consul_1_vm" {
+  type    = number
+  default = 2011
+}
+variable "consul_2_vm" {
+  type    = number
+  default = 2012
+}
+variable "consul_3_vm" {
+  type    = number
+  default = 2013
+}
+
+variable "consul_1_mac" {
+  type    = string
+  default = "B8:1B:E4:C6:88:03"
+}
+variable "consul_2_mac" {
+  type    = string
+  default = "B8:2B:E4:C6:88:03"
+}
+variable "consul_3_mac" {
+  type    = string
+  default = "B8:3B:E4:C6:88:03"
+}
+
+variable "consul_1_ip" {
+  type    = string
+  default = "10.0.20.1/24"
+}
+variable "consul_2_ip" {
+  type    = string
+  default = "10.0.20.2/24"
+}
+variable "consul_3_ip" {
+  type    = string
+  default = "10.0.20.3/24"
+}
+
+variable "consul_bridge" {
+  type    = string
+  default = "vMgt"
+}
+
+variable "consul_gateway" {
+  description = "Consul gateway IP"
+  type        = string
+  default     = "10.0.20.254"
+}
+
+// vault
+
+variable "vault_1_vm" {
+  type    = number
+  default = 2014
+}
+variable "vault_2_vm" {
+  type    = number
+  default = 2015
+}
+
+variable "vault_1_mac" {
+  type    = string
+  default = "B8:4B:E4:C6:88:03"
+}
+variable "vault_2_mac" {
+  type    = string
+  default = "B8:5B:E4:C6:88:03"
+}
+
+
+variable "vault_1_ip" {
+  type    = string
+  default = "10.0.20.4/24"
+}
+variable "vault_2_ip" {
+  type    = string
+  default = "10.0.20.5/24"
+}
+
+variable "vault_bridge" {
+  type    = string
+  default = "vMgt"
+}
+
+variable "vault_gateway" {
+  description = "Consul gateway IP"
+  type        = string
+  default     = "10.0.20.254"
+}
+
 // Traefic
 
 variable "traefik_lxcid" {

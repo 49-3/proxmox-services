@@ -63,5 +63,5 @@ resource "proxmox_vm_qemu" "runners" {
     ipconfig0 = "ip=${var.runners_ip},gw=${var.runners_gateway}"
 
     sshkeys = file(var.pub_ssh_key)
-    cicustom = "./cloud-init/runners.yml"
+    cicustom = "./cloud-init/init.yml"
 }

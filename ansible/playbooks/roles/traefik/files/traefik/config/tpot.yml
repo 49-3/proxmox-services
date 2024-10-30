@@ -4,6 +4,8 @@ http:
     to-tpot:
       rule: "Host(`tpot.korporate.org`)"
       service: tpot
+      middlewares:
+        - "chain-basic-auth"
 
   services:
     tpot:

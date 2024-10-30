@@ -4,6 +4,8 @@ http:
     to-grafana:
       rule: "Host(`grafana.korporate.org`)"
       service: grafana
+      middlewares:
+        - "chain-basic-auth"
 
   services:
     grafana:

@@ -1,0 +1,8 @@
+galaxy_info:
+  author: David Ribeiro
+  description: K3d role
+  company: 42 Mulhouse
+  license: GPLv3
+  min_ansible_version: 2.4
+  galaxy_tags: []
+dependencies: []

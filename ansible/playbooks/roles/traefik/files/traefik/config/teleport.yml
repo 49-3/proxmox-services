@@ -1,12 +1,14 @@
 ---
 http:
   routers:
-    to-reverse:
+    to-teleport:
       rule: "Host(`*.teleport.korporate.org`)"
-      service: reverse
+      service: teleport
+      middlewares:
+        - "chain-basic-auth"
 
   services:
-    reverse:
+    teleport:
       loadBalancer:
         servers:
           - url: https://10.0.10.10:3080

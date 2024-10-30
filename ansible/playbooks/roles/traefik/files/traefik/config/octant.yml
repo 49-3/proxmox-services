@@ -4,6 +4,8 @@ http:
     to-octant:
       rule: "Host(`octant.korporate.org`)"
       service: octant
+      middlewares:
+        - "chain-basic-auth"
 
   services:
     octant:

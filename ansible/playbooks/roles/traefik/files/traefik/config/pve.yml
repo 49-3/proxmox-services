@@ -4,6 +4,8 @@ http:
     to-proxmox:
       rule: "Host(`pve.korporate.org`)"
       service: proxmox
+      middlewares:
+        - "chain-basic-auth"
 
   services:
     proxmox:

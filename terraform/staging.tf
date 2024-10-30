@@ -63,5 +63,5 @@ resource "proxmox_vm_qemu" "staging" {
     ipconfig0 = "ip=${var.staging_ip},gw=${var.staging_gateway}"
 
     sshkeys = file(var.pub_ssh_key)
-    cicustom = "./cloud-init/staging.yml"
+    cicustom = "./cloud-init/init.yml"
 }

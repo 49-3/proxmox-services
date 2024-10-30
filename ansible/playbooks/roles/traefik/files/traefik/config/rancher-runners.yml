@@ -4,6 +4,8 @@ http:
     to-rancher-runners:
       rule: "Host(`rancher-runners.korporate.org`)"
       service: rancher-runners
+      middlewares:
+        - "chain-basic-auth"
 
   services:
     rancher-runners:

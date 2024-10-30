@@ -4,6 +4,8 @@ http:
     to-alertmanager:
       rule: "Host(`alertmanager.korporate.org`)"
       service: alertmanager
+      middlewares:
+        - "chain-basic-auth"
 
   services:
     alertmanager:

@@ -4,6 +4,8 @@ http:
     to-harbor:
       rule: "Host(`harbor.korporate.org`)"
       service: harbor
+      middlewares:
+        - "chain-basic-auth"
 
   services:
     harbor:
