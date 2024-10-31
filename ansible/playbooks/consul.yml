@@ -1,0 +1,15 @@
+---
+- name: Install and configure Consul
+  hosts: all
+  become: yes
+  vars:
+    consul_ansible_master_group_name: "consul_masters"
+    secrets_dir: "/home/evil/secret"
+    consul_ca_info:
+      C: "FR"
+      ST: "LORRAINE"
+      L: "Epinal"
+      O: "splitfire"
+
+  roles:
+    - consul-bootstrap

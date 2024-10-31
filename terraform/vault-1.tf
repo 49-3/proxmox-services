@@ -1,5 +1,5 @@
-resource "proxmox_vm_qemu" "vault-1" {
-    name = "vault-1"
+resource "proxmox_vm_qemu" "vault1" {
+    name = "vault1"
     desc = "vault server 1"
 
     # Node name has to be the same name as within the cluster

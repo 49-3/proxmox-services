@@ -5,7 +5,7 @@ http:
       rule: "Host(`dev.korporate.org`)"
       service: dev
       middlewares:
-        - "chain-basic-auth"
+        - "chain-no-auth"
 
   services:
     dev:

@@ -5,12 +5,12 @@ http:
       rule: "Host(`consul.korporate.org`)"
       service: consul
       middlewares:
-        - "chain-basic-auth"
+        - "chain-no-auth"
     to-consul-secure:
       rule: "Host(`consul.korporate.org`)"
       service: consul
       middlewares:
-        - "chain-basic-auth"
+        - "chain-no-auth"
       tls:
         certResolver: letsencrypt
 
@@ -18,6 +18,6 @@ http:
     consul:
       loadBalancer:
         servers:
-          - url: http://10.0.20.1:8500
+          - url: https://10.0.20.1:8500
           - url: http://10.0.20.2:8500
           - url: http://10.0.20.3:8500

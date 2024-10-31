@@ -1,0 +1,22 @@
+# -----------------------------+
+# agent-server-tls.hcl         |
+# -----------------------------+
+
+tls {
+  defaults {
+      ca_file = "$CONSUL_CONFIG_DIR/certs/consul-agent-ca.pem"
+      cert_file = "$CONSUL_CONFIG_DIR/certs/dc1-server-consul.pem"
+      key_file = "$CONSUL_CONFIG_DIR/certs/dc1-server-consul-key.pem"
+
+      verify_incoming = true
+      verify_outgoing = true
+  }
+  internal_rpc {
+      verify_server_hostname = true
+  }
+}
+
+# Enable auto-encrypt for server nodes
+auto_encrypt {
+  allow_tls = true
+}

@@ -1,0 +1,37 @@
+# -----------------------------+
+# agent-server-networking.hcl  |
+# -----------------------------+
+
+# Enable service mesh
+connect {
+  enabled = true
+}
+
+# Addresses and ports
+client_addr = "127.0.0.1"
+bind_addr   = "{{ GetInterfaceIP \"eth0\" }}"
+
+addresses {
+  grpc = "127.0.0.1"
+  grpc_tls = "127.0.0.1"
+  http = "0.0.0.0"
+  https = "0.0.0.0"
+  # dns = "127.0.0.1"
+  dns = "0.0.0.0"
+}
+
+ports {
+  http        = 8500
+  https       = 8443
+  grpc        = 8502
+  # grpc        = -1
+  grpc_tls    = 8503
+  # grpc_tls  = -1
+  dns         = 8600
+}
+
+# Join other Consul agents
+retry_join = [ "consul-server-1" , "consul-server-2" , "consul-server-3" ]
+
+# DNS recursors
+recursors = ["1.1.1.1", "1.0.0.1"]

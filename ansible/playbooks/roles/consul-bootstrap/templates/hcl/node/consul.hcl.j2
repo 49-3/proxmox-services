@@ -1,0 +1,69 @@
+{% set comma = joiner(",") %}
+# -----------------------------+
+# consul.hcl                   |
+# -----------------------------+
+
+server = {{ (consul_mode == 'server')|lower }}
+datacenter = "{{ consul_dc_name }}"
+domain = "consul"
+node_name = "{{ inventory_hostname|regex_replace("\.", "_") }}"
+
+# Logging
+log_level = "INFO"
+enable_syslog = true
+
+# Data persistence
+data_dir = "{{ consul_data_dir }}"
+
+## Networking
+client_addr = "127.0.0.1"
+bind_addr   = "{{ ansible_default_ipv4.address }}"
+
+# Join other Consul agents
+retry_join = [
+    {%- for host in consul_ansible_bootstrap_group -%}
+    {{ comma() }}"{{ hostvars[host]['ansible_'+consul_network_interface]['ipv4']['address'] }}"
+    {%- endfor -%}
+    ]
+
+# Ports
+ports {
+  http        = 8500
+  https       = 8443
+  # grpc      = 8502
+  grpc        = -1
+  grpc_tls    = 8503
+  # grpc_tls  = -1
+  dns         = 8600
+}
+
+# Enable Consul service mesh
+connect {
+  enabled = true
+}
+
+## Disable script checks
+enable_script_checks = false
+## Enable local script checks
+enable_local_script_checks = true
+## Enable central service config
+enable_central_service_config = true
+## Disable Remote exec
+disable_remote_exec = true
+
+tls {
+   defaults {
+      ca_file = "/etc/consul.d/tls/consul-root.cer"
+      cert_file = "/etc/consul.d/tls/consul-node.cer"
+      key_file = "/etc/consul.d/tls/consul-node.key"
+      verify_incoming = true
+      verify_outgoing = true
+   }
+   internal_rpc {
+      verify_server_hostname = true
+   }
+}
+
+auto_encrypt {
+  tls = true
+}

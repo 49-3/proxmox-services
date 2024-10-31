@@ -1,0 +1,37 @@
+---
+- name: Install unzip package
+  package:
+    name: "unzip"
+    state: present
+
+- name: Create cache directory for download
+  file:
+    path: "{{ consul_cache_dir }}"
+    state: directory
+    mode: 0750
+
+- name: Download
+  get_url:
+    url: "{{ consul_archive_url }}"
+    dest: "{{ consul_archive_dest }}"
+    checksum: "sha256:{{ consul_archive_sum }}"
+    mode: 0750
+
+- name: Unarchive
+  unarchive:
+    src: "{{ consul_archive_dest }}"
+    dest: "{{ consul_binary_basedir }}"
+    creates: "{{ consul_binary_path }}"
+    remote_src: yes
+
+- name: Set rights on consul binary
+  file:
+    path: "{{ consul_binary_path }}"
+    owner: root
+    group: "{{ consul_user_name }}"
+    mode: 0750
+
+- name: Remove archive
+  ansible.builtin.file:
+    path: "{{ consul_archive_dest }}"
+    state: absent

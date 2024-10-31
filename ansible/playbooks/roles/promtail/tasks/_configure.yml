@@ -1,0 +1,17 @@
+---
+- name: Create promtail config directories
+  file:
+    path: "{{ promtail_config_dir }}"
+    state: directory
+    mode: 0750
+    owner: "root"
+    group: "{{ promtail_groups }}"
+
+- name: Generate configuration
+  template:
+    src: "config.yaml.j2"
+    dest: "{{ promtail_config_dir }}/config.yaml"
+    owner: root
+    group: "{{ promtail_groups }}"
+    mode: 0640
+  notify: Restart promtail

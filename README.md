@@ -1,5 +1,13 @@
 # Proxmox services
 
+# bypass ssh fingerprint
+
+```
+❯ cat ~/.ansible.cfg
+[defaults]
+host_key_checking = False
+```
+
 Terraform/Ansible scripts to setup self-hosted services on Proxmox
 
 ```bash

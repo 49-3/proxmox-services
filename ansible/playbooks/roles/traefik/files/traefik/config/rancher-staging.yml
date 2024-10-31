@@ -5,7 +5,7 @@ http:
       rule: "Host(`rancher-staging.korporate.org`)"
       service: rancher-staging
       middlewares:
-        - "chain-basic-auth"
+        - "chain-no-auth"
 
   services:
     rancher-staging:

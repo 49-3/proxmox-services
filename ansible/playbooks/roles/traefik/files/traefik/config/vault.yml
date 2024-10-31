@@ -5,12 +5,12 @@ http:
       rule: "Host(`vault.korporate.org`)"
       service: vault
       middlewares:
-        - "chain-basic-auth"
+        - "chain-no-auth"
     to-vault-secure:
       rule: "Host(`vault.korporate.org`)"
       service: vault
       middlewares:
-        - "chain-basic-auth"
+        - "chain-no-auth"
       tls:
         certResolver: letsencrypt
 

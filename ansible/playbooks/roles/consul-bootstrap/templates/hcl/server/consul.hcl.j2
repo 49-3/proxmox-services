@@ -1,0 +1,21 @@
+# -----------------------------+
+# consul.hcl                   |
+# -----------------------------+
+
+# Node name
+node_name = "$(hostname)"
+
+# Data Persistence
+data_dir = "/var/lib/consul/data"
+
+# Logging
+log_level = "DEBUG"
+enable_syslog = true
+log_json = true
+
+
+## Disable script checks
+enable_script_checks = false
+
+## Enable local script checks
+enable_local_script_checks = true

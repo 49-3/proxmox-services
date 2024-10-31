@@ -1,0 +1,18 @@
+[Unit]
+Description=Promtail
+After=network.target
+
+[Service]
+Type=notify-reload
+User={{ promtail_user_name }}
+Group={{ promtail_groups }}
+WorkingDirectory={{ promtail_config_dir }}
+ExecStart={{ promtail_binary_path }} --config.file={{ promtail_config_dir }}/{{ promtail_config_file }} -config.expand-env=true
+SuccessExitStatus=143
+Restart=always
+RestartSec=5
+TimeoutStopSec=10
+WatchdogSec=180
+
+[Install]
+WantedBy=multi-user.target

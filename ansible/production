@@ -1,17 +1,38 @@
-[all]
-traefik.korporate.org
-runners.korporate.org
-staging.korporate.org
+[alls]
+consul-1 ansible_host=10.0.20.1
+consul-2 ansible_host=10.0.20.2
+consul-3 ansible_host=10.0.20.3
+vault-1 ansible_host=10.0.20.4
+vault-2 ansible_host=10.0.20.5
+traefik ansible_host=10.0.10.12
+runners ansible_host=10.0.20.26
+staging ansible_host=10.0.50.21
 
-[k3d]
-runners.korporate.org
-staging.korporate.org
+[k3ds]
+runners ansible_host=10.0.20.26
+staging ansible_host=10.0.50.21
 
 [runners]
-runners.korporate.org
+runners ansible_host=10.0.20.26
 
 [staging]
-staging.korporate.org
+staging ansible_host=10.0.50.21
 
 [traefik]
-traefik.korporate.org
+traefik ansible_host=10.0.10.12
+
+[vaults]
+vault1 ansible_host=10.0.20.4
+vault2 ansible_host=10.0.20.5
+
+[consul_nodes]
+vault1 ansible_host=10.0.20.4
+vault2 ansible_host=10.0.20.5
+traefik ansible_host=10.0.10.12
+staging ansible_host=10.0.50.21
+runners ansible_host=10.0.20.26
+
+[consul_masters]
+consul1 ansible_host=10.0.20.1
+consul2 ansible_host=10.0.20.2
+consul3 ansible_host=10.0.20.3

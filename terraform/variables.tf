@@ -35,15 +35,15 @@ variable "gateway_ip" {
 
 variable "consul_1_vm" {
   type    = number
-  default = 2011
+  default = 2001
 }
 variable "consul_2_vm" {
   type    = number
-  default = 2012
+  default = 2002
 }
 variable "consul_3_vm" {
   type    = number
-  default = 2013
+  default = 2003
 }
 
 variable "consul_1_mac" {
@@ -87,11 +87,11 @@ variable "consul_gateway" {
 
 variable "vault_1_vm" {
   type    = number
-  default = 2014
+  default = 2004
 }
 variable "vault_2_vm" {
   type    = number
-  default = 2015
+  default = 2005
 }
 
 variable "vault_1_mac" {

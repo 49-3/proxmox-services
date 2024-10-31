@@ -1,0 +1,27 @@
+---
+- name: Check if consul_ansible_master_group_name is defined
+  assert:
+    that:
+      - consul_ansible_master_group_name is defined and consul_ansible_master_group_name|length > 0
+    msg: "Variable 'consul_ansible_master_group_name' should be defined"
+
+- name: Check if secrets_dir is defined
+  assert:
+    that:
+      - secrets_dir is defined and secrets_dir|length > 0
+    msg: "Variable 'secrets_dir' should be defined"
+
+- name: Call role _setup_user_and_group
+  import_tasks: _setup_user_and_group.yml
+
+- name: Call role _get_consul
+  import_tasks: _get_consul.yml
+
+- name: Call role _configure
+  import_tasks: _configure.yml
+
+- name: Call role _sys_integration
+  import_tasks: _sys_integration.yml
+
+- name: Flush handlers
+  meta: flush_handlers

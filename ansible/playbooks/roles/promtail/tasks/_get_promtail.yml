@@ -1,0 +1,45 @@
+---
+- name: Install unzip package
+  package:
+    name: "unzip"
+    state: present
+
+- name: Create cache directory for download
+  file:
+    path: "{{ promtail_cache_dir }}"
+    state: directory
+    mode: 0750
+
+- name: Download
+  get_url:
+    url: "{{ promtail_archive_url }}"
+    dest: "{{ promtail_archive_dest }}"
+    checksum: "sha256:{{ promtail_archive_sum }}"
+    mode: 0750
+
+- name: Unarchive
+  unarchive:
+    src: "{{ promtail_archive_dest }}"
+    dest: "{{ promtail_binary_basedir }}"
+    creates: "{{ promtail_binary_path }}"
+    remote_src: yes
+
+- name: Stat promtail_binari_old_name
+  stat: path={{ promtail_binary_basedir }}{{ promtail_binari_old_name }}
+  register: promtail_stat
+
+- name: Move promtail binary
+  command: mv {{ promtail_binary_basedir }}{{ promtail_binari_old_name }} {{ promtail_binary_path }}
+  when: promtail_stat.stat.exists
+
+- name: Set rights on promtail binary
+  file:
+    path: "{{ promtail_binary_path }}"
+    owner: root
+    group: "{{ promtail_groups }}"
+    mode: 0750
+
+- name: Remove archive
+  ansible.builtin.file:
+    path: "{{ promtail_archive_dest }}"
+    state: absent

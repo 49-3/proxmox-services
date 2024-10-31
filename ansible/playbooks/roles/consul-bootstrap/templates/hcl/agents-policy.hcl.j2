@@ -1,0 +1,48 @@
+# -----------------------------+
+# agents-policy.hcl            |
+# -----------------------------+
+
+node_prefix "" {
+     policy = "write"
+}
+service_prefix "" {
+    policy = "read"
+}
+
+key_prefix "vault/" {
+    policy = "write"
+}
+
+key_prefix "transcendence/" {
+    policy = "read"
+}
+
+service "vault" {
+    policy = "write"
+}
+
+service "consul" {
+    policy = "write"
+}
+
+service "consul" {
+    policy = "write"
+}
+
+node_prefix "nomad-" {
+  policy = "write"
+}
+
+agent_prefix "" {
+    policy = "read"
+}
+
+agent_prefix "consul-server-" {
+    policy = "write"
+}
+
+session_prefix "" {
+    policy = "write"
+}
+mesh = "write"
+acl  = "write"

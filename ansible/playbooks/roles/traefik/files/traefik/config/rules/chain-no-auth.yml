@@ -3,7 +3,6 @@ http:
     chain-no-auth:
       chain:
         middlewares:
-          - middlewares-redirect-errors
           - middlewares-rate-limit
           - middlewares-secure-headers
           - middlewares-compress

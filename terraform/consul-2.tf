@@ -1,5 +1,5 @@
-resource "proxmox_vm_qemu" "consul-2" {
-    name = "consul-2"
+resource "proxmox_vm_qemu" "consul2" {
+    name = "consul2"
     desc = "Consul server 2"
 
     # Node name has to be the same name as within the cluster

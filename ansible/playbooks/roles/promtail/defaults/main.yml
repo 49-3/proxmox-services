@@ -1,0 +1,29 @@
+---
+promtail_cache_dir: "/var/cache/ansible"
+
+promtail_version: "3.2.1"
+promtail_archive_sum: "4524683947a8071ecb49608b9be8ce816895ed9a9f6195bec67c6155b6cc5158"
+
+promtail_url_prefix: "https://github.com/grafana/loki/releases/download/v{{ promtail_version }}"
+promtail_archive_name: "promtail-linux-amd64.zip"
+promtail_binari_old_name: "promtail-linux-amd64"
+promtail_archive_dest: "{{ promtail_cache_dir }}/{{ promtail_archive_name }}"
+promtail_archive_url: "{{ promtail_url_prefix }}/{{ promtail_archive_name }}"
+
+promtail_binary_basedir: "/usr/local/bin/"
+promtail_config_dir: "/opt/promtail/"
+promtail_config_file: "config.yaml"
+promtail_data_dir: "/var/lib/promtail"
+promtail_binary_path: "{{ promtail_binary_basedir }}/promtail"
+
+http_listen_port: "9080"
+grpc_listen_port: "0"
+
+loki_ip: "10.0.30.22"
+loki_port: "3100"
+
+promtail_user_name: "promtail"
+promtail_groups: "adm"
+promtail_user_id: "888"
+
+position_filename: "/tmp/positions.yaml"

@@ -1,0 +1,10 @@
+---
+- name: Create system user
+  user:
+    name: "{{ promtail_user_name }}"
+    group: "{{ promtail_groups }}"
+    uid: "{{ promtail_user_id }}"
+    home: "{{ promtail_data_dir }}"
+    shell: "/usr/sbin/nologin"
+    createhome: no
+    system: yes

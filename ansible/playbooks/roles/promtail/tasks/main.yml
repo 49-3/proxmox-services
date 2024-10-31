@@ -1,0 +1,15 @@
+---
+- name: Call role _setup_user_and_group
+  import_tasks: _setup_user_and_group.yml
+
+- name: Call role _get_promtail
+  import_tasks: _get_promtail.yml
+
+- name: Call role _configure
+  import_tasks: _configure.yml
+
+- name: Call role _sys_integration
+  import_tasks: _sys_integration.yml
+
+- name: Flush handlers
+  meta: flush_handlers

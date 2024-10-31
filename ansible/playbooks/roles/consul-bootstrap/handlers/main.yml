@@ -1,0 +1,12 @@
+---
+- name: Restart consul
+  systemd:
+    name: "{{ consul_user_name }}"
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+
+- name: Restart rsyslog
+  service:
+    name: rsyslog
+    state: restarted

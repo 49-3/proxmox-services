@@ -1,0 +1,21 @@
+---
+- name: Generate systemd service
+  template:
+    src: "promtail.service.j2"
+    dest: "/etc/systemd/system/promtail.service"
+    mode: 0640
+  notify: Restart promtail
+
+- name: Make promtail service available
+  service:
+    name: "{{ promtail_user_name }}"
+    state: started
+    enabled: yes
+
+- name: Copy journald overide
+  ansible.builtin.copy:
+    src: override.conf
+    dest: /etc/systemd/system/systemd-journald.service.d/
+    mode: "0755"
+  notify:
+    - Restart systemd-journald

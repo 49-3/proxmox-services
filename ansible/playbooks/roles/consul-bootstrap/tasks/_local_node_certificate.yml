@@ -1,0 +1,51 @@
+---
+# -----------------------
+# Supposed:
+#  delegate_to: localhost
+#  become: no
+#
+- name: Init certificate index
+  file:
+    path: "{{ consul_node_tls_workdir }}/consul-node.cer.index"
+    state: touch
+    mode: 0750
+  changed_when: false
+  delegate_to: localhost
+  become: no
+
+- name: Generate consul ca configuration
+  template:
+    src: consulca.conf.j2
+    dest: "{{ consul_node_tls_workdir }}/consulca.conf"
+    mode: 0750
+  delegate_to: localhost
+  become: no
+
+- name: Check certificate serial file
+  stat:
+    path: "{{ consul_node_tls_workdir }}/consul-node.cer.serial"
+  register: node_ca_serial
+  delegate_to: localhost
+  become: no
+
+- name: Init certificate serial file
+  copy:
+    dest: "{{ consul_node_tls_workdir }}/consul-node.cer.serial"
+    content: "0A"
+    mode: 0750
+  when: not node_ca_serial.stat.exists
+  delegate_to: localhost
+  become: no
+
+- name: Create node specific signed cert
+  shell: openssl ca \
+    -batch -notext \
+    -in consul-node.csr \
+    -out consul-node.cer \
+    -config consulca.conf
+  args:
+    executable: /bin/bash
+    chdir: "{{ consul_node_tls_workdir }}"
+    creates: "{{ consul_node_tls_workdir }}/consul-node.cer"
+  delegate_to: localhost
+  become: no
