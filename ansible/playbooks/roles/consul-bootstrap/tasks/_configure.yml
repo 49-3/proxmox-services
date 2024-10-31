@@ -1,4 +1,10 @@
 ---
+- name: Install rsync
+  ansible.builtin.apt:
+    pkg:
+      - rsync
+    state: present
+
 - name: Create consul data directory
   file:
     path: "{{ consul_data_dir }}"
@@ -18,75 +24,162 @@
     - "{{ consul_config_dir }}"
     - "{{ consul_config_dir }}/tls"
 
-- name: Generate root certificate locally
-  include_tasks: "_local_ca_certificate.yml"
-
-- name: Root certificate upload
-  copy:
-    src: "{{ consul_local_tls_dir }}/consul-root.cer"
-    dest: "{{ consul_config_dir }}/tls/consul-root.cer"
-    mode: 0640
-    owner: "root"
-    group: "{{ consul_user_name }}"
-
-- name: Create node cert signing
-  shell: openssl req \
-    -newkey rsa:4096 \
-    -nodes \
-    -subj "{{ consul_node_cert_subj }}" \
-    -out {{ consul_config_dir }}/tls/consul-node.csr \
-    -keyout {{ consul_config_dir }}/tls/consul-node.key \
-    && chown root:{{ consul_user_name}} {{ consul_config_dir }}/tls/consul-node.* \
-    && chmod 640 {{ consul_config_dir }}/tls/consul-node.*
+- name: Generate root certificate for dc
+  shell: mkdir -p {{ consul_config_dir }}/certs/ && \
+    rm -rf {{ consul_config_dir }}/certs/* && \
+    cd {{ consul_config_dir }}/certs/ && \
+    consul tls ca create && \
+    consul tls cert create -server -dc dc1 -domain consul && \
+    consul tls cert create -server -dc dc1 -domain consul && \
+    consul tls cert create -server -dc dc1 -domain consul
   args:
     executable: /bin/bash
-    chdir: "{{ consul_config_dir }}/tls"
-    creates: "{{ consul_config_dir }}/tls/consul-node.csr"
+    creates: "{{ consul_config_dir }}/certs/consul-agent-ca.pem"
+  run_once: true
+  become: no
 
-- name: Get certificate signing request
-  fetch:
-    src: "{{ consul_config_dir }}/tls/consul-node.csr"
-    dest: "{{ consul_node_tls_workdir }}/consul-node.csr"
-    flat: yes
+- name: Fetch certificate locally
+  include_tasks: "_local_get_certificates.yml"
 
-- name: Generate node certificate from csr
-  include_tasks: _local_node_certificate.yml
-
-
-- name: Upload certificate
+- name: Root certificate upload to masters
   copy:
-    src: "{{ consul_node_tls_workdir }}/consul-node.cer"
-    dest: "{{ consul_config_dir }}/tls/consul-node.cer"
+    src: "{{ consul_local_tls_dir }}/consul-agent-ca.pem"
+    dest: "{{ consul_config_dir }}/tls/consul-agent-ca.pem"
+    mode: 0640
     owner: "root"
     group: "{{ consul_user_name }}"
-    mode: 0640
-  notify: Restart consul
-
-- name: Generate agent configuration
-  template:
-    src: "config.json.j2"
-    dest: "{{ consul_config_dir }}/config.json"
-    owner: root
-    group: "{{ consul_user_name }}"
-    mode: 0640
-  notify: Restart consul
-
-- name: Generate default variables
-  template:
-    src: "{{ consul_mode }}/defaults.j2"
-    dest: "/etc/default/consul"
-    owner: root
-    group: "{{ consul_user_name }}"
-    mode: 0640
-  notify: Restart consul
-
-- name: Generate services variables
-  template:
-    src: "server/ui.consul-service.json.j2"
-    dest: "/etc/consul.d/ui.consul-service.json"
-    owner: root
-    group: "{{ consul_user_name }}"
-    mode: 0640
-  notify: Restart consul
-  tags: traefik
   when: consul_mode == "server"
+
+- name: Upload consul-agent.pem to consul-1
+  copy:
+    src: "{{ consul_local_tls_dir }}/dc1-server-consul-0.pem"
+    dest: "{{ consul_config_dir }}/tls/consul-agent.pem"
+    mode: 0640
+    owner: "root"
+    group: "{{ consul_user_name }}"
+  when: inventory_hostname == "consul-1"
+
+- name: Upload consul-agent-key.pem to consul-1
+  copy:
+    src: "{{ consul_local_tls_dir }}/dc1-server-consul-0-key.pem"
+    dest: "{{ consul_config_dir }}/tls/consul-agent-key.pem"
+    mode: 0640
+    owner: "root"
+    group: "{{ consul_user_name }}"
+  when: inventory_hostname == "consul-1"
+
+- name: Upload consul-agent.pem to consul-2
+  copy:
+    src: "{{ consul_local_tls_dir }}/dc1-server-consul-1.pem"
+    dest: "{{ consul_config_dir }}/tls/consul-agent.pem"
+    mode: 0640
+    owner: "root"
+    group: "{{ consul_user_name }}"
+  when: inventory_hostname == "consul-2"
+
+- name: Upload consul-agent-key.pe to consul-2
+  copy:
+    src: "{{ consul_local_tls_dir }}/dc1-server-consul-1-key.pem"
+    dest: "{{ consul_config_dir }}/tls/consul-agent-key.pem"
+    mode: 0640
+    owner: "root"
+    group: "{{ consul_user_name }}"
+  when: inventory_hostname == "consul-2"
+
+- name: Upload certs to consul-3
+  copy:
+    src: "{{ consul_local_tls_dir }}/dc1-server-consul-2.pem"
+    dest: "{{ consul_config_dir }}/tls/consul-agent.pem"
+    mode: 0640
+    owner: "root"
+    group: "{{ consul_user_name }}"
+  when: inventory_hostname == "consul-3"
+
+- name: Upload consul-agent-key.pem to consul-3
+  copy:
+    src: "{{ consul_local_tls_dir }}/dc1-server-consul-2-key.pem"
+    dest: "{{ consul_config_dir }}/tls/consul-agent-key.pem"
+    mode: 0640
+    owner: "root"
+    group: "{{ consul_user_name }}"
+  when: inventory_hostname == "consul-3"
+
+# - name: Upload certificate
+#   copy:
+#     src: "{{ consul_node_tls_workdir }}/consul-node.cer"
+#     dest: "{{ consul_config_dir }}/tls/consul-node.cer"
+#     owner: "root"
+#     group: "{{ consul_user_name }}"
+#     mode: 0640
+#   notify: Restart consul
+
+- name: Get Gossip
+  ansible.builtin.command:
+    cmd: consul keygen
+  register: gossip
+  run_once: true
+  become: no
+
+- name: Generate agent-gossip-encryption.hcl configuration
+  template:
+    src: "hcl/server/agent-gossip-encryption.hcl.j2"
+    dest: "{{ consul_config_dir }}/agent-gossip-encryption.hcl"
+    owner: root
+    group: "{{ consul_user_name }}"
+    mode: 0640
+  when: consul_mode == "server"
+
+- name: Generate agent-server-acl.hcl configuration
+  template:
+    src: "hcl/server/agent-server-acl.hcl.j2"
+    dest: "{{ consul_config_dir }}/agent-server-acl.hcl"
+    owner: root
+    group: "{{ consul_user_name }}"
+    mode: 0640
+  when: consul_mode == "server"
+
+- name: Generate agent-server-networking.hcl configuration
+  template:
+    src: "hcl/server/agent-server-networking.hcl.j2"
+    dest: "{{ consul_config_dir }}/agent-server-networking.hcl"
+    owner: root
+    group: "{{ consul_user_name }}"
+    mode: 0640
+  when: consul_mode == "server"
+
+- name: Copy agent-server-specific-ui.hcl configuration
+  copy:
+    src: "agent-server-specific-ui.hcl"
+    dest: "{{ consul_config_dir }}/agent-server-specific-ui.hcl"
+    owner: root
+    group: "{{ consul_user_name }}"
+    mode: 0640
+  when: consul_mode == "server"
+
+- name: Generate agent-server-telemetry.hcl configuration
+  template:
+    src: "hcl/server/agent-server-telemetry.hcl.j2"
+    dest: "{{ consul_config_dir }}/agent-server-telemetry.hcl"
+    owner: root
+    group: "{{ consul_user_name }}"
+    mode: 0640
+  when: consul_mode == "server"
+
+- name: Generate agent-server-tls.hcl configuration
+  template:
+    src: "hcl/server/agent-server-tls.hcl.j2"
+    dest: "{{ consul_config_dir }}/agent-server-tls.hcl"
+    owner: root
+    group: "{{ consul_user_name }}"
+    mode: 0640
+  when: consul_mode == "server"
+
+- name: Generate consul.hcl configuration
+  template:
+    src: "hcl/server/consul.hcl.j2"
+    dest: "{{ consul_config_dir }}/consul.hcl"
+    owner: root
+    group: "{{ consul_user_name }}"
+    mode: 0640
+  when: consul_mode == "server"
+  notify: Restart consul

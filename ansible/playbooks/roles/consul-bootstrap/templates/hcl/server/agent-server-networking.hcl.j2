@@ -1,3 +1,4 @@
+{% set comma = joiner(",") %}
 # -----------------------------+
 # agent-server-networking.hcl  |
 # -----------------------------+
@@ -9,7 +10,6 @@ connect {
 
 # Addresses and ports
 client_addr = "127.0.0.1"
-bind_addr   = "{{ GetInterfaceIP \"eth0\" }}"
 
 addresses {
   grpc = "127.0.0.1"
@@ -31,7 +31,8 @@ ports {
 }
 
 # Join other Consul agents
-retry_join = [ "consul-server-1" , "consul-server-2" , "consul-server-3" ]
-
-# DNS recursors
-recursors = ["1.1.1.1", "1.0.0.1"]
+retry_join = [
+    {%- for host in consul_ansible_bootstrap_group -%}
+    {{ comma() }}"{{ hostvars[host]['ansible_'+consul_network_interface]['ipv4']['address'] }}"
+    {%- endfor -%}
+]

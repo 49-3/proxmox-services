@@ -8,12 +8,15 @@ node_prefix "" {
 service_prefix "" {
     policy = "read"
 }
+agent_prefix "" {
+    policy = "read"
+}
 
 key_prefix "vault/" {
     policy = "write"
 }
 
-key_prefix "transcendence/" {
+key_prefix "splitfire/" {
     policy = "read"
 }
 
@@ -23,18 +26,6 @@ service "vault" {
 
 service "consul" {
     policy = "write"
-}
-
-service "consul" {
-    policy = "write"
-}
-
-node_prefix "nomad-" {
-  policy = "write"
-}
-
-agent_prefix "" {
-    policy = "read"
 }
 
 agent_prefix "consul-server-" {

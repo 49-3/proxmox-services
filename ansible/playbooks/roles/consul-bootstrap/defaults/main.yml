@@ -11,7 +11,7 @@ consul_archive_url: "{{ consul_url_prefix }}/{{ consul_archive_name }}"
 
 consul_data_dir: "/var/lib/consul"
 consul_config_dir: "/etc/consul.d"
-consul_config_file: "config.json"
+consul_config_file: "consul.hcl"
 consul_env_file: "/etc/default/consul"
 
 consul_dc_name: "dc1"
@@ -27,14 +27,6 @@ consul_ansible_bootstrap_group: "{{ groups[consul_ansible_master_group_name] }}"
 consul_local_tls_dir: "{{ secrets_dir }}/consul/tls"
 
 consul_local_cluster_encrypt_key: "{{ secrets_dir }}/consul/encrypt.key"
-
-consul_cluster_encrypt_key: >-
-  {{ lookup(
-       'password',
-       consul_local_cluster_encrypt_key + ' chars=ascii_letters,digits,hexdigits,punctuation length=16'
-     )
-     |b64encode
-  }}
 
 consul_ca_info:
   C: "FR"

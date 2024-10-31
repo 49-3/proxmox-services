@@ -22,17 +22,17 @@ staging ansible_host=10.0.50.21
 traefik ansible_host=10.0.10.12
 
 [vaults]
-vault1 ansible_host=10.0.20.4
-vault2 ansible_host=10.0.20.5
+vault-1 ansible_host=10.0.20.4
+vault-2 ansible_host=10.0.20.5
 
 [consul_nodes]
-vault1 ansible_host=10.0.20.4
-vault2 ansible_host=10.0.20.5
+vault-1 ansible_host=10.0.20.4
+vault-2 ansible_host=10.0.20.5
 traefik ansible_host=10.0.10.12
 staging ansible_host=10.0.50.21
 runners ansible_host=10.0.20.26
 
 [consul_masters]
-consul1 ansible_host=10.0.20.1
-consul2 ansible_host=10.0.20.2
-consul3 ansible_host=10.0.20.3
+consul-1 ansible_host=10.0.20.1
+consul-2 ansible_host=10.0.20.2
+consul-3 ansible_host=10.0.20.3

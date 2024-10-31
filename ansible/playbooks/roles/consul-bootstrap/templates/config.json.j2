@@ -9,7 +9,7 @@
     "enable_script_checks": false,
     "enable_local_script_checks": true,
 
-    "encrypt": "{{ consul_cluster_encrypt_key }}",
+    "encrypt": "{{ gossip.stdout }}",
     "addresses": {
     "https" : "0.0.0.0"
     },
@@ -18,19 +18,27 @@
     },
     "tls" : {
         "defaults": {
-          "ca_file": "/etc/consul.d/tls/consul-root.cer",
-          "cert_file": "/etc/consul.d/tls/consul-node.cer",
-          "key_file": "/etc/consul.d/tls/consul-node.key",
+          "ca_file": "/etc/consul.d/tls/consul-agent-ca.pem",
+          "cert_file": "/etc/consul.d/tls/consul-agent.pem",
+          "key_file": "/etc/consul.d/tls/consul-agent-key.pem",
+          "tls_min_version": "TLSv1_2",
           "verify_incoming": true,
-          "verify_outgoing": true,
-          "verify_server_hostname": true
+          "verify_outgoing": true
+        },
+        "https": {
+            "verify_incoming": false
+        },
+        "internal_rpc": {
+            "verify_incoming": true,
+            "verify_server_hostname": true
         }
     },
+    "translate_wan_addrs": false,
     "connect": {
         "enabled": true
     },
     "auto_encrypt" : {
-        "allow_tls" : true
+        "allow_tls" : false
     },
     "retry_join": [
     {%- for host in consul_ansible_bootstrap_group -%}
