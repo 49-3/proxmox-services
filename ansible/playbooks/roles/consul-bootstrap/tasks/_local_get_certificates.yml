@@ -14,7 +14,10 @@
   register: consul_agent_ca
 
 - name: Get certificate from consul-1
-  synchronize:  src={{ item }} dest={{ consul_local_tls_dir }} mode=pull
+  synchronize:
+    src: "{{ item }}"
+    dest: "{{ consul_local_tls_dir }}"
+    mode: pull
   with_items:
     - "{{ consul_config_dir }}/certs/consul-agent-ca.pem"
     - "{{ consul_config_dir }}/certs/consul-agent-ca-key.pem"

@@ -10,6 +10,7 @@ connect {
 
 # Addresses and ports
 client_addr = "127.0.0.1"
+bind_addr   = "{{ ansible_default_ipv4.address }}"
 
 addresses {
   grpc = "127.0.0.1"

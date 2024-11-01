@@ -1,0 +1,16 @@
+# -----------------------------+
+# agent-server-acl.hcl         |
+# -----------------------------+
+
+## ACL configuration
+acl = {
+  enabled = true
+  # default_policy = "allow"
+  default_policy = "deny"
+  enable_token_persistence = true
+  enable_token_replication = true
+  down_policy = "extend-cache"
+  tokens {
+    agent = "{{ consul_http_token.stdout }}"
+  }
+}

@@ -8,13 +8,15 @@ node_name = "{{ ansible_hostname }}"
 server = {{ (consul_mode == 'server')|lower }}
 bootstrap_expect = 3
 
+encrypt = "{{ gossip.stdout }}"
+
 # Data Persistence
 data_dir = "{{ consul_data_dir }}/data"
 
 # Logging
 log_level = "DEBUG"
 enable_syslog = true
-log_json = true
+log_json = false
 
 ## Disable script checks
 enable_script_checks = false

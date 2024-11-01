@@ -1,0 +1,82 @@
+---
+- name: Install yq
+  ansible.builtin.apt:
+    pkg:
+      - yq
+    state: present
+
+- name: Check if acl-token-bootstrap.json exist
+  stat:
+    path: "{{ consul_config_dir }}/acl-token-bootstrap.json"
+  register: acl_token_bootstrap
+  when: inventory_hostname == "consul-1"
+  changed_when: not acl_token_bootstrap.stat.exists
+
+- name: Bootstrap consul Acls
+  shell: consul acl bootstrap --format json > {{ consul_config_dir }}/acl-token-bootstrap.json
+  args:
+    executable: /bin/bash
+    chdir: "{{ consul_config_dir }}"
+  when:
+    - inventory_hostname == "consul-1"
+    - not acl_token_bootstrap.stat.exists
+  retries: 3
+  delay: 3
+  run_once: true
+  register: result
+  until: result.rc == 0
+  changed_when: result.rc != 0
+
+- name: Get CONSUL_HTTP_TOKEN
+  shell: |
+    set -o pipefail
+    cat {{ consul_config_dir }}/acl-token-bootstrap.json | jq -r ".SecretID"
+  args:
+    executable: /bin/bash
+  register: consul_http_token
+  when: inventory_hostname == "consul-1"
+  run_once: true
+  changed_when: consul_http_token.rc != 0
+  become: no
+
+- name: Download acl-token-bootstrap.json from consul-1
+  synchronize:
+    src: "{{ item }}"
+    dest: "{{ secrets_dir }}/consul"
+    mode: pull
+  with_items:
+    - "{{ consul_config_dir }}/acl-token-bootstrap.json"
+  when: inventory_hostname == "consul-1"
+
+- name: Remove agent-server-acl.hcl
+  ansible.builtin.file:
+    path: "{{ consul_config_dir }}/agent-server-acl.hcl"
+    state: absent
+
+- name: Remove agent-client-acl.hc
+  ansible.builtin.file:
+    path: "{{ consul_config_dir }}/agent-client-acl.hc"
+    state: absent
+
+- name: Generate agent-server-acl.hcl with token configuration
+  template:
+    src: "{{ consul_mode }}/agent-server-acl-token.hcl.j2"
+    dest: "{{ consul_config_dir }}/agent-server-acl.hcl"
+    owner: root
+    group: "{{ consul_user_name }}"
+    mode: 0640
+  when: consul_mode == "server"
+
+- name: Generate agent-client-acl.hcl with token configuration
+  template:
+    src: "{{ consul_mode }}/agent-client-acl-token.hcl.j2"
+    dest: "{{ consul_config_dir }}/agent-client-acl.hcl"
+    owner: root
+    group: "{{ consul_user_name }}"
+    mode: 0640
+  when: consul_mode == "node"
+
+# - name: Remove Acl-token-bootstrap.json
+#   ansible.builtin.file:
+#     path: "{{ consul_config_dir }}/acl-token-bootstrap.json"
+#     state: absent

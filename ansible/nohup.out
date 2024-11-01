@@ -1,0 +1,22 @@
+Loading config
+Validating config
+MySQL semaphore@127.0.0.1:3306 semaphore
+Tmp Path (projects home) /home/evil/proxmox-services
+Semaphore 2.10.35-a71a3c5-1730103563
+Interface 
+Port :3000
+Server is running
+
+time="2024-10-31T17:44:45Z" level=error msg="websocket: close sent" fields.level=Error
+time="2024-10-31T17:44:45Z" level=error msg="close tcp 10.0.20.77:3000->10.0.10.12:47966: use of closed network connection" fields.level=Error
+
+time="2024-10-31T17:45:50Z" level=error msg="websocket: close sent" fields.level=Error
+time="2024-10-31T17:45:50Z" level=error msg="close tcp 10.0.20.77:3000->10.0.10.12:50844: use of closed network connection" fields.level=Error
+
+time="2024-10-31T17:46:37Z" level=error msg="websocket: close sent" fields.level=Error
+time="2024-10-31T17:46:37Z" level=error msg="close tcp 10.0.20.77:3000->10.0.10.12:39088: use of closed network connection" fields.level=Error
+[mysql] 2024/11/01 22:13:14 packets.go:122: closing bad idle connection: connection reset by peer
+[mysql] 2024/11/01 22:13:14 packets.go:122: closing bad idle connection: connection reset by peer
+
+time="2024-11-01T22:26:57Z" level=error msg="websocket: close sent" fields.level=Error
+time="2024-11-01T22:26:57Z" level=error msg="close tcp 10.0.20.77:3000->10.0.10.12:59718: use of closed network connection" fields.level=Error
