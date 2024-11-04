@@ -4,6 +4,10 @@
     name: "unzip"
     state: present
 
+- name: Stat promtail_binari_old_name
+  stat: path={{ consul_binary_path }}
+  register: consul_stat
+
 - name: Create cache directory for download
   file:
     path: "{{ consul_cache_dir }}"
@@ -16,6 +20,7 @@
     dest: "{{ consul_archive_dest }}"
     checksum: "sha256:{{ consul_archive_sum }}"
     mode: 0750
+  when: not consul_stat.stat.exists
 
 - name: Unarchive
   unarchive:
@@ -23,6 +28,7 @@
     dest: "{{ consul_binary_basedir }}"
     creates: "{{ consul_binary_path }}"
     remote_src: yes
+  when: not consul_stat.stat.exists
 
 - name: Set rights on consul binary
   file:
@@ -35,3 +41,4 @@
   ansible.builtin.file:
     path: "{{ consul_archive_dest }}"
     state: absent
+  when: not consul_stat.stat.exists

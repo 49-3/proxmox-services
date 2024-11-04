@@ -7,8 +7,6 @@
     mode: 0640
   notify: Restart consul
 
-  
-
 - name: Generate systemd service
   template:
     src: "{{ consul_mode }}/systemd.service.j2"
@@ -40,6 +38,3 @@
     name: "{{ consul_user_name }}"
     state: started
     enabled: yes
-
-- name: Bootstrap acls
-  include_tasks: "_bootstrap_acls.yml"

@@ -5,6 +5,6 @@ acl {
   default_policy = "deny"
   enable_token_persistence = true
   tokens {
-    agent = "{{ consul_http_token.stdout }}"
+    agent = "{{ hostvars[inventory_hostname]['agent_token_fact'] }}"
   }
 }

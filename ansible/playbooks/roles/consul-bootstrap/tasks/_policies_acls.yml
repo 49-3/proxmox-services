@@ -1,0 +1,101 @@
+---
+- name: Upload agents-policy to consul-1
+  copy:
+    src: "agents-policy.hcl"
+    dest: "{{ consul_config_dir }}/policies/"
+    mode: 0640
+    owner: "root"
+    group: "{{ consul_user_name }}"
+  when: inventory_hostname == "consul-1"
+
+- name: Check if agents-policy already created
+  shell: consul acl policy list | grep agents-policy | wc -l
+  args:
+    executable: /bin/bash
+  when:
+    - inventory_hostname == "consul-1"
+  register: agents_policy_allready_created
+  changed_when: false
+  become: no
+
+- name: Create Agents policie
+  shell: consul acl policy create -name agents-policy -description 'Agent policy' -rules @agents-policy.hcl
+  args:
+    executable: /bin/bash
+    chdir: "{{ consul_config_dir }}/policies/"
+  when:
+    - inventory_hostname == "consul-1"
+    - agents_policy_allready_created == "0"
+  changed_when: false
+  become: no
+
+- name: Get agent tokens
+  shell: |
+    set -o pipefail
+    consul acl token create -description "Token for Agents" -policy-name agents-policy --format json > {{ consul_config_dir }}/tokens/agent-token.json
+  args:
+    executable: /bin/bash
+  register: consul_agent_token
+
+- name: Get agent token from json file
+  shell:
+    cat {{ consul_config_dir }}/tokens/agent-token.json | jq -r ".SecretID"
+  args:
+    executable: /bin/bash
+  register: consul_agent_secretid
+  changed_when: consul_agent_secretid.rc != 0
+  become: no
+
+- name: Prepare the agent token fact
+  set_fact:
+    agent_token_fact: "{{ consul_agent_secretid.stdout }}"
+
+- name: Remove /etc/environment file
+  ansible.builtin.file:
+    path: "/etc/environment"
+    state: absent
+
+- name: Set http_token on each environment with agent token
+  template:
+    src: agent-environment.j2
+    dest: /etc/environment
+  when: consul_agent_secretid.stdout is defined
+
+- name: Set agent_token on all
+  shell: |
+    set -o pipefail
+    consul acl set-agent-token agent {{ agent_token_fact }}
+  args:
+    executable: /bin/bash
+
+- name: Remove agent-server-acl.hcl
+  ansible.builtin.file:
+    path: "{{ consul_config_dir }}/agent-server-acl.hcl"
+    state: absent
+  when: consul_mode == "server"
+
+- name: Remove agent-client-acl.hc
+  ansible.builtin.file:
+    path: "{{ consul_config_dir }}/agent-client-acl.hc"
+    state: absent
+  when: consul_mode == "node"
+
+- name: Generate agent-server-acl.hcl with token configuration
+  template:
+    src: "{{ consul_mode }}/agent-server-acl-token.hcl.j2"
+    dest: "{{ consul_config_dir }}/agent-server-acl.hcl"
+    owner: root
+    group: "{{ consul_user_name }}"
+    mode: 0640
+  when: consul_mode == "server"
+  notify: Restart consul
+
+- name: Generate agent-client-acl.hcl with token configuration
+  template:
+    src: "{{ consul_mode }}/agent-client-acl-token.hcl.j2"
+    dest: "{{ consul_config_dir }}/agent-client-acl.hcl"
+    owner: root
+    group: "{{ consul_user_name }}"
+    mode: 0640
+  when: consul_mode == "node"
+  notify: Restart consul

@@ -1,10 +1,16 @@
-[alls]
+[promtails]
+; loki ansible_host=10.0.30.22  => to be installed on loki playbook or not ??
 consul-1 ansible_host=10.0.20.1
 consul-2 ansible_host=10.0.20.2
 consul-3 ansible_host=10.0.20.3
 vault-1 ansible_host=10.0.20.4
 vault-2 ansible_host=10.0.20.5
 traefik ansible_host=10.0.10.12
+teleport ansible_host=10.0.10.10
+grafana ansible_host=10.0.30.20
+prometheus ansible_host=10.0.30.21
+alertmanager ansible_host=10.0.30.23
+influxdb ansible_host=10.0.30.24
 runners ansible_host=10.0.20.26
 staging ansible_host=10.0.50.21
 
@@ -29,6 +35,12 @@ vault-2 ansible_host=10.0.20.5
 vault-1 ansible_host=10.0.20.4
 vault-2 ansible_host=10.0.20.5
 traefik ansible_host=10.0.10.12
+teleport ansible_host=10.0.10.10
+grafana ansible_host=10.0.30.20
+prometheus ansible_host=10.0.30.21
+loki ansible_host=10.0.30.22
+alertmanager ansible_host=10.0.30.23
+influxdb ansible_host=10.0.30.24
 staging ansible_host=10.0.50.21
 runners ansible_host=10.0.20.26
 

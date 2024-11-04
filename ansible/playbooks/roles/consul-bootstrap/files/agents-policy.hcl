@@ -28,7 +28,7 @@ service "consul" {
     policy = "write"
 }
 
-agent_prefix "consul-server-" {
+agent_prefix "consul-" {
     policy = "write"
 }
 

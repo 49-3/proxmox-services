@@ -1,6 +1,6 @@
 ---
 - name: Install and configure promtail for systemd logs
-  hosts: alls
+  hosts: promtails
   become: yes
 
   roles:

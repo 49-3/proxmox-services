@@ -2,7 +2,7 @@
 api:
   dashboard: true # Optional can be disabled
   insecure: true # Optional can be disabled
-  debug: false # Optional can be Enabled if needed for troubleshooting 
+  debug: false # Optional can be Enabled if needed for troubleshooting
 entryPoints:
   web:
     address: ":80"
@@ -29,6 +29,9 @@ providers:
   file:
     directory: /etc/traefik/config
     watch: true
+  consulcatalog:
+    prefix: "traefik"
+
 certificatesResolvers:
   dns-cloudflare:
     acme:

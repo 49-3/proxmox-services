@@ -8,8 +8,6 @@ node_name = "{{ ansible_hostname }}"
 server = {{ (consul_mode == 'server')|lower }}
 bootstrap_expect = 3
 
-encrypt = "{{ gossip.stdout }}"
-
 # Data Persistence
 data_dir = "{{ consul_data_dir }}/data"
 

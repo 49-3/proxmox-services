@@ -1,0 +1,63 @@
+---
+- name: Bootstrap consul Acls
+  shell: consul acl bootstrap --format json > {{ consul_config_dir }}/tokens/acl-token-bootstrap.json
+  args:
+    executable: /bin/bash
+    chdir: "{{ consul_config_dir }}/tokens"
+  when:
+    - inventory_hostname == "consul-1"
+  retries: 3
+  delay: 3
+  run_once: true
+  register: result
+  until: result.rc == 0
+  changed_when: result.rc == 0
+
+- name: Get CONSUL_HTTP_TOKEN
+  shell: |
+    set -o pipefail
+    cat {{ consul_config_dir }}/tokens/acl-token-bootstrap.json | jq -r ".SecretID"
+  args:
+    executable: /bin/bash
+  register: consul_http_token
+  when:
+    - inventory_hostname == "consul-1"
+  run_once: true
+  changed_when: consul_http_token.rc != 0
+  become: no
+
+- name: Download acl-token-bootstrap.json from consul-1
+  synchronize:
+    src: "{{ item }}"
+    dest: "{{ secrets_dir }}/consul"
+    mode: pull
+  with_items:
+    - "{{ consul_config_dir }}/tokens/acl-token-bootstrap.json"
+  when:
+    - inventory_hostname == "consul-1"
+  run_once: true
+
+- name: Remove Acl-token-bootstrap.json
+  ansible.builtin.file:
+    path: "{{ consul_config_dir }}/acl-token-bootstrap.json"
+    state: absent
+  when:
+    - inventory_hostname == "consul-1"
+
+- name: Set consul_http_token of consul-1 as fact
+  set_fact: consul_http_token_fact="{{ consul_http_token.stdout }}"
+  when: inventory_hostname == "consul-1"
+
+- debug: msg="http_token_fact = {{ hostvars['consul-1']['consul_http_token_fact'] }}"
+  when:
+    - inventory_hostname == "consul-1"
+
+- name: Remove /etc/environment file
+  ansible.builtin.file:
+    path: "/etc/environment"
+    state: absent
+
+- name: Set http_token on each environment with global token
+  template:
+    src: global-environment.j2
+    dest: /etc/environment

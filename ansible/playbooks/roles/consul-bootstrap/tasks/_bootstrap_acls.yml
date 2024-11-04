@@ -5,78 +5,55 @@
       - yq
     state: present
 
-- name: Check if acl-token-bootstrap.json exist
-  stat:
-    path: "{{ consul_config_dir }}/acl-token-bootstrap.json"
-  register: acl_token_bootstrap
-  when: inventory_hostname == "consul-1"
-  changed_when: not acl_token_bootstrap.stat.exists
-
-- name: Bootstrap consul Acls
-  shell: consul acl bootstrap --format json > {{ consul_config_dir }}/acl-token-bootstrap.json
+- name: Check if already Bootstraped
+  shell: cat /etc/environment | grep "CONSUL_HTTP_TOKEN" | wc -l
   args:
     executable: /bin/bash
-    chdir: "{{ consul_config_dir }}"
   when:
     - inventory_hostname == "consul-1"
-    - not acl_token_bootstrap.stat.exists
-  retries: 3
-  delay: 3
-  run_once: true
-  register: result
-  until: result.rc == 0
-  changed_when: result.rc != 0
-
-- name: Get CONSUL_HTTP_TOKEN
-  shell: |
-    set -o pipefail
-    cat {{ consul_config_dir }}/acl-token-bootstrap.json | jq -r ".SecretID"
-  args:
-    executable: /bin/bash
-  register: consul_http_token
-  when: inventory_hostname == "consul-1"
-  run_once: true
-  changed_when: consul_http_token.rc != 0
+  register: allready_bootstraped
+  changed_when: false
   become: no
 
-- name: Download acl-token-bootstrap.json from consul-1
-  synchronize:
-    src: "{{ item }}"
-    dest: "{{ secrets_dir }}/consul"
-    mode: pull
-  with_items:
-    - "{{ consul_config_dir }}/acl-token-bootstrap.json"
+- debug: msg="allready_bootstraped = {{ allready_bootstraped.stdout }}"
+  when:
+      - inventory_hostname == "consul-1"
+
+- name: Call _bootstrap_acls_first_time
+  include_tasks: "_bootstrap_acls_first_time.yml"
+  when:
+    - allready_bootstraped.stdout == "0"
+  run_once: true
+
+
+- name: Get consul_http_tocken from env when already bootstraped
+  shell: echo $CONSUL_HTTP_TOKEN
+  register: consul_http_token
+  when:
+    - inventory_hostname == "consul-1"
+    - allready_bootstraped.stdout == "1"
+
+- debug: msg="http_token = {{ consul_http_token.stdout }}"
+  when:
+      - inventory_hostname == "consul-1"
+
+- name: Set consul_http_token of consul-1 as fact
+  set_fact: consul_http_token_fact="{{ consul_http_token.stdout }}"
   when: inventory_hostname == "consul-1"
 
-- name: Remove agent-server-acl.hcl
+- debug: msg="http_token_fact = {{ hostvars['consul-1']['consul_http_token_fact'] }}"
+  when:
+    - inventory_hostname == "consul-1"
+
+- name: Remove /etc/environment file
   ansible.builtin.file:
-    path: "{{ consul_config_dir }}/agent-server-acl.hcl"
+    path: "/etc/environment"
     state: absent
 
-- name: Remove agent-client-acl.hc
-  ansible.builtin.file:
-    path: "{{ consul_config_dir }}/agent-client-acl.hc"
-    state: absent
-
-- name: Generate agent-server-acl.hcl with token configuration
+- name: Set http_token on each environment with global token
   template:
-    src: "{{ consul_mode }}/agent-server-acl-token.hcl.j2"
-    dest: "{{ consul_config_dir }}/agent-server-acl.hcl"
-    owner: root
-    group: "{{ consul_user_name }}"
-    mode: 0640
-  when: consul_mode == "server"
+    src: global-environment.j2
+    dest: /etc/environment
 
-- name: Generate agent-client-acl.hcl with token configuration
-  template:
-    src: "{{ consul_mode }}/agent-client-acl-token.hcl.j2"
-    dest: "{{ consul_config_dir }}/agent-client-acl.hcl"
-    owner: root
-    group: "{{ consul_user_name }}"
-    mode: 0640
-  when: consul_mode == "node"
-
-# - name: Remove Acl-token-bootstrap.json
-#   ansible.builtin.file:
-#     path: "{{ consul_config_dir }}/acl-token-bootstrap.json"
-#     state: absent
+- name: Call _policies_acls.yml
+  include_tasks: "_policies_acls.yml"
