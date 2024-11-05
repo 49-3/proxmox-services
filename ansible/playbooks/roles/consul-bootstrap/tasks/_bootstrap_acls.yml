@@ -18,6 +18,7 @@
 - debug: msg="allready_bootstraped = {{ allready_bootstraped.stdout }}"
   when:
       - inventory_hostname == "consul-1"
+      - allready_bootstraped.stdout == "1"
 
 - name: Call _bootstrap_acls_first_time
   include_tasks: "_bootstrap_acls_first_time.yml"
@@ -25,15 +26,13 @@
     - allready_bootstraped.stdout == "0"
   run_once: true
 
-
-- name: Get consul_http_tocken from env when already bootstraped
-  shell: echo $CONSUL_HTTP_TOKEN
+- name: Get consul_http_token from /etc/environment
+  shell: cat /etc/environment | grep "CONSUL_HTTP_TOKEN" | cut -d '=' -f 2
   register: consul_http_token
   when:
     - inventory_hostname == "consul-1"
-    - allready_bootstraped.stdout == "1"
 
-- debug: msg="http_token = {{ consul_http_token.stdout }}"
+- debug: msg="http_token from env = {{ consul_http_token.stdout }}"
   when:
       - inventory_hostname == "consul-1"
 
@@ -54,6 +53,3 @@
   template:
     src: global-environment.j2
     dest: /etc/environment
-
-- name: Call _policies_acls.yml
-  include_tasks: "_policies_acls.yml"

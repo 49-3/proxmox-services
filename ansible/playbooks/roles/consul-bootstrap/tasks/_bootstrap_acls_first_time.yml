@@ -56,8 +56,12 @@
   ansible.builtin.file:
     path: "/etc/environment"
     state: absent
+  when:
+    - inventory_hostname == "consul-1"
 
-- name: Set http_token on each environment with global token
+- name: Set http_token on consul-1 environment with global token
   template:
     src: global-environment.j2
     dest: /etc/environment
+  when:
+    - inventory_hostname == "consul-1"

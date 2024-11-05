@@ -9,7 +9,9 @@
   when: inventory_hostname == "consul-1"
 
 - name: Check if agents-policy already created
-  shell: consul acl policy list | grep agents-policy | wc -l
+  shell: |
+    while read -r line; do export "$line"; done < /etc/environment
+    consul acl policy list | grep agents-policy | wc -l
   args:
     executable: /bin/bash
   when:
@@ -19,19 +21,22 @@
   become: no
 
 - name: Create Agents policie
-  shell: consul acl policy create -name agents-policy -description 'Agent policy' -rules @agents-policy.hcl
+  shell: |
+    while read -r line; do export "$line"; done < /etc/environment
+    consul acl policy create -name agents-policy -description 'Agent policy' -rules @agents-policy.hcl
   args:
     executable: /bin/bash
     chdir: "{{ consul_config_dir }}/policies/"
   when:
     - inventory_hostname == "consul-1"
-    - agents_policy_allready_created == "0"
+    - agents_policy_allready_created.stdout == "0"
   changed_when: false
   become: no
 
 - name: Get agent tokens
   shell: |
     set -o pipefail
+    while read -r line; do export "$line"; done < /etc/environment
     consul acl token create -description "Token for Agents" -policy-name agents-policy --format json > {{ consul_config_dir }}/tokens/agent-token.json
   args:
     executable: /bin/bash
@@ -64,6 +69,7 @@
 - name: Set agent_token on all
   shell: |
     set -o pipefail
+    while read -r line; do export "$line"; done < /etc/environment
     consul acl set-agent-token agent {{ agent_token_fact }}
   args:
     executable: /bin/bash

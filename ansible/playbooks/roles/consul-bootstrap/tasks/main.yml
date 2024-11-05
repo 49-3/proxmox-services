@@ -26,5 +26,8 @@
 - name: Bootstrap acls
   include_tasks: "_bootstrap_acls.yml"
 
+- name: Call _policies_acls.yml
+  include_tasks: "_policies_acls.yml"
+
 - name: Flush handlers
   meta: flush_handlers

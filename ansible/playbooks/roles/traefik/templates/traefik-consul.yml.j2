@@ -29,6 +29,12 @@ providers:
   file:
     directory: /etc/traefik/config
     watch: true
+  consulcatalog:
+    refreshInterval: "10s"
+    endpoint:
+      address: "{{ consul_addr }}"
+      token: "{{ consul_http_token.stdout }}"
+
 certificatesResolvers:
   dns-cloudflare:
     acme:

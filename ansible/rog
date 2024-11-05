@@ -1,0 +1,37 @@
+[promtails]
+; loki ansible_host=10.0.30.22  => to be installed on loki playbook or not ??
+consul-1 ansible_host=192.168.1.161
+consul-2 ansible_host=192.168.1.162
+consul-3 ansible_host=192.168.1.163
+vault-1 ansible_host=192.168.1.164
+vault-2 ansible_host=192.168.1.165
+; runners ansible_host=192.168.1.166
+; staging ansible_host=192.168.1.167
+
+[k3ds]
+; runners ansible_host=192.168.1.166
+; staging ansible_host=192.168.1.167
+
+; [runners]
+; runners ansible_host=192.168.1.166
+
+; [staging]
+; staging ansible_host=192.168.1.167
+
+[traefik]
+traefik ansible_host=192.168.1.170
+
+[vaults]
+vault-1 ansible_host=192.168.1.164
+vault-2 ansible_host=192.168.1.165
+
+[consul_nodes]
+vault-1 ansible_host=192.168.1.164
+vault-2 ansible_host=192.168.1.165
+; runners ansible_host=192.168.1.166
+; staging ansible_host=192.168.1.167
+
+[consul_masters]
+consul-1 ansible_host=192.168.1.161
+consul-2 ansible_host=192.168.1.162
+consul-3 ansible_host=192.168.1.163

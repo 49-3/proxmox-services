@@ -1,6 +1,8 @@
 ---
 - name: Include my vars
-  ansible.builtin.include_vars: /home/evil/proxmox-services/ansible/host_vars/ansible_vars.yml
+  ansible.builtin.include_vars:
+    dir: /home/n43/Documents/proxmox-services/ansible/host_vars/
+    depth: 1
 
 - name: Install Traefik
   ansible.builtin.unarchive:
@@ -55,11 +57,39 @@
   notify:
     - Restart Traefik
 
-- name: Create Traefik config file
+- name: Check if consul_http_token is here
+  shell: cat /etc/environment | grep "CONSUL_HTTP_TOKEN" | wc -l
+  args:
+    executable: /bin/bash
+  register: consul_http_token_exist
+  changed_when: false
+  become: no
+
+- debug: msg="consul_http_token exist = {{ consul_http_token_exist.stdout }}"
+  when:
+      - consul_http_token_exist.stdout == "1"
+
+- name: Create Traefik config file whitout consul
   ansible.builtin.template:
     src: traefik.yml.j2
     dest: /etc/traefik/traefik.yml
     mode: "0644"
+  when:
+    - consul_http_token_exist.stdout == "0"
+  notify:
+    - Restart Traefik
+
+- name: Get consul_http_token from /etc/environment
+  shell: cat /etc/environment | grep "CONSUL_HTTP_TOKEN" | cut -d '=' -f 2
+  register: consul_http_token
+
+- name: Create Traefik config file with consul
+  ansible.builtin.template:
+    src: traefik-consul.yml.j2
+    dest: /etc/traefik/traefik.yml
+    mode: "0644"
+  when:
+    - consul_http_token_exist.stdout == "1"
   notify:
     - Restart Traefik
 
