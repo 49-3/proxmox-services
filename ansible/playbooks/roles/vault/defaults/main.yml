@@ -7,7 +7,7 @@ enterprise: false
 
 # unseal keys options
 key_amount: '3'
-key_min_to_unseal: '1'
+key_min_to_unseal: '3' # must be greater than one for multiple shares
 
 vault_privileged_install: false
 
