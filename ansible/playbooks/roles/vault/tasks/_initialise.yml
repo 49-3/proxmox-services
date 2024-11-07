@@ -86,6 +86,9 @@
   template:
     src: environment.j2
     dest: /etc/environment
+  changed_when: false
+  ignore_errors: true
+  check_mode: false
   when:
     - not vault_init_file.stat.exists | bool
   tags:

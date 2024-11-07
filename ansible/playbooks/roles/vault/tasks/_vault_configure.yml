@@ -20,8 +20,6 @@
 
 - name: Call _get_envs
   include_tasks: "_get_envs.yml"
-  when:
-    - vault_mode == "server"
 
 - name: Templating out Vault configuration
   ansible.builtin.template:
