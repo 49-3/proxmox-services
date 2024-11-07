@@ -1,0 +1,80 @@
+---
+- name: Get vault_token
+  shell: |
+    cat /etc/environment | grep VAULT_TOKEN | cut -d '=' -f2
+  args:
+    executable: /bin/bash
+  register: vault_token
+  tags:
+    - unseal_vault
+
+- name: Set vault_token as fact
+  set_fact: vault_token_fact="{{ vault_token.stdout }}"
+  tags:
+    - unseal_vault
+
+- name: check vault_token
+  debug:
+    msg: "VAULT_TOKEN={{ hostvars[inventory_hostname]['vault_token_fact'] }}"
+  tags:
+    - unseal_vault
+
+- name: Get vault_addr
+  shell: |
+    cat /etc/environment | grep VAULT_ADDR | cut -d '=' -f2
+  args:
+    executable: /bin/bash
+  register: vault_addr
+  tags:
+    - unseal_vault
+
+- name: Set vault_addr as fact
+  set_fact: vault_addr_fact="{{ vault_addr.stdout }}"
+  tags:
+    - unseal_vault
+
+- name: check vault_addr
+  debug:
+    msg: "VAULT_ADDR={{ hostvars[inventory_hostname]['vault_addr_fact'] }}"
+  tags:
+    - unseal_vault
+
+- name: Get consul_http_token
+  shell: |
+    cat /etc/environment | grep CONSUL_HTTP_TOKEN | cut -d '=' -f2
+  args:
+    executable: /bin/bash
+  register: consul_http_token
+  tags:
+    - unseal_vault
+
+- name: Set consul_http_token as fact
+  set_fact: consul_http_token_fact="{{ consul_http_token.stdout }}"
+  tags:
+    - unseal_vault
+
+- name: check vault_token
+  debug:
+    msg: "CONSUL_HTTP_TOKEN={{ hostvars[inventory_hostname]['consul_http_token_fact'] }}"
+  tags:
+    - unseal_vault
+
+- name: Get consul_http_addr
+  shell: |
+    cat /etc/environment | grep CONSUL_HTTP_ADDR | cut -d '=' -f2
+  args:
+    executable: /bin/bash
+  register: consul_http_addr
+  tags:
+    - unseal_vault
+
+- name: Set consul_http_addr as fact
+  set_fact: consul_http_addr_fact="{{ consul_http_addr.stdout }}"
+  tags:
+    - unseal_vault
+
+- name: check consul_http_addr
+  debug:
+    msg: "CONSUL_HTTP_ADDR={{ hostvars[inventory_hostname]['consul_http_addr_fact'] }}"
+  tags:
+    - unseal_vault

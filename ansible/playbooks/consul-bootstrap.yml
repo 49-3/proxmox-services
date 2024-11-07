@@ -1,10 +1,10 @@
 ---
 - name: Install and configure Consul
-  hosts: all
+  hosts: alls
   become: yes
   vars:
     consul_ansible_master_group_name: "consul_masters"
-    secrets_dir: "/home/n43/Documents/proxmox-services/secret"
+    secrets_dir: "/root/secret"
     consul_ca_info:
       C: "FR"
       ST: "LORRAINE"
@@ -12,4 +12,5 @@
       O: "splitfire"
 
   roles:
+    - common
     - consul-bootstrap

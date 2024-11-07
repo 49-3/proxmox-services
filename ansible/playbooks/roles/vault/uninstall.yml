@@ -1,0 +1,26 @@
+---
+- hosts: vault
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: stopping vault service
+      ansible.builtin.systemd:
+        name: vault
+        state: stopped
+        enabled: false
+      
+    - name: removing all Vault files and directories
+      ansible.builtin.file:
+        path: '{{ item }}'
+        state: absent
+      with_items:
+      - '/lib/systemd/system/vault.service'
+      - '{{ vault_home_directory }}'
+      - '{{ vault_data_directory }}'
+      - '{{ vault_install_directory }}/vault'
+    
+    - name: removing vault user
+      ansible.builtin.user:
+        name: '{{ vault_user }}'
+        state: absent
+        remove: yes

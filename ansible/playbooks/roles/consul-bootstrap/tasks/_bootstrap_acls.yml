@@ -1,10 +1,4 @@
 ---
-- name: Install yq
-  ansible.builtin.apt:
-    pkg:
-      - yq
-    state: present
-
 - name: Check if already Bootstraped
   shell: cat /etc/environment | grep "CONSUL_HTTP_TOKEN" | wc -l
   args:

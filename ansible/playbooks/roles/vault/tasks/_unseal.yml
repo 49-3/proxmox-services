@@ -1,0 +1,85 @@
+---
+- name: Call _get_envs
+  include_tasks: "_get_envs.yml"
+
+- name: Check Vault init.file (local)
+  stat:
+    path: "{{ secrets_dir }}/vault/init.file"
+  become: true
+  run_once: true
+  become:  "{{ vault_privileged_install }}"
+  register: vault_local_init_file
+  delegate_to: 127.0.0.1
+  tags:
+    - unseal_vault
+  when:
+  - vault_mode == "server"
+
+- name: Check Vault init.file (vault-1)
+  stat:
+    path: "{{ vault_home_directory }}/init.file"
+  register: vault_1_init_file
+  tags:
+    - unseal_vault
+  when:
+    - vault_mode == "server"
+    - inventory_hostname == "vault-1"
+
+- name: Check Vault init.file (vault-2)
+  stat:
+    path: "{{ vault_home_directory }}/init.file"
+  register: vault_2_init_file
+  tags:
+    - unseal_vault
+  when:
+    - vault_mode == "server"
+    - inventory_hostname == "vault-2"
+
+- name: Upload init.file on vault-1
+  copy:
+    src: "{{ secrets_dir }}/vault/init.file"
+    dest: "{{ vault_home_directory }}/"
+  when:
+    - vault_mode == "server"
+    - inventory_hostname == "vault-1"
+    - vault_local_init_file.stat.exists | bool
+    - not vault_1_init_file.stat.exists | bool
+  tags:
+    - unseal_vault
+
+- name: Upload init.file on vault-2
+  copy:
+    src: "{{ secrets_dir }}/vault/init.file"
+    dest: "{{ vault_home_directory }}/"
+  when:
+    - vault_mode == "server"
+    - inventory_hostname == "vault-2"
+    - vault_local_init_file.stat.exists | bool
+    - not vault_2_init_file.stat.exists | bool
+  tags:
+    - unseal_vault
+
+- name: Unseal vaults
+  shell: |
+    export VAULT_TOKEN={{ hostvars[inventory_hostname]['vault_token_fact'] }} &&
+    export VAULT_ADDR={{ hostvars[inventory_hostname]['vault_addr_fact'] }} &&
+    export CONSUL_HTTP_TOKEN={{ hostvars[inventory_hostname]['consul_http_token_fact'] }} &&
+    export CONSUL_HTTP_ADDR={{ hostvars[inventory_hostname]['consul_http_addr_fact'] }} &&
+    for i in $(cat /etc/vault.d/init.file | grep Unseal | cut -d " " -f4 | head -n 3); do vault operator unseal $i; done
+  args:
+    chdir: /etc/vault.d/
+    executable: /bin/bash
+  register: vaults_unsealed
+  tags:
+    - unseal_vault
+  when:
+    - vault_mode == "server"
+
+- name: Remove init.file
+  ansible.builtin.file:
+    path: "/etc/vault.d/init.file"
+    state: absent
+  tags:
+    - unseal_vault
+  when:
+    - vault_mode == "server"

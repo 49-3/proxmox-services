@@ -11,6 +11,12 @@
       - curl
     state: present
 
+- name: Install yq
+  ansible.builtin.apt:
+    pkg:
+      - yq
+    state: present
+    
 - name: Set SSH authorized key
   ansible.posix.authorized_key:
     user: root

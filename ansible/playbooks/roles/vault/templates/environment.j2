@@ -1,0 +1,4 @@
+CONSUL_HTTP_TOKEN={{ consul_http_token.stdout }}
+CONSUL_HTTP_ADDR={{ consul_http_addr }}:{{ consul_http_port }}
+VAULT_ADDR=http://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
+VAULT_TOKEN={{ hostvars['vault-1']['vault_token_fact'] }}

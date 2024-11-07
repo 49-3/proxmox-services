@@ -1,0 +1,72 @@
+- name: Copying Vault license file
+  ansible.builtin.copy:
+    src: '{{ vault_license_file }}'
+    dest: '{{ vault_license_directory }}/vault.hclic'
+    owner: '{{ vault_user }}'
+    group: '{{ vault_group }}'
+    mode: '0400'
+  when:
+    - vault_mode == "server"
+    - vault_license_file is defined
+
+- name: Creating Vault license file
+  ansible.builtin.copy:
+    dest: '{{ vault_license_directory }}/vault.hclic'
+    owner: '{{ vault_user }}'
+    group: '{{ vault_group }}'
+    mode: '0400'
+    content: '{{ vault_license_string }}'
+  when:
+    - vault_mode == "server"
+    - vault_license_string is defined
+
+- name: Call _get_envs
+  include_tasks: "_get_envs.yml"
+  when:
+    - vault_mode == "server"
+
+- name: Templating out Vault configuration
+  ansible.builtin.template:
+    src: vault.hcl.j2
+    dest: '{{ vault_config_file }}'
+    owner: 'root'
+    group: '{{ vault_group }}'
+    mode: '0750'
+  when:
+    - vault_mode == "server"
+  notify:
+    - Restart Vault
+
+- name: Creating service environment file
+  ansible.builtin.file:
+    path: '{{ vault_home_directory }}/vault.env'
+    owner: 'root'
+    group: '{{ vault_group }}'
+    mode: '0750'
+    state: touch
+    access_time: preserve
+    modification_time: preserve
+  when:
+    - vault_mode == "server"
+  notify:
+    - Reload Vault daemon
+
+- name: Templating out systemd script
+  ansible.builtin.template:
+    src: vault.systemd.j2
+    dest: /lib/systemd/system/vault.service
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - vault_mode == "server"
+  notify:
+    - Reload Vault daemon
+
+- name: Starting and enabling Vault
+  ansible.builtin.systemd:
+    name: vault
+    enabled: true
+    state: started
+  when:
+    - vault_mode == "server"

@@ -1,0 +1,12 @@
+.DS_Store
+.vagrant
+.ansible
+.vscode
+*.crt
+*.key
+*.retry
+*.zip
+ansible/playbooks/roles/vault/files/LICENSE*
+ansible/playbooks/roles/vault/vault*
+secret/consul
+secret/vault

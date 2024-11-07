@@ -1,0 +1,9 @@
+---
+- name: Install vault
+  hosts: alls
+  become: yes
+  vars:
+    secrets_dir: "/root/secret"
+  roles:
+    - common
+    - vault

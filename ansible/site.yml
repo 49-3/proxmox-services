@@ -1,3 +1,5 @@
 ---
 - import_playbook: ./playbooks/traefik.yml
-- import_playbook: ./playbooks/runners.yml
+- import_playbook: ./playbooks/consul-bootstrap.yml
+- import_playbook: ./playbooks/traefik.yml
+- import_playbook: ./playbooks/vault.yml

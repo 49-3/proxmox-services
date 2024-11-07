@@ -1,0 +1,1 @@
+- check la version plutot que le binaire exist pour consul et vault au moment de linstall

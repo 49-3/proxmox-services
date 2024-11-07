@@ -1,0 +1,36 @@
+---
+- name: Check if secrets_dir is defined
+  assert:
+    that:
+      - secrets_dir is defined and secrets_dir|length > 0
+    msg: "Variable 'secrets_dir' should be defined"
+
+- name: Generate vault secret dir
+  file:
+    path: "{{ secrets_dir }}/vault"
+    state: directory
+    mode: 0750
+  delegate_to: localhost
+  run_once: true
+  become: no
+
+- name: Checking input variables
+  include_tasks: _check_input.yml
+
+- name: Configure system
+  include_tasks: _os_configure.yml
+
+- name: Installing Vault via download archive
+  include_tasks: _install.yml
+
+- name: Configure Vault
+  include_tasks: _vault_configure.yml
+
+- name: Initialise Vault
+  include_tasks: _initialise.yml
+
+- name: Unseal Vault
+  include_tasks: _unseal.yml
+
+- name: Flush handlers
+  meta: flush_handlers
