@@ -2,11 +2,11 @@
 - name: Check Vault init.file (local)
   stat:
     path: "{{ secrets_dir }}/vault/init.file"
-  become: true
-  run_once: true
   become:  "{{ vault_privileged_install }}"
   register: vault_init_file
   delegate_to: 127.0.0.1
+  when:
+    - inventory_hostname == "deploy"
   tags:
     - unseal_vault
 
