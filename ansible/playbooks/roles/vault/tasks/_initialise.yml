@@ -9,7 +9,6 @@
   delegate_to: 127.0.0.1
   tags:
     - unseal_vault
-    - vault_mode == "server"
 
 - name: Initialise vault
   shell: |
@@ -79,7 +78,6 @@
     path: "/etc/environment"
     state: absent
   when:
-    - vault_mode == "server"
     - not vault_init_file.stat.exists | bool
   tags:
     - unseal_vault
@@ -89,7 +87,6 @@
     src: environment.j2
     dest: /etc/environment
   when:
-    - vault_mode == "server"
     - not vault_init_file.stat.exists | bool
   tags:
     - unseal_vault

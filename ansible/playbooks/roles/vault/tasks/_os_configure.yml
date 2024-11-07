@@ -5,7 +5,6 @@
     system: true
   when:
     - vault_create_account
-    - vault_mode == "server"
 
 - name: Creating Vault user
   ansible.builtin.user:
@@ -16,7 +15,6 @@
     system: true
   when:
     - vault_create_account
-    - vault_mode == "server"
 
 - name: Creating Vault directories
   ansible.builtin.file:
@@ -32,8 +30,6 @@
     - '{{ vault_log_dir }}'
     - '{{ vault_license_directory }}'
     - '{{ vault_data_directory }}/data'
-  when:
-    - vault_mode == "server"
 
 - name: Creating Vault plugin directory
   ansible.builtin.file:
@@ -44,4 +40,3 @@
     mode: '0750'
   when:
     - vault_enable_plugins
-    - vault_mode == "server"
