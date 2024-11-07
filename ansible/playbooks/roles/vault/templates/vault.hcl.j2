@@ -1,14 +1,14 @@
 listener "tcp" {
 {% if (vault_tls_cert_file is defined or vault_tls_cert_string is defined) and (vault_tls_key_file is defined or vault_tls_key_string is defined) %}
 {% set proto="https" %}
-  address                  = "{{ vault_client_addr.stdout }}:{{ vault_api_port }}"
+  address                  = "{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
   cluster_address          = "{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_cluster_port }}"
   tls_cert_file            = "{{ vault_tls_directory }}/vault.crt"
   tls_key_file             = "{{ vault_tls_directory }}/vault.key"
   tls_disable_client_certs = {{ vault_tls_disable_client_certs | lower }}
 {% else %}
 {% set proto="http" %}
-  address         = "{{ vault_client_addr.stdout }}:{{ vault_api_port }}"
+  address         = "{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
   cluster_address = "{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_cluster_port }}"
   tls_disable     = true
 {% endif %}
