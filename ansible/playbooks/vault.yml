@@ -3,7 +3,7 @@
   hosts: alls
   become: yes
   vars:
-    secrets_dir: "/root/secret"
+    secrets_dir: "/home/evil/secret"
   roles:
     - common
     - vault

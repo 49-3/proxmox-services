@@ -1,9 +1,4 @@
 ---
-- name: Include my vars
-  ansible.builtin.include_vars:
-    dir: /home/n43/Documents/proxmox-services/ansible/host_vars/
-    depth: 1
-
 - name: Install Traefik
   ansible.builtin.unarchive:
     src: https://github.com/traefik/traefik/releases/download/v3.2.0-rc2/traefik_v3.2.0-rc2_linux_amd64.tar.gz
