@@ -34,3 +34,4 @@
 
 - name: Flush handlers
   meta: flush_handlers
+  when: vault_mode == "server"

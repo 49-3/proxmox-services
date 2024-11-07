@@ -5,15 +5,10 @@
 - name: Check Vault init.file (local)
   stat:
     path: "{{ secrets_dir }}/vault/init.file"
-  become: true
-  run_once: true
-  become:  "{{ vault_privileged_install }}"
-  register: vault_local_init_file
   delegate_to: 127.0.0.1
+  register: vault_local_init_file
   tags:
     - unseal_vault
-  when:
-  - vault_mode == "server"
 
 - name: Check Vault init.file (vault-1)
   stat:
@@ -42,8 +37,8 @@
   when:
     - vault_mode == "server"
     - inventory_hostname == "vault-1"
-    - vault_local_init_file.stat.exists | bool
-    - not vault_1_init_file.stat.exists | bool
+    - vault_local_init_file.stat.exists
+    - not vault_1_init_file.stat.exists
   tags:
     - unseal_vault
 
@@ -54,8 +49,8 @@
   when:
     - vault_mode == "server"
     - inventory_hostname == "vault-2"
-    - vault_local_init_file.stat.exists | bool
-    - not vault_2_init_file.stat.exists | bool
+    - vault_local_init_file.stat.exists
+    - not vault_2_init_file.stat.exists
   tags:
     - unseal_vault
 
