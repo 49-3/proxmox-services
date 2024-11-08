@@ -1,109 +1,115 @@
 ---
-- name: Check Vault init.file (local)
-  stat:
-    path: "{{ secrets_dir }}/vault/init.file"
-  become:  "{{ vault_privileged_install }}"
-  register: vault_init_file
-  delegate_to: 127.0.0.1
-  when:
-    - inventory_hostname == "deploy"
-  tags:
-    - unseal_vault
+  - name: Check Vault init.file (local)
+    stat:
+      path: "{{ secrets_dir }}/vault/init.file"
+    become:  "{{ vault_privileged_install }}"
+    register: vault_init_file
+    delegate_to: 127.0.0.1
+    when:
+      - inventory_hostname == "deploy"
+    tags:
+      - unseal_vault
 
-- name: Initialise vault
-  shell: |
-    export VAULT_ADDR=http://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
-    vault operator init -key-shares={{ key_amount }} -key-threshold={{ key_min_to_unseal }} > /etc/vault.d/init.file
-  args:
-    chdir: /etc/vault.d/
-    executable: /bin/bash
-  when:
-    - vault_mode == "server"
-    - inventory_hostname == "vault-1"
-    - not vault_init_file
-  tags:
-    - unseal_vault
+  - name: Initialise vault
+    shell: |
+      export VAULT_ADDR=http://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
+      vault operator init -key-shares={{ key_amount }} -key-threshold={{ key_min_to_unseal }} > /etc/vault.d/init.file
+    args:
+      chdir: /etc/vault.d/
+      executable: /bin/bash
+    when:
+      - vault_mode == "server"
+      - inventory_hostname == "vault-1"
+    changed_when: false
+    ignore_errors: true
+    check_mode: false
+    tags:
+      - unseal_vault
 
-- name: Get init.file from vault-1
-  synchronize:
-    src: "{{ item }}"
-    dest: "{{ secrets_dir }}/vault"
-    mode: pull
-  with_items:
-    - "/etc/vault.d/init.file"
-  when:
-    - vault_mode == "server"
-    - inventory_hostname == "vault-1"
-    - not vault_init_file
-  tags:
-    - unseal_vault
+  - name: Get init.file from vault-1
+    synchronize:
+      src: "{{ item }}"
+      dest: "{{ secrets_dir }}/vault"
+      mode: pull
+    with_items:
+      - "/etc/vault.d/init.file"
+    when:
+      - vault_mode == "server"
+      - inventory_hostname == "vault-1"
+      - not {{ hostvars['deploy']['vault_init_file.stat.exists'] }}
+    tags:
+      - unseal_vault
 
-- name: Get vault_token on vault-1
-  shell: |
-    export VAULT_ADDR=http://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
-    grep 'Initial Root Token' /etc/vault.d/init.file | cut -d ':' -f2 | tr -d ' '
-  args:
-    chdir: /etc/vault.d/
-    executable: /bin/bash
-  register: vault_token
-  when:
-    - vault_mode == "server"
-    - inventory_hostname == "vault-1"
-    - not vault_init_file
-  tags:
-    - unseal_vault
+  - name: Get vault_token on vault-1
+    shell: |
+      export VAULT_ADDR=http://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
+      grep 'Initial Root Token' /etc/vault.d/init.file | cut -d ':' -f2 | tr -d ' '
+    args:
+      chdir: /etc/vault.d/
+      executable: /bin/bash
+    register: vault_token
+    when:
+      - vault_mode == "server"
+      - inventory_hostname == "vault-1"
+      - not {{ hostvars['deploy']['vault_init_file.stat.exists'] }}
+    changed_when: false
+    ignore_errors: true
+    check_mode: false
+    tags:
+      - unseal_vault
 
-- name: Set vault_http_token as fact
-  set_fact: vault_token_fact="{{ vault_token.stdout }}"
-  when:
-    - vault_mode == "server"
-    - inventory_hostname == "vault-1"
-    - not vault_init_file
-  tags:
-    - unseal_vault
+  - name: Set vault_http_token as fact
+    set_fact: vault_token_fact="{{ vault_token.stdout }}"
+    when:
+      - vault_mode == "server"
+      - inventory_hostname == "vault-1"
+      - not {{ hostvars['deploy']['vault_init_file.stat.exists'] }}
+    changed_when: false
+    ignore_errors: true
+    check_mode: false
+    tags:
+      - unseal_vault
 
-- name: Upload init.file on vault-2
-  copy:
-    src: "{{ secrets_dir }}/vault/init.file"
-    dest: "{{ vault_home_directory }}/"
-  when:
-    - vault_mode == "server"
-    - inventory_hostname == "vault-2"
-    - not vault_init_file
-  tags:
-    - unseal_vault
+  - name: Upload init.file on vault-2
+    copy:
+      src: "{{ secrets_dir }}/vault/init.file"
+      dest: "{{ vault_home_directory }}/"
+    when:
+      - vault_mode == "server"
+      - inventory_hostname == "vault-2"
+    changed_when: false
+    ignore_errors: true
+    check_mode: false
+    tags:
+      - unseal_vault
 
-- name: Remove /etc/environment file
-  ansible.builtin.file:
-    path: "/etc/environment"
-    state: absent
-  when:
-    - not vault_init_file
-  tags:
-    - unseal_vault
+  - name: Remove /etc/environment file
+    ansible.builtin.file:
+      path: "/etc/environment"
+      state: absent
+    tags:
+      - unseal_vault
 
-- name: Flush environment with vault_token for vault servers
-  template:
-    src: environment.j2
-    dest: /etc/environment
-  changed_when: false
-  ignore_errors: true
-  check_mode: false
-  when:
-    - not vault_init_file
-    - vault_mode == "server"
-  tags:
-    - unseal_vault
+  - name: Flush environment with vault_token for vault servers
+    template:
+      src: environment.j2
+      dest: /etc/environment
+    changed_when: false
+    ignore_errors: true
+    check_mode: false
+    when:
+      - vault_mode == "server"
+    tags:
+      - unseal_vault
 
-- name: Flush environment with vault_token for vault client
-  template:
-    src: environment-clients.j2
-    dest: /etc/environment
-  changed_when: false
-  ignore_errors: true
-  check_mode: false
-  when:
-    - not vault_init_file
-    - vault_mode == "client"
-  tags:
-    - unseal_vault
+  - name: Flush environment with vault_token for vault client
+    template:
+      src: environment-clients.j2
+      dest: /etc/environment
+    changed_when: false
+    ignore_errors: true
+    check_mode: false
+    when:
+      - vault_mode == "client"
+    tags:
+      - unseal_vault
