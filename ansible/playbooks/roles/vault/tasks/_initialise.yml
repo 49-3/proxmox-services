@@ -1,115 +1,62 @@
 ---
-  - name: Check Vault init.file (local)
-    stat:
-      path: "{{ secrets_dir }}/vault/init.file"
-    become:  "{{ vault_privileged_install }}"
-    register: vault_init_file
-    delegate_to: 127.0.0.1
-    when:
-      - inventory_hostname == "deploy"
-    tags:
-      - unseal_vault
+- name: Initialiser et configurer Vault en HA
+  hosts: vault-1, vault-2
+  become: yes
+  tasks:
 
-  - name: Initialise vault
-    shell: |
-      export VAULT_ADDR=http://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
-      vault operator init -key-shares={{ key_amount }} -key-threshold={{ key_min_to_unseal }} > /etc/vault.d/init.file
-    args:
-      chdir: /etc/vault.d/
-      executable: /bin/bash
-    when:
-      - vault_mode == "server"
-      - inventory_hostname == "vault-1"
-    changed_when: false
-    ignore_errors: true
-    check_mode: false
-    tags:
-      - unseal_vault
+    - name: Vérifier si les clés existent déjà sur deploy
+      stat:
+        path: "{{ secret_dir }}/vault/unseal_keys.txt"
+      register: unseal_keys_exist
+      delegate_to: deploy
+      run_once: true
 
-  - name: Get init.file from vault-1
-    synchronize:
-      src: "{{ item }}"
-      dest: "{{ secrets_dir }}/vault"
-      mode: pull
-    with_items:
-      - "/etc/vault.d/init.file"
-    when:
-      - vault_mode == "server"
-      - inventory_hostname == "vault-1"
-      - not {{ hostvars['deploy']['vault_init_file.stat.exists'] }}
-    tags:
-      - unseal_vault
+    - name: Initialiser Vault sur vault-1 si les clés n'existent pas
+      shell: |
+        export VAULT_ADDR="http://localhost:8200"
+        vault operator init -key-shares={{ key_amount }} -key-threshold={{ key_min_to_unseal }} > /etc/vault.d/init.file
+      args:
+        executable: /bin/bash
+      when: not unseal_keys_exist.stat.exists and inventory_hostname == "vault-1"
+      register: init_response
+      changed_when: false
 
-  - name: Get vault_token on vault-1
-    shell: |
-      export VAULT_ADDR=http://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
-      grep 'Initial Root Token' /etc/vault.d/init.file | cut -d ':' -f2 | tr -d ' '
-    args:
-      chdir: /etc/vault.d/
-      executable: /bin/bash
-    register: vault_token
-    when:
-      - vault_mode == "server"
-      - inventory_hostname == "vault-1"
-      - not {{ hostvars['deploy']['vault_init_file.stat.exists'] }}
-    changed_when: false
-    ignore_errors: true
-    check_mode: false
-    tags:
-      - unseal_vault
+    - name: Extraire les clés et le root token sur vault-1
+      shell: |
+        grep 'Unseal Key' /etc/vault.d/init.file | awk '{print $4}' > /etc/vault.d/unseal_keys.txt
+        grep 'Initial Root Token' /etc/vault.d/init.file | awk '{print $4}' > /etc/vault.d/root_token.txt
+      when: init_response is defined and inventory_hostname == "vault-1"
+      changed_when: false
 
-  - name: Set vault_http_token as fact
-    set_fact: vault_token_fact="{{ vault_token.stdout }}"
-    when:
-      - vault_mode == "server"
-      - inventory_hostname == "vault-1"
-      - not {{ hostvars['deploy']['vault_init_file.stat.exists'] }}
-    changed_when: false
-    ignore_errors: true
-    check_mode: false
-    tags:
-      - unseal_vault
+    - name: Copier les clés vers deploy si Vault est initialisé
+      fetch:
+        src: "/etc/vault.d/unseal_keys.txt"
+        dest: "{{ secret_dir }}/vault/unseal_keys.txt"
+        flat: yes
+      when: init_response is defined and inventory_hostname == "vault-1"
+      delegate_to: deploy
 
-  - name: Upload init.file on vault-2
-    copy:
-      src: "{{ secrets_dir }}/vault/init.file"
-      dest: "{{ vault_home_directory }}/"
-    when:
-      - vault_mode == "server"
-      - inventory_hostname == "vault-2"
-    changed_when: false
-    ignore_errors: true
-    check_mode: false
-    tags:
-      - unseal_vault
+    - name: Copier le root token vers deploy
+      fetch:
+        src: "/etc/vault.d/root_token.txt"
+        dest: "{{ secret_dir }}/vault/root_token.txt"
+        flat: yes
+      when: init_response is defined and inventory_hostname == "vault-1"
+      delegate_to: deploy
 
-  - name: Remove /etc/environment file
-    ansible.builtin.file:
-      path: "/etc/environment"
-      state: absent
-    tags:
-      - unseal_vault
+    - name: Récupérer les clés depuis deploy pour initialiser vault-2
+      copy:
+        src: "{{ secret_dir }}/vault/unseal_keys.txt"
+        dest: "/etc/vault.d/unseal_keys.txt"
+      when: unseal_keys_exist.stat.exists and inventory_hostname == "vault-2"
+      delegate_to: deploy
 
-  - name: Flush environment with vault_token for vault servers
-    template:
-      src: environment.j2
-      dest: /etc/environment
-    changed_when: false
-    ignore_errors: true
-    check_mode: false
-    when:
-      - vault_mode == "server"
-    tags:
-      - unseal_vault
-
-  - name: Flush environment with vault_token for vault client
-    template:
-      src: environment-clients.j2
-      dest: /etc/environment
-    changed_when: false
-    ignore_errors: true
-    check_mode: false
-    when:
-      - vault_mode == "client"
-    tags:
-      - unseal_vault
+    - name: Déverrouiller vault-1 et vault-2 avec les clés
+      shell: |
+        export VAULT_ADDR="http://localhost:8200"
+        while read -r key; do
+          vault operator unseal "$key"
+        done < /etc/vault.d/unseal_keys.txt
+      args:
+        executable: /bin/bash
+      when: inventory_hostname in ["vault-1", "vault-2"]
