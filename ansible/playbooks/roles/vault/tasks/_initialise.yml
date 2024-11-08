@@ -20,7 +20,7 @@
   when:
     - vault_mode == "server"
     - inventory_hostname == "vault-1"
-    - not vault_init_file.stat.exists | bool
+    - not vault_init_file
   tags:
     - unseal_vault
 
@@ -34,7 +34,7 @@
   when:
     - vault_mode == "server"
     - inventory_hostname == "vault-1"
-    - not vault_init_file.stat.exists | bool
+    - not vault_init_file
   tags:
     - unseal_vault
 
@@ -49,7 +49,7 @@
   when:
     - vault_mode == "server"
     - inventory_hostname == "vault-1"
-    - not vault_init_file.stat.exists | bool
+    - not vault_init_file
   tags:
     - unseal_vault
 
@@ -58,7 +58,7 @@
   when:
     - vault_mode == "server"
     - inventory_hostname == "vault-1"
-    - not vault_init_file.stat.exists | bool
+    - not vault_init_file
   tags:
     - unseal_vault
 
@@ -69,7 +69,7 @@
   when:
     - vault_mode == "server"
     - inventory_hostname == "vault-2"
-    - not vault_init_file.stat.exists | bool
+    - not vault_init_file
   tags:
     - unseal_vault
 
@@ -78,11 +78,11 @@
     path: "/etc/environment"
     state: absent
   when:
-    - not vault_init_file.stat.exists | bool
+    - not vault_init_file
   tags:
     - unseal_vault
 
-- name: Flush environment with vault_token
+- name: Flush environment with vault_token for vault servers
   template:
     src: environment.j2
     dest: /etc/environment
@@ -90,6 +90,20 @@
   ignore_errors: true
   check_mode: false
   when:
-    - not vault_init_file.stat.exists | bool
+    - not vault_init_file
+    - vault_mode == "server"
+  tags:
+    - unseal_vault
+
+- name: Flush environment with vault_token for vault client
+  template:
+    src: environment-clients.j2
+    dest: /etc/environment
+  changed_when: false
+  ignore_errors: true
+  check_mode: false
+  when:
+    - not vault_init_file
+    - vault_mode == "client"
   tags:
     - unseal_vault
