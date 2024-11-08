@@ -13,7 +13,7 @@
 
     - name: Initialiser Vault sur vault-1 si les clés n'existent pas
       shell: |
-        export VAULT_ADDR="http://localhost:8200"
+        export VAULT_ADDR="http://{{ hostvars[vault-1]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
         vault operator init -key-shares={{ key_amount }} -key-threshold={{ key_min_to_unseal }} > /etc/vault.d/init.file
       args:
         executable: /bin/bash
@@ -53,7 +53,7 @@
 
     - name: Déverrouiller vault-1 et vault-2 avec les clés
       shell: |
-        export VAULT_ADDR="http://localhost:8200"
+        export VAULT_ADDR="http://{{ hostvars[vault-2]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
         while read -r key; do
           vault operator unseal "$key"
         done < /etc/vault.d/unseal_keys.txt

@@ -29,9 +29,9 @@
 - name: Initialise Vault
   include_tasks: _initialise.yml
 
-- name: Unseal Vault
-  include_tasks: _unseal.yml
+# - name: Unseal Vault
+#   include_tasks: _unseal.yml
 
-- name: Flush handlers
-  meta: flush_handlers
-  when: vault_mode == "server"
+# - name: Flush handlers
+#   meta: flush_handlers
+#   when: vault_mode == "server"
