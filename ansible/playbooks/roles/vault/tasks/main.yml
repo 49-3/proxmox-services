@@ -32,8 +32,11 @@
 - name: Initialise Vault
   include_tasks: _initialise.yml
 
-# - name: Unseal Vault
-#   include_tasks: _unseal.yml
+- name: Unseal Vault
+  include_tasks: _unseal.yml
+
+-name: Lock secret directory on deploy
+  include_tasks: _lock_secrets.yml
 
 # - name: Flush handlers
 #   meta: flush_handlers
