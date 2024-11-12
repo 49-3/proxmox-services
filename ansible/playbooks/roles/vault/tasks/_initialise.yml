@@ -14,6 +14,7 @@
     executable: /bin/bash
   when: not unseal_keys_exist.stat.exists and inventory_hostname == "vault-1"
   register: init_response
+  ignore_errors: true
   changed_when: false
 
 - name: Extraire les clés et le root token sur vault-1
