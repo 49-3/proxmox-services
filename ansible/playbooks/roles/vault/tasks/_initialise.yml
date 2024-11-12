@@ -8,7 +8,7 @@
 
 - name: Initialiser Vault sur vault-1 si les clés n'existent pas
   shell: |
-    export VAULT_ADDR="http://{{ hostvars[vault-1]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+    export VAULT_ADDR="http://{{ hostvars['vault-1']['ansible_' + vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
     vault operator init -key-shares={{ key_amount }} -key-threshold={{ key_min_to_unseal }} > /etc/vault.d/init.file
   args:
     executable: /bin/bash
@@ -22,6 +22,17 @@
     grep 'Initial Root Token' /etc/vault.d/init.file | awk '{print $4}' > /etc/vault.d/root_token.txt
   when: init_response is defined and inventory_hostname == "vault-1"
   changed_when: false
+
+- name: Vérifier la présence du fichier unseal_keys.txt sur vault-1
+  stat:
+    path: "/etc/vault.d/unseal_keys.txt"
+  register: unseal_keys_file
+  when: inventory_hostname == "vault-1"
+
+- name: Attendre que le fichier unseal_keys.txt soit créé
+  pause:
+    seconds: 5
+  when: not unseal_keys_file.stat.exists and inventory_hostname == "vault-1"
 
 - name: Copier les clés vers deploy si Vault est initialisé
   fetch:
