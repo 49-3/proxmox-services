@@ -1,7 +1,7 @@
 ---
 - name: Vérifier si les clés existent déjà sur deploy
   stat:
-    path: "{{ secret_dir }}/vault/unseal_keys.txt"
+    path: "{{ secrets_dir }}/vault/unseal_keys.txt"
   register: unseal_keys_exist
   delegate_to: deploy
   run_once: true
@@ -26,7 +26,7 @@
 - name: Copier les clés vers deploy si Vault est initialisé
   fetch:
     src: "/etc/vault.d/unseal_keys.txt"
-    dest: "{{ secret_dir }}/vault/unseal_keys.txt"
+    dest: "{{ secrets_dir }}/vault/unseal_keys.txt"
     flat: yes
   when: init_response is defined and inventory_hostname == "vault-1"
   delegate_to: deploy
@@ -34,14 +34,14 @@
 - name: Copier le root token vers deploy
   fetch:
     src: "/etc/vault.d/root_token.txt"
-    dest: "{{ secret_dir }}/vault/root_token.txt"
+    dest: "{{ secrets_dir }}/vault/root_token.txt"
     flat: yes
   when: init_response is defined and inventory_hostname == "vault-1"
   delegate_to: deploy
 
 - name: Récupérer les clés depuis deploy pour initialiser vault-2
   copy:
-    src: "{{ secret_dir }}/vault/unseal_keys.txt"
+    src: "{{ secrets_dir }}/vault/unseal_keys.txt"
     dest: "/etc/vault.d/unseal_keys.txt"
   when: unseal_keys_exist.stat.exists and inventory_hostname == "vault-2"
   delegate_to: deploy
