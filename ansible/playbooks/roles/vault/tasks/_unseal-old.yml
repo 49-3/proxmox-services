@@ -5,7 +5,7 @@
 - name: Check Vault init.file (local)
   stat:
     path: "{{ secrets_dir }}/vault/init.file"
-  delegate_to: 127.0.0.1
+  delegate_to: deploy
   register: vault_local_init_file
   tags:
     - unseal_vault

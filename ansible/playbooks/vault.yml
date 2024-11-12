@@ -5,5 +5,4 @@
   vars:
     secrets_dir: "/home/evil/secret"
   roles:
-    - common
     - vault
