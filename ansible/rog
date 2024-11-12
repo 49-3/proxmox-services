@@ -5,6 +5,7 @@ consul-2 ansible_host=192.168.1.162
 consul-3 ansible_host=192.168.1.163
 vault-1 ansible_host=192.168.1.164
 vault-2 ansible_host=192.168.1.165
+traefik ansible_host=192.168.1.170
 
 [promtails]
 ; loki ansible_host=10.0.30.22  => to be installed on loki playbook or not ??
@@ -13,6 +14,7 @@ consul-2 ansible_host=192.168.1.162
 consul-3 ansible_host=192.168.1.163
 vault-1 ansible_host=192.168.1.164
 vault-2 ansible_host=192.168.1.165
+traefik ansible_host=192.168.1.170
 ; runner ansible_host=192.168.1.166
 ; staging ansible_host=192.168.1.167
 

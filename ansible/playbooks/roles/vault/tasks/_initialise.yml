@@ -8,6 +8,7 @@
   register: vault1_initialized
   delegate_to: vault-1
   run_once: true
+  changed_when: false  # Cette tâche ne change pas l'état
 
 - name: Vérifier si vault-2 est initialisé
   shell: |
@@ -18,41 +19,48 @@
   register: vault2_initialized
   delegate_to: vault-2
   run_once: true
+  changed_when: false  # Cette tâche ne change pas l'état
 
 - name: Initialiser Vault sur vault-1 si nécessaire
   block:
     - name: Initialiser Vault sur vault-1
       shell: |
         export VAULT_ADDR="http://{{ hostvars['vault-1']['ansible_' + vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
-        vault operator init -key-shares={{ key_amount }} -key-threshold={{ key_min_to_unseal }} > /etc/vault.d/init.file
+        vault operator init -key-shares={{ key_amount }} -key-threshold={{ key_min_to_unseal }} > {{ vault_home_directory }}/init.file
       args:
         executable: /bin/bash
       delegate_to: vault-1
       run_once: true
+      register: vault_init_result
+      changed_when: true  # Marque un changement en cas d'initialisation réussie
+
     - name: Extraire les clés unseal dans unseal_keys.txt
       shell: |
-        grep 'Unseal Key' /etc/vault.d/init.file | awk '{print $4}' > {{ secrets_dir }}/vault/unseal_keys.txt
+        grep 'Unseal Key' {{ vault_home_directory }}/init.file | awk '{print $4}' > {{ vault_home_directory }}/unseal_keys.txt
       delegate_to: vault-1
       run_once: true
+      when: vault_init_result.changed
+
     - name: Extraire le master token dans vault_token.txt
       shell: |
-        grep 'Initial Root Token:' /etc/vault.d/init.file | awk '{print $4}' > {{ secrets_dir }}/vault/vault_token.txt
+        grep 'Initial Root Token:' {{ vault_home_directory }}/init.file | awk '{print $4}' > {{ vault_home_directory }}/vault_token.txt
       delegate_to: vault-1
       run_once: true
-  when: vault1_initialized.stdout != "true"
-  register: is_init_now
+      when: vault_init_result.changed
 
-- name: Download files from vault-1 to deploy
+  when: vault1_initialized.stdout != "true"
+
+- name: Télécharger les fichiers de vault-1 vers deploy
   synchronize:
     src: "{{ item }}"
     dest: "{{ secrets_dir }}/vault"
     mode: pull
     delegate_to: deploy
   with_items:
-    - "/etc/vault.d/init.file"
-    - "/etc/vault.d/unseal_keys.txt"
-    - "/etc/vault.d/vault_token.txt"
+    - "{{ vault_home_directory }}/init.file"
+    - "{{ vault_home_directory }}/unseal_keys.txt"
+    - "{{ vault_home_directory }}/vault_token.txt"
   when:
-    - is_init_now.changed
+    - vault_init_result is defined and vault_init_result.changed
     - inventory_hostname == "vault-1"
   run_once: true

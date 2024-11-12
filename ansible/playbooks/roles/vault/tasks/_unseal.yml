@@ -68,9 +68,9 @@
     mode: push
     delegate_to: deploy
   with_items:
-    - "{{ secrets_dir }}/etc/vault.d/init.file"
-    - "{{ secrets_dir }}/etc/vault.d/unseal_keys.txt"
-    - "{{ secrets_dir }}/etc/vault.d/vault_token.txt"
+    - "{{ secrets_dir }}/vault/init.file"
+    - "{{ secrets_dir }}/vault/unseal_keys.txt"
+    - "{{ secrets_dir }}/vault/vault_token.txt"
   when:
     - vault1_sealed.stdout == "true"
     - inventory_hostname == "vault-1"
@@ -85,9 +85,9 @@
     mode: push
     delegate_to: deploy
   with_items:
-    - "{{ secrets_dir }}/etc/vault.d/init.file"
-    - "{{ secrets_dir }}/etc/vault.d/unseal_keys.txt"
-    - "{{ secrets_dir }}/etc/vault.d/vault_token.txt"
+    - "{{ secrets_dir }}/vault/init.file"
+    - "{{ secrets_dir }}/vault/unseal_keys.txt"
+    - "{{ secrets_dir }}/vault/vault_token.txt"
   when:
     - vault2_sealed.stdout == "true"
     - inventory_hostname == "vault-2"
@@ -130,20 +130,29 @@
   run_once: true
   ignore_errors: true
 
-- name: Vérifier la copie des clés sur deploy et supprimer de vault-1 et vault-2
+- name: Supprimer de vault-1 et vault-2 les fiers c'init de vault
   block:
     - name: Supprimer les clés sur vault-1
       file:
-        path: "/etc/vault.d/unseal_keys.txt"
+        path: "{{ item }}"
         state: absent
+      with_items:
+        - "{{ vault_home_directory }}/init.file"
+        - "{{ vault_home_directory }}/unseal_keys.txt"
+        - "{{ vault_home_directory }}/vault_token.txt"
       when: vault1_unseal_keys_exist.stat.exists
       delegate_to: vault-1
+      run_once: true
 
     - name: Supprimer les clés sur vault-2
       file:
-        path: "/etc/vault.d/unseal_keys.txt"
+        path: "{{ item }}"
         state: absent
+      with_items:
+        - "{{ vault_home_directory }}/init.file"
+        - "{{ vault_home_directory }}/unseal_keys.txt"
+        - "{{ vault_home_directory }}/vault_token.txt"
       when: vault2_unseal_keys_exist.stat.exists
       delegate_to: vault-2
-
+      run_once: true
   when: deploy_unseal_keys_exist.stdout != "0"
