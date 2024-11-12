@@ -1,31 +1,33 @@
 ---
-# - name: Check if secrets_dir is defined
-#   assert:
-#     that:
-#       - secrets_dir is defined and secrets_dir|length > 0
-#     msg: "Variable 'secrets_dir' should be defined"
-#   run_once: true
+- name: Check if secrets_dir is defined
+  assert:
+    that:
+      - secrets_dir is defined and secrets_dir|length > 0
+    msg: "Variable 'secrets_dir' should be defined"
+  run_once: true
 
-# - name: Generate vault secret dir
-#   file:
-#     path: "{{ secrets_dir }}/vault"
-#     state: directory
-#     mode: 0750
-#   delegate_to: deploy
-#   run_once: true
-#   become: no
+- name: Generate vault secret dir
+  file:
+    path: "{{ secrets_dir }}/vault"
+    state: directory
+    mode: 0750
+    owner: "{{ consul_user_name }}"
+    group: "{{ consul_user_name }}"
+  delegate_to: deploy
+  run_once: true
+  become: no
 
-# - name: Checking input variables
-#   include_tasks: _check_input.yml
+- name: Checking input variables
+  include_tasks: _check_input.yml
 
-# - name: Configure system
-#   include_tasks: _os_configure.yml
+- name: Configure system
+  include_tasks: _os_configure.yml
 
-# - name: Installing Vault via download archive
-#   include_tasks: _install.yml
+- name: Installing Vault via download archive
+  include_tasks: _install.yml
 
-# - name: Configure Vault
-#   include_tasks: _vault_configure.yml
+- name: Configure Vault
+  include_tasks: _vault_configure.yml
 
 - name: Initialise Vault
   include_tasks: _initialise.yml
