@@ -39,7 +39,7 @@
   delegate_to: vault-2
   run_once: true
 
-- name: Vérifier si les clés unseal existent déjà sur deploy
+- name: Vérifier si les clés existent déjà sur deploy
   shell: |
     set -o pipefail
     cat "{{ secrets_dir }}/vault/unseal_keys.txt" 2>/dev/null | wc -l
@@ -48,43 +48,79 @@
   register: deploy_unseal_keys_exist
   delegate_to: deploy
   run_once: true
+  ignore_errors: true
 
 - name: Vérifier si les clés unseal existent sur vault-1
-  stat:
-    path: "/etc/vault.d/unseal_keys.txt"
+  shell: |
+    set -o pipefail
+    cat "{{ secrets_dir }}/vault/unseal_keys.txt" 2>/dev/null | wc -l
+  args:
+    executable: /bin/bash
   register: vault1_unseal_keys_exist
   delegate_to: vault-1
   run_once: true
+  ignore_errors: true
 
 - name: Vérifier si les clés unseal existent sur vault-2
-  stat:
-    path: "/etc/vault.d/unseal_keys.txt"
+  shell: |
+    set -o pipefail
+    cat "{{ secrets_dir }}/vault/unseal_keys.txt" 2>/dev/null | wc -l
+  args:
+    executable: /bin/bash
   register: vault2_unseal_keys_exist
   delegate_to: vault-2
   run_once: true
+  ignore_errors: true
 
-- name: Synchroniser les clés unseal si nécessaire
+- name: Initialiser Vault sur vault-1 si nécessaire
   block:
-    - name: Synchroniser les clés de vault-1 vers deploy et vault-2
-      fetch:
-        src: "/etc/vault.d/unseal_keys.txt"
-        dest: "{{ secrets_dir }}/vault/unseal_keys.txt"
-        flat: yes
-      when: vault1_unseal_keys_exist.stat.exists and not deploy_unseal_keys_exist.stdout == "0"
-      delegate_to: deploy
+    - name: Initialiser Vault sur vault-1
+      shell: |
+        export VAULT_ADDR="http://{{ hostvars['vault-1']['ansible_' + vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+        vault operator init -key-shares={{ key_amount }} -key-threshold={{ key_min_to_unseal }} > /etc/vault.d/init.file
+      args:
+        executable: /bin/bash
+      delegate_to: vault-1
+      run_once: true
+    - name: Extraire les clés unseal dans unseal_keys.txt
+      shell: |
+        grep 'Unseal Key' /etc/vault.d/init.file | awk '{print $4}' > {{ secrets_dir }}/vault/unseal_keys.txt
+      delegate_to: vault-1
+      run_once: true
 
-    - name: Synchroniser les clés de vault-2 vers deploy et vault-1
-      fetch:
-        src: "/etc/vault.d/unseal_keys.txt"
-        dest: "{{ secrets_dir }}/vault/unseal_keys.txt"
-        flat: yes
-      when: vault2_unseal_keys_exist.stat.exists and not deploy_unseal_keys_exist.stdout == "0"
-      delegate_to: deploy
+    - name: Extraire le master token dans vault_token.txt
+      shell: |
+        grep 'Initial Root Token:' /etc/vault.d/init.file | awk '{print $4}' > {{ secrets_dir }}/vault/vault_token.txt
+      delegate_to: vault-1
+      run_once: true
+  when: vault1_initialized.stdout != "true"
+
+- name: Download files from vault-1 to deploy
+  synchronize:
+    src: "{{ item }}"
+    dest: "{{ secrets_dir }}/vault"
+    mode: pull
+  with_items:
+    - "/etc/vault.d/init.file"
+    - "/etc/vault.d/unseal_keys.txt"
+    - "/etc/vault.d/vault_token.txt"
+  when:
+    - inventory_hostname == "vault-1"
+    - deploy_unseal_keys_exist.stdout == "0"
+  run_once: true
+
+
+
+
+
+  when: vault1_unseal_keys_exist.stat.exists and not deploy_unseal_keys_exist.stdout == "0"
+  when: vault2_unseal_keys_exist.stat.exists and not deploy_unseal_keys_exist.stdout == "0"
 
   when:
     - (vault1_initialized.stdout == "true" or vault2_initialized.stdout == "true")
     - (vault1_sealed.stdout == "true" or vault2_sealed.stdout == "true")
     - deploy_unseal_keys_exist.stdout == "0"
+
 
 - name: Arrêter le playbook si les clés sont manquantes
   fail:
