@@ -55,6 +55,7 @@
     src: "{{ item }}"
     dest: "{{ secrets_dir }}/vault"
     mode: pull
+    flat: yes
     delegate_to: deploy
   with_items:
     - "{{ vault_home_directory }}/init.file"
@@ -64,3 +65,4 @@
     - vault_init_result is defined and vault_init_result.changed
     - inventory_hostname == "vault-1"
   run_once: true
+  become: true
