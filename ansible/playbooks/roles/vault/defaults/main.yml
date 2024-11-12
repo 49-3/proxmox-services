@@ -5,6 +5,9 @@ use_hashicorp_repository: false
 # only supported when using the HashiCorp repository
 enterprise: false
 
+# username for owner of secrets_dir
+secrets_user_name: 'evil'
+
 # unseal keys options
 key_amount: '3'
 key_min_to_unseal: '3' # must be greater than one for multiple shares

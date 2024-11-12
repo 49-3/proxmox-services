@@ -11,8 +11,8 @@
     path: "{{ secrets_dir }}/vault"
     state: directory
     mode: 0750
-    owner: "{{ consul_user_name }}"
-    group: "{{ consul_user_name }}"
+    owner: "{{ secrets_user_name }}"
+    group: "{{ secrets_user_name }}"
   delegate_to: deploy
   run_once: true
   become: no
