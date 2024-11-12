@@ -27,12 +27,17 @@
   stat:
     path: "/etc/vault.d/unseal_keys.txt"
   register: unseal_keys_file
-  when: inventory_hostname == "vault-1"
+  delegate_to: vault-1
+  run_once: true
+  ignore_errors: true
 
 - name: Attendre que le fichier unseal_keys.txt soit créé
   pause:
     seconds: 5
-  when: not unseal_keys_file.stat.exists and inventory_hostname == "vault-1"
+  when: not unseal_keys_file.stat.exists
+  delegate_to: vault-1
+  run_once: true
+  ignore_errors: true
 
 - name: Copier les clés vers deploy si Vault est initialisé
   fetch:
