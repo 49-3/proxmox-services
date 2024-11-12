@@ -35,7 +35,7 @@
 - name: Unseal Vault
   include_tasks: _unseal.yml
 
--name: Lock secret directory on deploy
+- name: Lock secret directory on deploy
   include_tasks: _lock_secrets.yml
 
 # - name: Flush handlers
