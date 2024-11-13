@@ -55,7 +55,7 @@
 
 - name: Starting and enabling Vault
   ansible.builtin.systemd:
-    name: vault
+    name: "{{ vault_service_name }}"
     enabled: true
     state: started
   when:

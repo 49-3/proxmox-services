@@ -2,6 +2,8 @@
   shell: |
     systemctl is-active --quiet "{{ vault_service_name }}"
   register: vault_status
+  when:
+    - vault_mode == "server"
   ignore_errors: true
   become: yes
 
@@ -10,7 +12,9 @@
     name: vault
     state: restarted
     enabled: yes
-  when: vault_status.rc != 0
+  when:
+    - vault_status.rc != 0
+    - vault_mode == "server"
   become: yes
 
 - name: Unseal Vault
