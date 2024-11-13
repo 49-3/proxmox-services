@@ -1,0 +1,17 @@
+- name: Vérifier si Vault est en cours d'exécution
+  shell: |
+    systemctl is-active --quiet "{{ vault_service_name }}"
+  register: vault_status
+  ignore_errors: true
+  become: yes
+
+- name: Redémarrer Vault si le service est arrêté
+  systemd:
+    name: vault
+    state: restarted
+    enabled: yes
+  when: vault_status.rc != 0
+  become: yes
+
+- name: Unseal Vault
+  include_tasks: _unseal.yml

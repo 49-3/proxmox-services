@@ -35,3 +35,6 @@
 
 - name: Check environments
   include_tasks: _get_environments.yml
+
+- name: Restart Vaults
+  include_tasks: _restart.yml
