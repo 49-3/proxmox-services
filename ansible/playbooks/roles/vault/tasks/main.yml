@@ -6,17 +6,6 @@
     msg: "Variable 'secrets_dir' should be defined"
   run_once: true
 
-- name: Generate vault secret dir
-  file:
-    path: "{{ secrets_dir }}/vault"
-    state: directory
-    mode: 0750
-    owner: "{{ secrets_user_name }}"
-    group: "{{ secrets_user_name }}"
-  delegate_to: deploy
-  run_once: true
-  become: no
-
 - name: Checking input variables
   include_tasks: _check_input.yml
 
@@ -32,8 +21,11 @@
 - name: Initialise Vault
   include_tasks: _initialise.yml
 
-- name: Unseal Vault
-  include_tasks: _unseal.yml
+- name: Fetch secret to deploy
+  include_tasks: _local_get_secrets.yml
+
+# - name: Unseal Vault
+#   include_tasks: _unseal.yml
 
 # - name: Lock secret directory on deploy
 #   include_tasks: _lock_secrets.yml

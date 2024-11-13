@@ -7,6 +7,7 @@ enterprise: false
 
 # username for owner of secrets_dir
 secrets_user_name: 'evil'
+vault_local_dir: "{{ secrets_dir }}/vault"
 
 # unseal keys options
 key_amount: '3'

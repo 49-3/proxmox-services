@@ -49,20 +49,4 @@
       when: vault_init_result.changed
 
   when: vault1_initialized.stdout != "true"
-
-- name: Télécharger les fichiers de vault-1 vers deploy
-  synchronize:
-    src: "{{ item }}"
-    dest: "{{ secrets_dir }}/vault"
-    mode: pull
-    flat: yes
-    delegate_to: deploy
-  with_items:
-    - "{{ vault_home_directory }}/init.file"
-    - "{{ vault_home_directory }}/unseal_keys.txt"
-    - "{{ vault_home_directory }}/vault_token.txt"
-  when:
-    - vault_init_result is defined and vault_init_result.changed
-    - inventory_hostname == "vault-1"
-  run_once: true
-  become: true
+  
