@@ -30,8 +30,6 @@
     mode: '0750'
   when:
     - vault_mode == "server"
-  notify:
-    - Restart Vault
 
 - name: Creating service environment file
   ansible.builtin.file:
@@ -44,8 +42,6 @@
     modification_time: preserve
   when:
     - vault_mode == "server"
-  notify:
-    - Reload Vault daemon
 
 - name: Templating out systemd script
   ansible.builtin.template:
@@ -56,8 +52,6 @@
     mode: '0644'
   when:
     - vault_mode == "server"
-  notify:
-    - Reload Vault daemon
 
 - name: Starting and enabling Vault
   ansible.builtin.systemd:

@@ -84,9 +84,18 @@
     owner: "root"
     group: "{{ vault_group }}"
     mode: "0750"
-  notify: Restart Vault
   tags: installation
+  register: vault_installation_status
   when: installation_required
+
+- name: Start and enable Vault service
+  become: true
+  systemd:
+    name: "{{ vault_service_name }}" 
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  when: not vault_installation_status is failed
 
 - name: Cleanup (local)
   file:

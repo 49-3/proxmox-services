@@ -9,6 +9,7 @@ enterprise: false
 secrets_user_name: 'evil'
 vault_local_dir: "{{ secrets_dir }}/vault"
 
+
 # unseal keys options
 key_amount: '3'
 key_min_to_unseal: '3' # must be greater than one for multiple shares
@@ -22,6 +23,7 @@ vault_server_group: "{{ groups[vault_ansible_group] }}"
 consul_http_token: "{{ lookup('env', 'CONSUL_HTTP_TOKEN') | default('', false) }}"
 consul_http_addr: "{{ lookup('env', 'CONSUL_HTTP_ADDR') | default('', false) }}"
 
+vault_service_name: 'vault'
 vault_user: 'vault'
 vault_group: 'vault'
 vault_create_account: true
