@@ -21,7 +21,11 @@
     checksum: "sha256:{{ consul_archive_sum }}"
     mode: 0750
   when: not consul_stat.stat.exists
-
+  retries: 3         # Nombre de tentatives
+  delay: 5           # Délai entre chaque tentative en secondes
+  register: download_result
+  until: download_result is succeeded
+  
 - name: Unarchive
   unarchive:
     src: "{{ consul_archive_dest }}"
