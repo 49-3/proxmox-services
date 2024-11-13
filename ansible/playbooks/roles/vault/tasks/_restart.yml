@@ -1,3 +1,4 @@
+---
 - name: Vérifier si Vault est en cours d'exécution
   shell: |
     systemctl is-active --quiet "{{ vault_service_name }}"
@@ -13,7 +14,8 @@
     state: restarted
     enabled: yes
   when:
-    - vault_status.rc != 0
+    - vault_status is defined
+    - vault_status.rc is defined and vault_status.rc != 0
     - vault_mode == "server"
   become: yes
 
