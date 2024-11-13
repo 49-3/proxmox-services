@@ -1,0 +1,35 @@
+---
+- name: Get VAULT_TOKEN from deploy
+  shell: |
+    cat {{ vault_local_dir }}/vault_token.txt
+  args:
+    executable: /bin/bash
+  register: vault_token
+  when:
+    - inventory_hostname == "deploy"
+  run_once: true
+  changed_when: vault_token.rc != 0
+  become: yes
+
+- name: Set vault_token of deploy as fact
+  set_fact: vault_token_fact="{{ vault_token.stdout }}"
+  when: inventory_hostname == "deploy"
+
+- name: Remove /etc/environment file
+  ansible.builtin.file:
+    path: "/etc/environment"
+    state: absent
+
+- name: Set vault_token and vault_addr on servers environment
+  template:
+    src: environment-servers.j2
+    dest: /etc/environment
+  when:
+    - vault_mode == "server"
+
+- name: Set vault_token and vault_addr on clients environment
+  template:
+    src: environment-clients.j2
+    dest: /etc/environment
+  when:
+    - vault_mode == "client"

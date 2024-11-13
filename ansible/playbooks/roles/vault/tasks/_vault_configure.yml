@@ -18,8 +18,8 @@
   when:
     - vault_license_string is defined
 
-- name: Call _get_envs
-  include_tasks: "_get_envs.yml"
+- name: Call _get_environments
+  include_tasks: "_get_environments.yml"
 
 - name: Templating out Vault configuration
   ansible.builtin.template:
