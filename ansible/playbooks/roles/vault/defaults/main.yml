@@ -63,6 +63,10 @@ vault_api_port: '8200'
 vault_cluster_port: '8201'
 vault_ui_enable: true
 
+# Handlers
+vault_service_restart: false
+vault_service_reload: true
+
 # options: none, gce, azure, aws
 cloud:
   provider: 'none'

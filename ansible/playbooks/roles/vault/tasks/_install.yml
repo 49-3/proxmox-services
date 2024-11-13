@@ -76,7 +76,6 @@
     - vault_install_directory != "/usr/bin"
     - installation_required
 
-
 - name: Install Vault
   become: true
   copy:
