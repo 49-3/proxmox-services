@@ -47,6 +47,4 @@
       delegate_to: vault-1
       run_once: true
       when: vault_init_result.changed
-
   when: vault1_initialized.stdout != "true"
-  
