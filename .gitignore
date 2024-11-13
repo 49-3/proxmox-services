@@ -7,6 +7,6 @@
 *.retry
 *.zip
 ansible/playbooks/roles/vault/files/LICENSE*
-ansible/playbooks/roles/vault/files/vault*
+ansible/playbooks/roles/vault/files/vaul*
 secret/consul
 secret/vault
