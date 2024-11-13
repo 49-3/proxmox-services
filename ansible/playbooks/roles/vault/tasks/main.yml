@@ -35,7 +35,3 @@
 
 - name: Check environments
   include_tasks: _get_environments.yml
-
-- name: Flush handlers
-  meta: flush_handlers
-  when: vault_mode == "server"

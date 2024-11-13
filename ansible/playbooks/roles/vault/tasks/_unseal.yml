@@ -26,6 +26,16 @@
     - deploy_unseal_keys_exist.stdout == "0"
   run_once: true
 
+- name: Unlock secret on deploy
+  file:
+    path: "{{ secrets_dir }}"
+    owner: "{{ secrets_user_name }}"
+    recurse: true
+    group: "{{ secrets_user_name }}"
+    mode: "0700"
+  when:
+    - inventory_hostname == "deploy"
+
 - name: Upload files from deploy to vaults need unseal
   synchronize:
     src: "{{ item }}"
@@ -36,7 +46,7 @@
   when:
     - vault_sealed.stdout == "true"
     - deploy_unseal_keys_exist.stdout != "0"
-  become: true
+  become: yes
 
 - name: Déverrouiller vaults si scellé
   shell: |
