@@ -15,13 +15,13 @@ bind_addr   = "{{ ansible_default_ipv4.address }}"
 addresses {
   grpc = "127.0.0.1"
   grpc_tls = "0.0.0.0"
-  http = "0.0.0.0"
+  http = "127.0.0.1"
   https = "0.0.0.0"
   dns = "0.0.0.0"
 }
 
 ports {
-  http        = 8500
+  http        = -1
   https       = 8443
   #grpc       = 8502
   grpc        = -1
