@@ -17,7 +17,7 @@
       - yq
     state: present
 
- - name: Install systemd-resolved
+- name: Install systemd-resolved
   ansible.builtin.apt:
     pkg:
       - systemd-resolved
