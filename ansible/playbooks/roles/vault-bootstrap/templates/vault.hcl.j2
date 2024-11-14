@@ -111,6 +111,12 @@ service_registration "{{ service_registration.name }}" {
 }
 {% endif %}
 
+service_registration "consul" {
+  address = "127.0.0.1:8500"
+  service_id = "vault"
+  service_name = "vault"
+}
+
 ui            = {{ vault_ui_enable | lower }}
 disable_cache = true
 disable_mlock = true

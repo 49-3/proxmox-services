@@ -22,6 +22,7 @@
   register: audit_devices
   when: vault_mode == "server"
   changed_when: false
+  become: yes
 
 - name: Afficher les dispositifs d'audit existants
   debug:
@@ -34,12 +35,14 @@
     - audit_devices.stdout is defined
     - '"file/" in audit_devices.stdout'
     - vault_mode == "server"
+  become: yes
 
 - name: Activer le dispositif d'audit
   command: vault audit enable file file_path={{ vault_log_dir }}/{{ audit_log_file }}
   when:
     - vault_mode == "server"
   run_once: true
+  become: yes
 
 - name: Copy logrotate vault rule
   ansible.builtin.copy:
@@ -47,6 +50,7 @@
     dest: /etc/logrotate.d/
     mode: "0755"
   when: vault_mode == "server"
-
+  become: yes
+  
 - name: Restart Vaults
   include_tasks: _restart.yml

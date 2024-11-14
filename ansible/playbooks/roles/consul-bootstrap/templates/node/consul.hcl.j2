@@ -16,7 +16,7 @@ enable_syslog = true
 data_dir = "{{ consul_data_dir }}"
 
 ## Networking
-client_addr = "127.0.0.1"
+client_addr = "0.0.0.0"
 bind_addr   = "{{ ansible_default_ipv4.address }}"
 
 # Join other Consul agents
