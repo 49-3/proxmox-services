@@ -112,10 +112,10 @@ service_registration "{{ service_registration.name }}" {
 {% endif %}
 
 service_registration "consul" {
-  address = "{{ consul_http_addr }}:8500"
+  address = "{{ consul_http_addr.stdout }}:8500"
   service_id = "vault"
   service_name = "vault"
-  token = "{{ consul_http_token }}"
+  token = "{{ consul_http_token.stdout }}"
 }
 
 ui            = {{ vault_ui_enable | lower }}
