@@ -1,0 +1,14 @@
+/var/log/vault/audit.json {
+    rotate 7
+    daily
+    compress
+    delaycompress
+    missingok
+    notifempty
+    extension json
+    dateext
+    dateformat %Y-%m-%d.
+    postrotate
+        /bin/systemctl reload vault || true
+    endscript
+}

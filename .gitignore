@@ -6,7 +6,7 @@
 *.key
 *.retry
 *.zip
-ansible/playbooks/roles/vault/files/LICENSE*
-ansible/playbooks/roles/vault/files/vaul*
-secret/consul
-secret/vault
+ansible/playbooks/roles/vault-bootstrap/files/LICENSE*
+ansible/playbooks/roles/vault-bootstrap/files/vaul*
+ansible/playbooks/roles/consul-template/files/LICENSE*
+ansible/playbooks/roles/consul-template/files/consul*

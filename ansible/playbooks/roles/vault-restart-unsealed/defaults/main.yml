@@ -1,0 +1,11 @@
+---
+# defaults file for vault-restart-unsealed
+
+vault_service_name: 'vault'
+vault_api_port: '8200'
+vault_network_interface: 'ens33'
+vault_local_dir: "{{ secrets_dir }}/vault"
+secrets_user_name: 'evil'
+vault_home_directory: '/etc/vault.d'
+vault_ansible_group: 'vaults'
+vault_server_group: "{{ groups[vault_ansible_group] }}"

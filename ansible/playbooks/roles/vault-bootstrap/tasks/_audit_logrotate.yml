@@ -1,0 +1,52 @@
+---
+- name: Assurer que le fichier d'audit existe et a les bonnes permissions
+  file:
+    path: "{{ vault_log_dir }}/{{ audit_log_file }}"
+    state: touch
+    owner: "{{ vault_user}}"
+    group: "{{ vault_group}}"
+    mode: '0640'
+  when: vault_mode == "server"
+
+- name: Assurer que le répertoire /var/log a les bonnes permissions
+  file:
+    path: "{{ vault_log_dir }}"
+    state: directory
+    owner: root
+    group: "{{ vault_group}}"
+    mode: '0750'
+  when: vault_mode == "server"
+
+- name: Vérifier les dispositifs d'audit existants
+  command: vault audit list -format=json
+  register: audit_devices
+  when: vault_mode == "server"
+  changed_when: false
+
+- name: Afficher les dispositifs d'audit existants
+  debug:
+    var: audit_devices.stdout
+  when: audit_devices.stdout is defined and vault_mode == "server"
+
+- name: Désactiver le dispositif d'audit si déjà configuré
+  command: vault audit disable file
+  when:
+    - audit_devices.stdout is defined
+    - '"file/" in audit_devices.stdout'
+    - vault_mode == "server"
+
+- name: Activer le dispositif d'audit
+  command: vault audit enable file file_path={{ vault_log_dir }}/{{ audit_log_file }}
+  when:
+    - vault_mode == "server"
+  run_once: true
+
+- name: Copy logrotate vault rule
+  ansible.builtin.copy:
+    src: logrotate/vault
+    dest: /etc/logrotate.d/
+    mode: "0755"
+  when: vault_mode == "server"
+
+- name: Restart Vaults
+  include_tasks: _restart.yml

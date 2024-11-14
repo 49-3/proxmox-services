@@ -1,0 +1,4 @@
+---
+# vars file for vault-restart-unsealed
+vault_mode: >-
+  {% if inventory_hostname in vault_server_group %}server{% else %}client{% endif %}

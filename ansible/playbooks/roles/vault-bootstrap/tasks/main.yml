@@ -1,0 +1,43 @@
+---
+- name: Check if secrets_dir is defined
+  assert:
+    that:
+      - secrets_dir is defined and secrets_dir|length > 0
+    msg: "Variable 'secrets_dir' should be defined"
+  run_once: true
+
+- name: Checking input variables
+  include_tasks: _check_input.yml
+
+- name: Configure system
+  include_tasks: _os_configure.yml
+
+- name: Installing Vault via download archive
+  include_tasks: _install.yml
+
+- name: Configure Vault
+  include_tasks: _vault_configure.yml
+
+- name: Initialise Vault
+  include_tasks: _initialise.yml
+
+- name: Fetch secret to deploy
+  include_tasks: _local_get_secrets.yml
+
+- name: Unseal Vault
+  include_tasks: _unseal.yml
+
+- name: Flush environments
+  include_tasks: _flush_environments.yml
+
+- name: Check environments
+  include_tasks: _get_environments.yml
+
+- name: Activate audit mode
+  include_tasks: _audit_logrotate.yml
+
+- name: Restart Vaults
+  include_tasks: _restart.yml
+
+- name: Lock secret directory on deploy
+  include_tasks: _local_lock_secrets.yml

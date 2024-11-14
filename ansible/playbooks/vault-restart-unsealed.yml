@@ -1,0 +1,8 @@
+---
+- name: Restart Vaults server and unsealed them
+  hosts: alls
+  become: yes
+  vars:
+    secrets_dir: "/home/evil/secret"
+  roles:
+    - vault-restart-unsealed

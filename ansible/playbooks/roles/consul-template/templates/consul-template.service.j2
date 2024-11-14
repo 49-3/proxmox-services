@@ -1,0 +1,14 @@
+[Unit]
+Description=Consul Template
+Documentation=https://github.com/hashicorp/consul-template
+After=network.target
+
+[Service]
+ExecStart={{ consul_template_install_path }} -config="{{ consul_template_config_dir }}"
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
+User=root
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

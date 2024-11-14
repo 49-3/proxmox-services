@@ -1,0 +1,16 @@
+- name: Vérifier si le moteur K/V est déjà activé
+  command: vault secrets list -format=json
+  register: secrets_list
+  delegate_to: deploy
+  run_once: true
+  changed_when: false
+  ignore_errors: true
+
+- name: Activer le moteur K/V si non activé
+  command: vault secrets enable -path=secret kv
+  when:
+    - secrets_list.stdout is defined
+    - "'secret/' not in secrets_list.stdout"
+  become: true
+  delegate_to: deploy
+  run_once: true

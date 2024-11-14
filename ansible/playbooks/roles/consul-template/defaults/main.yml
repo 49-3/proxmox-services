@@ -1,0 +1,19 @@
+---
+# vars/main.yml
+
+# Version et URL de téléchargement de Consul Template
+consul_template_version: "0.39.1"
+consul_template_architecture: "{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}"
+consul_template_download_url: "https://releases.hashicorp.com/consul-template/{{ consul_template_version }}/consul-template_{{ consul_template_version }}_linux_{{ consul_template_architecture }}.zip"
+consul_template_sha256_url: "https://releases.hashicorp.com/consul-template/{{ consul_template_version }}/consul-template_{{ consul_template_version }}_SHA256SUMS"
+
+# Chemins d'installation et stockage
+
+consul_template_install_path: "/usr/local/bin/consul-template"
+consul_template_config_dir: "/etc/consul-template.d"
+consul_template_data_dir: "/var/lib/consul-template"
+consul_template_files_dir: "{{ role_path }}/files"
+consul_template_archive_path: "{{ consul_template_files_dir }}/consul-template.zip"
+consul_template_sha256_path: "{{ consul_template_files_dir }}/consul-template_SHA256SUMS"
+consul_template_extracted_path: "{{ consul_template_files_dir }}/consul-template"
+consul_template_service_path: "/etc/systemd/system/consul-template.service"

@@ -1,8 +1,0 @@
----
-- name: Install vault
-  hosts: alls
-  become: yes
-  vars:
-    secrets_dir: "/home/evil/secret"
-  roles:
-    - vault

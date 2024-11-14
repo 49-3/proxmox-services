@@ -2,4 +2,6 @@
 - import_playbook: ./playbooks/traefik.yml
 - import_playbook: ./playbooks/consul-bootstrap.yml
 - import_playbook: ./playbooks/traefik.yml
-- import_playbook: ./playbooks/vault.yml
+- import_playbook: ./playbooks/vault-bootstrap.yml
+- import_playbook: ./playbooks/vault-key-value.yml
+- import_playbook: ./playbooks/consul-template.yml

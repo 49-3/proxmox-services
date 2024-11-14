@@ -1,0 +1,8 @@
+---
+- name: Install vault
+  hosts: vaults
+  become: yes
+  vars:
+    secrets_dir: "/home/evil/secret"
+  roles:
+    - vault-key-value

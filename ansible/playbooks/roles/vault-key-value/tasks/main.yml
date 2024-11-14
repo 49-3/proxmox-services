@@ -1,0 +1,10 @@
+---
+- name: Check if secrets_dir is defined
+  assert:
+    that:
+      - secrets_dir is defined and secrets_dir|length > 0
+    msg: "Variable 'secrets_dir' should be defined"
+  run_once: true
+
+- name: Enable if not yet
+  include_tasks: _init.yml
