@@ -34,9 +34,9 @@
 - name: Créer le fichier consul.conf
   copy:
     content: |
-[Resolve]
-DNS=127.0.0.1:8600
-Domains=~consul
+      [Resolve]
+      DNS=127.0.0.1:8600
+      Domains=~consul
     dest: "/etc/systemd/resolved.conf.d/consul.conf"
 
 - name: Remove /etc/systemd/resolved.conf
@@ -47,10 +47,22 @@ Domains=~consul
 - name: Créer le fichier resolved.conf
   copy:
     content: |
-[Resolve]
-DNS=1.1.1.1 1.0.0.1
-FallbackDNS=8.8.8.8 8.8.4.4
+      [Resolve]
+      DNS=1.1.1.1 1.0.0.1
+      FallbackDNS=8.8.8.8 8.8.4.4
     dest: "/etc/systemd/resolved.conf"
+
+- name: S'assurer que /etc/resolv.conf pointe vers le stub de systemd-resolved
+  file:
+    src: "/run/systemd/resolve/stub-resolv.conf"
+    dest: "/etc/resolv.conf"
+    state: link
+    force: yes
+
+- name: Redémarrer systemd-resolved
+  service:
+    name: systemd-resolved
+    state: restarted
 
 - name: Enable ans start systemd-resolved
   ansible.builtin.systemd_service:
