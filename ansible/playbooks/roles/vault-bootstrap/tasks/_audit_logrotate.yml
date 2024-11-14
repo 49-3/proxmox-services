@@ -18,7 +18,10 @@
   when: vault_mode == "server"
 
 - name: Vérifier les dispositifs d'audit existants
-  command: vault audit list -format=json
+  shell: |
+    vault audit list -format=json
+  args:
+    executable: /bin/bash
   register: audit_devices
   when: vault_mode == "server"
   changed_when: false
@@ -30,7 +33,10 @@
   when: audit_devices.stdout is defined and vault_mode == "server"
 
 - name: Désactiver le dispositif d'audit si déjà configuré
-  command: vault audit disable file
+  shell: |
+    vault audit disable file
+  args:
+    executable: /bin/bash
   when:
     - audit_devices.stdout is defined
     - '"file/" in audit_devices.stdout'
@@ -38,7 +44,10 @@
   become: yes
 
 - name: Activer le dispositif d'audit
-  command: vault audit enable file file_path={{ vault_log_dir }}/{{ audit_log_file }}
+  shell: |
+    vault audit enable file file_path={{ vault_log_dir }}/{{ audit_log_file }}
+  args:
+    executable: /bin/bash
   when:
     - vault_mode == "server"
   run_once: true
@@ -51,6 +60,6 @@
     mode: "0755"
   when: vault_mode == "server"
   become: yes
-  
+
 - name: Restart Vaults
   include_tasks: _restart.yml
