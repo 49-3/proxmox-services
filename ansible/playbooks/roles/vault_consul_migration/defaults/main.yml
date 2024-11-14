@@ -1,0 +1,11 @@
+---
+# defaults file for vault_consul_migration
+vault_address: "{{ lookup('env', 'VAULT_ADDR') | default('', false) }}"
+vault_token: "{{ lookup('env', 'VAULT_TOKEN') | default('', false) }}"
+consul_pki_path: "consul-pki"
+connect_pki_path: "connect-pki"
+consul_common_name: "consul-ca"
+connect_common_name: "connect-ca"
+consul_template_config_dir: "/etc/consul-template.d"
+consul_template_templates_dir: "/etc/consul-template.d/templates"
+consul_cert_path: "/etc/consul.d/ssl"

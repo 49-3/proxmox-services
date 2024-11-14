@@ -1,0 +1,19 @@
+---
+- name: "Déployer le service systemd pour Vault Agent"
+  copy:
+    src: "vault-agent.service"
+    dest: "{{ vault_agent_service_path }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: "Recharger systemd"
+  systemd:
+    daemon_reload: yes
+
+- name: "Activer et démarrer Vault Agent"
+  systemd:
+    name: vault-agent
+    enabled: yes
+    state: started
+  notify: "Redémarrer Vault Agent"

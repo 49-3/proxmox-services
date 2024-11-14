@@ -1,0 +1,80 @@
+---
+- name: "Vérifier si la méthode d'authentification AppRole est déjà activée"
+  shell: |
+    VAULT_ADDR={{ vault_address }} VAULT_TOKEN={{ vault_token }} vault auth list -format=json
+  args:
+    executable: /bin/bash
+  delegate_to: deploy
+  become: yes
+  run_once: true
+  register: vault_auth_list_result
+  changed_when: false
+
+- name: "Activer la méthode d'authentification AppRole"
+  shell: |
+    VAULT_ADDR={{ vault_address }} VAULT_TOKEN={{ vault_token }} vault auth enable approle
+  args:
+    executable: /bin/bash
+  delegate_to: deploy
+  become: yes
+  run_once: true
+  when: "'approle/' not in vault_auth_list_result.stdout"
+
+- name: "Créer le fichier de politique Vault"
+  copy:
+    content: |
+      path "{{ vault_pki_path }}/*" {
+        capabilities = ["create", "update", "read", "list"]
+      }
+
+      path "sys/mounts" {
+        capabilities = ["read", "list"]
+      }
+
+      path "auth/token/renew-self" {
+        capabilities = ["update"]
+      }
+    dest: "/tmp/{{ vault_approle_policy_name }}.hcl"
+  delegate_to: deploy
+  run_once: true
+
+- name: "Créer la politique pour Consul Template"
+  shell: |
+    VAULT_ADDR={{ vault_address }} VAULT_TOKEN={{ vault_token }} vault policy write {{ vault_approle_policy_name }} /tmp/{{ vault_approle_policy_name }}.hcl
+  args:
+    executable: /bin/bash
+  delegate_to: deploy
+  run_once: true
+
+- name: "Créer l'AppRole pour Consul Template"
+  shell: |
+    VAULT_ADDR={{ vault_address }} VAULT_TOKEN={{ vault_token }} vault write auth/approle/role/{{ vault_approle_name }} \
+      token_policies="{{ vault_approle_policy_name }}" \
+      token_ttl=20m \
+      token_max_ttl=30m \
+      secret_id_ttl=0 \
+      secret_id_num_uses=0
+  args:
+    executable: /bin/bash
+  delegate_to: deploy
+  run_once: true
+
+- name: "Récupérer le role_id de l'AppRole"
+  shell: |
+    VAULT_ADDR={{ vault_address }} VAULT_TOKEN={{ vault_token }} vault read -field=role_id auth/approle/role/{{ vault_approle_name }}/role-id
+  args:
+    executable: /bin/bash
+  delegate_to: deploy
+  run_once: true
+  register: approle_role_id
+  no_log: true
+
+- name: "Générer un secret_id pour l'AppRole"
+  shell: |
+    VAULT_ADDR={{ vault_address }} VAULT_TOKEN={{ vault_token }} vault write -f -field=secret_id auth/approle/role/{{ vault_approle_name }}/secret-id
+  args:
+    executable: /bin/bash
+  delegate_to: deploy
+  run_once: true
+  register: approle_secret_id
+  no_log: true

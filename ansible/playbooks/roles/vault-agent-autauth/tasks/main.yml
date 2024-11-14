@@ -1,0 +1,12 @@
+---
+- name: Créer les tâches pour gérer la politique et l'AppRole
+  import_tasks: _approle.yml
+
+- name: Configure Vault Agent
+  import_tasks: _configure_vault_agent.yml
+
+- name: Déployer le service systemd pour Vault Agent
+  import_tasks: _deploy_vault_agent_service.yml
+
+- name: Distribuer le role_id et le secret_id aux hôtes
+  import_tasks: _spray_role_secret_ids.yml

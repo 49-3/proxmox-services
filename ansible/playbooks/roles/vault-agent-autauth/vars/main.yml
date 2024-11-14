@@ -1,0 +1,7 @@
+---
+# vars file for vault_agent_autauth
+# Ces variables doivent être définies en toute sécurité
+# Vous pouvez utiliser Ansible Vault pour les chiffrer
+vault_role_id: ""
+vault_secret_id: ""
+vault_token: "{{ lookup('env', 'VAULT_TOKEN') | default('', false) }}"

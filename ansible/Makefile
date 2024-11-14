@@ -24,6 +24,10 @@ vault_restart_unsealed: ## Launch vault-bootstrap playbook
 vault_key_value: ## Launch vault-key-value playbook
 	bash -c "time ansible-playbook playbooks/vault-key-value.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
+.PHONY: vault_agent_autauth
+vault_agent_autauth: ## Launch vault-key-value playbook
+	bash -c "time ansible-playbook playbooks/vault-agent-autauth.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
+
 .PHONY: re
 re: ## clear secret and run ansible on site.yml
 	rm -rf ~/secret/* ; bash -c "time ansible-playbook site.yml --ssh-common-args='-o StrictHostKeyChecking=no'"

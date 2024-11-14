@@ -1,0 +1,21 @@
+---
+# defaults file for vault_agent_autauth
+# Adresse de Vault
+vault_address: "{{ lookup('env', 'VAULT_ADDR') | default('', false) }}"
+
+# Configuration de Vault Agent
+vault_agent_install_path: "/usr/local/bin/vault"
+vault_agent_config_dir: "/etc/vault-agent"
+vault_agent_service_path: "/etc/systemd/system/vault-agent.service"
+vault_agent_role_id_path: "{{ vault_agent_config_dir }}/role_id"
+vault_agent_secret_id_path: "{{ vault_agent_config_dir }}/secret_id"
+vault_agent_token_file: "{{ vault_agent_config_dir }}/.vault-token"
+
+# AppRole
+vault_approle_name: "consul-template-role"
+vault_approle_policy_name: "consul-template-policy"
+vault_pki_path: "consul-pki"
+
+# Utilisateur pour Vault Agent
+vault_agent_user: "vault"
+vault_agent_group: "vault"

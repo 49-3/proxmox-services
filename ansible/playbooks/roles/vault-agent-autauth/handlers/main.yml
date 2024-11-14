@@ -1,0 +1,6 @@
+---
+# handlers file for vault_agent_autauth
+- name: "Redémarrer Vault Agent"
+  systemd:
+    name: vault-agent
+    state: restarted

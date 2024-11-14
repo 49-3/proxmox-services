@@ -1,0 +1,13 @@
+[Unit]
+Description=Vault Agent
+After=network.target
+
+[Service]
+User={{ vault_agent_user }}
+Group={{ vault_agent_group }}
+ExecStart={{ vault_agent_install_path }} agent -config={{ vault_agent_config_dir }}/vault-agent.hcl
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -16,7 +16,35 @@
     pkg:
       - yq
     state: present
-    
+
+ - name: Install systemd-resolved
+  ansible.builtin.apt:
+    pkg:
+      - systemd-resolved
+    state: present
+
+- name: Create resolved.conf.d directory
+  file:
+    path: "/etc/systemd/resolved.conf.d"
+    state: directory
+    mode: 0750
+    owner: "root"
+    group: "root"
+
+- name: Créer le fichier consul.conf
+  copy:
+    content: |
+[Resolve]
+DNS=127.0.0.1:8600
+Domains=~consul
+    dest: "/etc/systemd/resolved.conf.d/consul.conf"
+
+- name: Enable ans start systemd-resolved
+  ansible.builtin.systemd_service:
+    name: systemd-resolved
+    state: started
+    enabled: true
+
 - name: Set SSH authorized key
   ansible.posix.authorized_key:
     user: root
