@@ -7,7 +7,7 @@
   ignore_errors: true
 
 - name: Activer le moteur K/V si non activé
-  command: vault secrets enable -path=secret kv
+  command: vault secrets enable -path=secret kv-v2
   when:
     - secrets_list.stdout is defined
     - "'secret/' not in secrets_list.stdout"
