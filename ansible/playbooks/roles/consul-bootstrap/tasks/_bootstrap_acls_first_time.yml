@@ -1,11 +1,12 @@
 ---
 - name: Bootstrap consul Acls
   shell: |
-    CONSUL_HTTP_ADDR=https://192.168.1.161:8443
-    CONSUL_CACERT={{ consul_config_dir }}/tls/consul-agent-ca.pem
-    CONSUL_CLIENT_CERT={{ consul_config_dir }}/tls/consul-agent.pem
-    CONSUL_CLIENT_KEY={{ consul_config_dir }}/tls/consul-agent-key.pem
-    CONSUL_TLS_SERVER_NAME=server.dc1.consul
+    export CONSUL_HTTP_ADDR=https://192.168.1.161:8443
+    export CONSUL_CACERT={{ consul_config_dir }}/tls/consul-agent-ca.pem
+    export CONSUL_CLIENT_CERT={{ consul_config_dir }}/tls/consul-agent.pem
+    export CONSUL_CLIENT_KEY={{ consul_config_dir }}/tls/consul-agent-key.pem
+    export CONSUL_TLS_SERVER_NAME=server.dc1.consul
+
     consul acl bootstrap \
       -ca-file={{ consul_config_dir }}/tls/consul-agent-ca.pem \
       -client-cert={{ consul_config_dir }}/tls/consul-agent.pem \

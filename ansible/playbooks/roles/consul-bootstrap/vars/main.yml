@@ -1,5 +1,5 @@
 ---
-consul_http_port: 8500
+consul_http_port: 8443
 
 consul_binary_basedir: "/usr/local/bin"
 

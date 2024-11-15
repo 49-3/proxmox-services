@@ -94,8 +94,8 @@ vault_tls_disable_client_certs: true
 
 # if Consul is used as storage backend
 consul_http_addr: '192.168.1.161'
-consul_http_port: '8500'
-consul_scheme: 'http'
+consul_http_port: '8443'
+consul_scheme: 'https'
 consul_tls_directory: '{{ vault_data_directory }}/consul'
 # consul_tls_ca_file: ''
 # consul_tls_cert_file: ''
