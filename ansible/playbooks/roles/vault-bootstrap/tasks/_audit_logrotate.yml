@@ -19,7 +19,9 @@
 
 - name: Vérifier les dispositifs d'audit existants
   shell: |
-    VAULT_ADDR=http://{{ hostvars['vault-1']['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }};VAULT_TOKEN={{ hostvars['deploy']['vault_token_fact'] }};vault audit list -format=json
+    export VAULT_ADDR=http://{{ hostvars['vault-1']['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
+    export VAULT_TOKEN={{ hostvars['deploy']['vault_token_fact'] }}
+    vault audit list -format=json
   args:
     executable: /bin/bash
   register: audit_devices
