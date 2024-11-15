@@ -21,6 +21,10 @@
   with_items:
     - "{{ consul_config_dir }}/certs/consul-agent-ca.pem"
     - "{{ consul_config_dir }}/certs/consul-agent-ca-key.pem"
+    - "{{ consul_config_dir }}/certs/dc1-client-consul-0.pem"
+    - "{{ consul_config_dir }}/certs/dc1-client-consul-0-key.pem"
+    - "{{ consul_config_dir }}/certs/dc1-client-consul-1.pem"
+    - "{{ consul_config_dir }}/certs/dc1-client-consul-1-key.pem"
     - "{{ consul_config_dir }}/certs/dc1-server-consul-0.pem"
     - "{{ consul_config_dir }}/certs/dc1-server-consul-0-key.pem"
     - "{{ consul_config_dir }}/certs/dc1-server-consul-1.pem"
