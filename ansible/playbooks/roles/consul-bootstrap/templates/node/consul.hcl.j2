@@ -62,7 +62,11 @@ tls {
     verify_outgoing = true
   }
   https {
-    verify_incoming = false
+    verify_incoming = false     # N'exige pas de certificat client pour les connexions HTTPS
+  }
+
+  grpc {
+    verify_incoming = false     # Si vous utilisez gRPC, ajustez également ce paramètre
   }
   internal_rpc {
     verify_server_hostname = true
