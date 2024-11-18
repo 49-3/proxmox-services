@@ -1,167 +1,31 @@
 ---
-# tasks/main.yml
-- name: Vérifier si Consul Template est déjà installé
-  command: "{{ consul_template_install_path }}/consul-template --version"
-  register: consul_template_version_output
-  ignore_errors: true
-  changed_when: false
+- name: Install consul-template
+  import_tasks: _install.yml
 
-- name: Définir la version installée de Consul Template ou 'not_installed' si non présent
-  set_fact:
-    installed_consul_template_version: "{{ consul_template_version_output.stdout | regex_search('v([0-9.]+)', '\\1') | default('not_installed') }}"
+- name: Configure service consul-template
+  import_tasks: _service_configure.yml
 
-- name: Déterminer si une réinstallation de Consul Template est nécessaire
-  set_fact:
-    reinstall_consul_template: "{{ installed_consul_template_version != consul_template_version }}"
+- name: Get an agent consul ACL token
+  import_tasks: _get_acl_token.yml
 
-- name: Créer le répertoire de stockage pour les fichiers temporaires de Consul Template
-  file:
-    path: "{{ consul_template_files_dir }}"
-    state: directory
-    mode: '0755'
-
-- name: Télécharger le fichier SHA256SUMS dans files (uniquement sur deploy)
-  get_url:
-    url: "{{ consul_template_sha256_url }}"
-    dest: "{{ consul_template_sha256_path }}"
-    mode: '0644'
-  delegate_to: deploy
-  run_once: true
-
-- name: Extraire le checksum correspondant à l'architecture
-  shell: |
-    set -o pipefail
-    grep consul-template_{{ consul_template_version }}_linux_{{ consul_template_architecture }}.zip {{ consul_template_sha256_path }} | awk '{print $1}'
-  args:
-    executable: /bin/bash
-  register: correct_checksum
-  delegate_to: deploy
-  run_once: true
-  changed_when: false
-
-- name: Calculer le checksum local de l'archive (si elle existe)
-  stat:
-    path: "{{ consul_template_archive_path }}"
-  register: archive_stat
-
-- name: Calculer le checksum de l'archive locale
-  command: "sha256sum {{ consul_template_archive_path }}"
-  register: local_checksum
-  when: archive_stat.stat.exists
-  changed_when: false
-
-- name: Vérifier si le checksum local diffère de celui téléchargé
-  set_fact:
-    archive_checksum_valid: "{{ local_checksum.stdout.split()[0] == correct_checksum.stdout }}"
-  when: archive_stat.stat.exists
-
-- name: Supprimer l'archive si le checksum est invalide
-  file:
-    path: "{{ consul_template_archive_path }}"
-    state: absent
-  when: archive_stat.stat.exists and not archive_checksum_valid
-
-- name: Télécharger l'archive de Consul Template dans files (uniquement si nécessaire)
-  get_url:
-    url: "{{ consul_template_download_url }}"
-    dest: "{{ consul_template_archive_path }}"
-    mode: '0644'
-  when: not archive_stat.stat.exists or not archive_checksum_valid
-  delegate_to: deploy
-  run_once: true
-
-- name: Décompresser l'archive de Consul Template dans files sur deploy
-  unarchive:
-    src: "{{ consul_template_archive_path }}"
-    dest: "{{ consul_template_files_dir }}"
-    remote_src: yes
-  delegate_to: deploy
-  run_once: true
-
-- name: Copier le binaire de Consul Template vers deploy
-  copy:
-    src: "{{ consul_template_extracted_path }}"
-    dest: "{{ consul_template_install_path }}"
-    mode: '0755'
-  delegate_to: deploy
-  run_once: true
-  when: reinstall_consul_template
-
-- name: Copier le binaire de Consul Template sur tous les hôtes
-  copy:
-    src: "{{ consul_template_extracted_path }}"
-    dest: "{{ consul_template_install_path }}"
-    mode: '0755'
-  when: reinstall_consul_template and inventory_hostname != "deploy"
-
-- name: Supprimer le binaire décompressé après installation
-  file:
-    path: "{{ item }}"
-    state: absent
-  with_items:
-    - "{{ consul_template_extracted_path }}"
-    - "{{ consul_template_files_dir }}/LICENSE.txt"
-    - "{{ consul_template_files_dir }}/consul-template_SHA256SUMS"
-  delegate_to: deploy
-  run_once: true
-
-- name: Créer les répertoire de Consul Template
-  file:
-    path: "{{ item }}"
-    mode: 0750
-    owner: "root"
-    group: "consul"
-    state: directory
-  with_items:
-    - "{{ consul_template_config_dir }}"
-    - "{{ consul_template_script_dir }}"
-    - "{{ consul_template_templates_dir }}"
-    - "{{ consul_template_data_dir }}"
-
-- name: Créer le fichier de service systemd pour Consul Template
-  template:
-    src: consul-template.service.j2
-    dest: "{{ consul_template_service_path }}"
-    mode: '0644'
-
-- name: Get vault_token from deploy secrets
-  shell: |
-    cat {{ deploy_vault_secret_dir }}/vault_token.txt
-  args:
-    executable: /bin/bash
-  register: vault_parent_token
-  delegate_to: deploy
-  run_once: true
-  become: yes
-
-- name: Créer le fichier de start pour Consul Template
-  template:
-    src: start-consul-template.sh.j2
-    dest: "{{ consul_template_script_dir }}/{{ consul_template_start_script_file }}"
-    owner: "root"
-    group: "consul"
-    mode: '0201'
-
-- name: Copier les templates de certificat
-  copy:
-    src: "{{ item }}"
-    dest: "{{ consul_template_templates_dir }}/{{ item }}"
-  with_items:
-    - server-cert.ctmpl
-    - server-key.ctmpl
-    - server-ca.ctmpl
-
-- name: Copier la configuration de Consul Template
-  template:
-    src: consul-template.hcl.j2
-    dest: "{{ consul_template_config_dir }}/consul-template.hcl"
+- name: Copie les templates
+  import_tasks: _templates.yml
 
 - name: Recharger systemd pour appliquer le nouveau service
   systemd:
     daemon_reload: true
+
+- name: Ensure Consul configuration is valid
+  command: consul validate {{ consul_config_dir }}
+  become: true
+
+- name: Reload Consul agent to apply new configuration
+  command: consul reload
+  become: true
 
 - name: Activer et démarrer Consul Template
   systemd:
     name: consul-template
     enabled: true
     state: started
+  become: true

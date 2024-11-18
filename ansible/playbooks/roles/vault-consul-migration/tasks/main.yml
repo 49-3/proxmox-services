@@ -13,27 +13,27 @@
 
 - name: Vérifier si le moteur PKI est déjà activé
   shell: |
+    export VAULT_ADDR="http://{{ hostvars['vault-1']['ansible_'+network_interface]['ipv4']['address'] }}:8200"
+    export VAULT_TOKEN="{{ vault_token.stdout }}"
     vault secrets list -detailed | grep "^{{ consul_pki_path }}/"
   args:
     executable: /bin/bash
-  environment:
-    VAULT_ADDR: "{{ vault_address }}"
-    VAULT_TOKEN: "{{ vault_token.stdout }}"
   register: pki_check_result
   delegate_to: deploy
+  become: yes
   run_once: true
   failed_when: false
   changed_when: false
 
 - name: Activer le moteur PKI pour Consul si non activé
   shell: |
+    export VAULT_ADDR="http://{{ hostvars['vault-1']['ansible_'+network_interface]['ipv4']['address'] }}:8200"
+    export VAULT_TOKEN="{{ vault_token.stdout }}"
     vault secrets enable -path={{ consul_pki_path }} -max-lease-ttl=87600h pki
   args:
     executable: /bin/bash
-  environment:
-    VAULT_ADDR: "{{ vault_address }}"
-    VAULT_TOKEN: "{{ vault_token.stdout }}"
   when: pki_check_result.rc != 0
+  become: yes
   register: enable_pki_result
   failed_when: enable_pki_result.rc != 0
   delegate_to: deploy
@@ -41,27 +41,27 @@
 
 - name: Générer le certificat CA pour Consul
   shell: |
+    export VAULT_ADDR="http://{{ hostvars['vault-1']['ansible_'+network_interface]['ipv4']['address'] }}:8200"
+    export VAULT_TOKEN="{{ vault_token.stdout }}"
     vault write {{ consul_pki_path }}/root/generate/internal common_name={{ consul_common_name }} ttl=87600h
   args:
     executable: /bin/bash
-  environment:
-    VAULT_ADDR: "{{ vault_address }}"
-    VAULT_TOKEN: "{{ vault_token.stdout }}"
   register: generate_ca_result
   delegate_to: deploy
+  become: yes
   run_once: true
   failed_when: generate_ca_result.rc != 0
 
 - name: Créer un rôle pour les serveurs Consul
   shell: |
+    export VAULT_ADDR="http://{{ hostvars['vault-1']['ansible_'+network_interface]['ipv4']['address'] }}:8200"
+    export VAULT_TOKEN="{{ vault_token.stdout }}"
     vault write {{ consul_pki_path }}/roles/consul-servers allowed_domains=consul allow_subdomains=true max_ttl=72h
   args:
     executable: /bin/bash
-  environment:
-    VAULT_ADDR: "{{ vault_address }}"
-    VAULT_TOKEN: "{{ vault_token.stdout }}"
   register: create_role_result
   delegate_to: deploy
+  become: yes
   run_once: true
   failed_when: create_role_result.rc != 0
 
@@ -75,6 +75,7 @@
   with_items:
     - "{{ vault_policies_dir }}"
   delegate_to: deploy
+  become: yes
   run_once: true
 
 - name: Copier la policy pour consul-template
@@ -84,19 +85,20 @@
   with_items:
     - consul-template-policy.hcl
   delegate_to: deploy
+  become: yes
   run_once: true
 
 - name: Create consul-template policy on vault
   shell: |
+    export VAULT_ADDR="http://{{ hostvars['vault-1']['ansible_'+network_interface]['ipv4']['address'] }}:8200"
+    export VAULT_TOKEN="{{ vault_token.stdout }}"
     vault policy write consul-template consul-template-policy.hcl
   args:
     executable: /bin/bash
     chdir: "{{  vault_policies_dir }}"
-  environment:
-    VAULT_ADDR: "{{ vault_address }}"
-    VAULT_TOKEN: "{{ vault_token.stdout }}"
   register: generate_ca_result
   delegate_to: deploy
+  become: yes
   run_once: true
   failed_when: generate_ca_result.rc != 0
 

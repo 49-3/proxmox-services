@@ -1,2 +1,5 @@
 ---
 # handlers file for consul-template
+handlers:
+  - name: Restart Consul agent
+    command: systemctl restart consul

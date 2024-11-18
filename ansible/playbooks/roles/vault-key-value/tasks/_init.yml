@@ -1,5 +1,20 @@
+---
+- name: Get vault_token from deploy secrets
+  shell: |
+    cat {{ deploy_vault_secret_dir }}/vault_token.txt
+  args:
+    executable: /bin/bash
+  register: vault_parent_token
+  delegate_to: deploy
+  run_once: true
+  become: yes
+
 - name: Vérifier si le moteur K/V est déjà activé
-  command: vault secrets list -format=json
+  shell: |
+    export VAULT_TOKEN="{{ vault_parent_token.stdout }}"
+    vault secrets list -format=json
+  args:
+    executable: /bin/bash
   register: secrets_list
   delegate_to: deploy
   run_once: true
@@ -7,7 +22,11 @@
   ignore_errors: true
 
 - name: Activer le moteur K/V si non activé
-  command: vault secrets enable -path=secret kv-v2
+  shell: |
+    export VAULT_TOKEN="{{ vault_parent_token.stdout }}"
+    vault secrets enable -path=secret kv-v2
+  args:
+    executable: /bin/bash
   when:
     - secrets_list.stdout is defined
     - "'secret/' not in secrets_list.stdout"

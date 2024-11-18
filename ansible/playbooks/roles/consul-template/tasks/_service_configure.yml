@@ -1,0 +1,37 @@
+---
+- name: Créer les répertoire de Consul Template
+  file:
+    path: "{{ item }}"
+    mode: 0750
+    owner: "root"
+    group: "consul"
+    state: directory
+  with_items:
+    - "{{ consul_template_config_dir }}"
+    - "{{ consul_template_script_dir }}"
+    - "{{ consul_template_templates_dir }}"
+    - "{{ consul_template_data_dir }}"
+
+- name: Créer le fichier de service systemd pour Consul Template
+  template:
+    src: consul-template.service.j2
+    dest: "{{ consul_template_service_path }}"
+    mode: '0644'
+
+- name: Get vault_token from deploy secrets
+  shell: |
+    cat {{ deploy_vault_secret_dir }}/vault_token.txt
+  args:
+    executable: /bin/bash
+  register: vault_parent_token
+  delegate_to: deploy
+  run_once: true
+  become: yes
+
+- name: Créer le fichier de start pour Consul Template
+  template:
+    src: start-consul-template.sh.j2
+    dest: "{{ consul_template_script_dir }}/{{ consul_template_start_script_file }}"
+    owner: "root"
+    group: "consul"
+    mode: '0201'

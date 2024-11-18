@@ -1,0 +1,48 @@
+- name: Get CONSUL_HTTP_TOKEN
+  shell: |
+    set -o pipefail
+    cat {{ secret_dir }}/consul/acl-token-bootstrap.json | jq -r ".SecretID"
+  args:
+    executable: /bin/bash
+  register: consul_http_token
+  changed_when: consul_http_token.rc != 0
+  delegate_to: deploy
+  become: yes
+  run_once: true
+
+- name: Create an ACL token for Consul agent
+  shell: |
+    export CONSUL_HTTP_TOKEN="{{ consul_http_token.stdout }}"
+    consul acl token create -description "Token for Consul agent deploy" -policy-name=agents-policy
+  args:
+    executable: /bin/bash
+  register: consul_agent_token
+  when: inventory_hostname not in ["consul-1", "consul-2", "consul-2", "vault-1", "vault-2"]
+
+- name: Get ACL token for Consul agent
+  shell: |
+    cat /etc/environment | grep CONSUL_HTTP_TOKEN | cut -d '=' -f 2
+  args:
+    executable: /bin/bash
+  register: consul_agent_token
+  when: inventory_hostname in ["consul-1", "consul-2", "consul-2", "vault-1", "vault-2"]
+
+- name: Set ACL token as a fact
+  set_fact:
+    consul_agent_token: "{{ consul_agent_token.stdout | jq -r ".SecretID }}"
+
+- name: Set Token as defautl token for consul agent
+  shell: |
+    export CONSUL_HTTP_TOKEN="{{ consul_http_token.stdout }}"
+    consul acl set-agent-token agent {{ hostvars[inventory_hostname]['consul_agent_token'] }}
+  args:
+    executable: /bin/bash
+
+- name: Generate agent-acl.hcl configuration
+  template:
+    src: "agent-acl.hcl.j2"
+    dest: "{{ consul_config_dir }}/agent-acl.hcl"
+    owner: root
+    group: "{{ consul_user_name }}"
+    mode: 0640
+  when: inventory_hostname not in ["consul-1", "consul-2", "consul-2", "vault-1", "vault-2"]

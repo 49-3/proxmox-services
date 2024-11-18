@@ -1,7 +1,5 @@
 ---
 # defaults file for vault_consul_migration
-vault_address: "{{ lookup('env', 'VAULT_ADDR') | default('', false) }}"
-vault_token: "{{ lookup('env', 'VAULT_TOKEN') | default('', false) }}"
 consul_pki_path: "consul-pki"
 connect_pki_path: "connect-pki"
 consul_common_name: "consul-ca"
@@ -9,3 +7,4 @@ connect_common_name: "connect-ca"
 vault_config_dir: "/etc/vault.d"
 vault_policies_dir: "{{ vault_config_dir }}/policies"
 deploy_vault_secret_dir: "/home/evil/secret/vault"
+network_interface: "ens33"
