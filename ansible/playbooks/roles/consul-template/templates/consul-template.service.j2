@@ -4,7 +4,7 @@ Documentation=https://github.com/hashicorp/consul-template
 After=network.target
 
 [Service]
-ExecStart=/bin/bash {{ consul_template_script_dir }}/{{ consul_template_start_script_file }} "
+ExecStart=/bin/bash {{ consul_template_script_dir }}/{{ consul_template_start_script_file }}
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
 User=consul

@@ -7,7 +7,7 @@ export VAULT_ADDR="{{ vault_address }}"
 export VAULT_TOKEN="{{ vault_parent_token.stdout }}"
 
 # Générer un nouveau token pour Consul Template avec une durée de vie limitée
-NEW_TOKEN=$(vault token create -policy="consul-template" -ttl="24h" -format=json | jq -r '.auth.client_token')
+NEW_TOKEN=$(vault token create -policy="consul-template" -ttl="1h" -format=json | jq -r '.auth.client_token')
 
 # Vérifier si la création du token a réussi
 if [ -z "$NEW_TOKEN" ]; then

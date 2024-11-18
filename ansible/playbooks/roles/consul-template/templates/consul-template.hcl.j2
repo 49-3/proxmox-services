@@ -11,3 +11,10 @@ template {
   perms       = 0600
   command     = "systemctl reload consul"
 }
+
+template {
+  source      = "/etc/consul-template.d/templates/consul-agent-ca.ctmpl"
+  destination = "/etc/consul.d/tls/consul-agent-ca.pem"
+  perms       = 0644
+  command     = "systemctl reload consul"
+}

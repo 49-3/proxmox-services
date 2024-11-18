@@ -1,0 +1,8 @@
+---
+- name: Migrate consul ca to vault with consul templates
+  hosts: alls
+  become: yes
+  vars:
+    secrets_dir: "/home/evil/secret"
+  roles:
+    - vault-consul-migration

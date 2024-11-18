@@ -1,3 +1,0 @@
-{{ with secret "consul-pki/issue/consul-servers" }}
-{{ .Data.private_key }}
-{{ end }}

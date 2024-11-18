@@ -28,6 +28,11 @@ vault_key_value: ## Launch vault-key-value playbook
 vault_agent_autauth: ## Launch vault-key-value playbook
 	bash -c "time ansible-playbook playbooks/vault-agent-autauth.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
+.PHONY: vault_consul_migration
+vault_consul_migration: ## Launch vault-key-value playbook
+	bash -c "time ansible-playbook playbooks/vault-consul-migration.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
+
+
 .PHONY: re
 re: ## clear secret and run ansible on site.yml
 	rm -rf ~/secret/* ; bash -c "time ansible-playbook site.yml --ssh-common-args='-o StrictHostKeyChecking=no'"

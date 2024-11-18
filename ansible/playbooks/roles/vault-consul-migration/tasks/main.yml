@@ -1,0 +1,105 @@
+---
+# tasks file for vault_consul_migration
+
+- name: Get vault_token from deploy secrets
+  shell: |
+    cat {{ deploy_vault_secret_dir }}/vault_token.txt
+  args:
+    executable: /bin/bash
+  register: vault_token
+  delegate_to: deploy
+  run_once: true
+  become: yes
+
+- name: Vérifier si le moteur PKI est déjà activé
+  shell: |
+    vault secrets list -detailed | grep "^{{ consul_pki_path }}/"
+  args:
+    executable: /bin/bash
+  environment:
+    VAULT_ADDR: "{{ vault_address }}"
+    VAULT_TOKEN: "{{ vault_token.stdout.stdout }}"
+  register: pki_check_result
+  delegate_to: deploy
+  run_once: true
+  failed_when: false
+  changed_when: false
+
+- name: Activer le moteur PKI pour Consul si non activé
+  shell: |
+    vault secrets enable -path={{ consul_pki_path }} -max-lease-ttl=87600h pki
+  args:
+    executable: /bin/bash
+  environment:
+    VAULT_ADDR: "{{ vault_address }}"
+    VAULT_TOKEN: "{{ vault_token.stdout }}"
+  when: pki_check_result.rc != 0
+  register: enable_pki_result
+  failed_when: enable_pki_result.rc != 0
+  delegate_to: deploy
+  run_once: true
+
+- name: Générer le certificat CA pour Consul
+  shell: |
+    vault write {{ consul_pki_path }}/root/generate/internal common_name={{ consul_common_name }} ttl=87600h
+  args:
+    executable: /bin/bash
+  environment:
+    VAULT_ADDR: "{{ vault_address }}"
+    VAULT_TOKEN: "{{ vault_token.stdout }}"
+  register: generate_ca_result
+  delegate_to: deploy
+  run_once: true
+  failed_when: generate_ca_result.rc != 0
+
+- name: Créer un rôle pour les serveurs Consul
+  shell: |
+    vault write {{ consul_pki_path }}/roles/consul-servers allowed_domains=consul allow_subdomains=true max_ttl=72h
+  args:
+    executable: /bin/bash
+  environment:
+    VAULT_ADDR: "{{ vault_address }}"
+    VAULT_TOKEN: "{{ vault_token.stdout }}"
+  register: create_role_result
+  delegate_to: deploy
+  run_once: true
+  failed_when: create_role_result.rc != 0
+
+- name: Créer les répertoire de polycies de vault
+  file:
+    path: "{{ item }}"
+    mode: 0750
+    owner: "root"
+    group: "vault"
+    state: directory
+  with_items:
+    - "{{ vault_policies_dir }}"
+  delegate_to: deploy
+  run_once: true
+
+- name: Copier la policy pour consul-template
+  copy:
+    src: "{{ item }}"
+    dest: "{{ vault_policies_dir }}/{{ item }}"
+  with_items:
+    - consul-template-policy.hcl
+  delegate_to: deploy
+  run_once: true
+
+- name: Create consul-template policy on vault
+  shell: |
+    vault policy write consul-template consul-template-policy.hcl
+  args:
+    executable: /bin/bash
+    chdir: "{{  vault_policies_dir }}"
+  environment:
+    VAULT_ADDR: "{{ vault_address }}"
+    VAULT_TOKEN: "{{ vault_token.stdout }}"
+  register: generate_ca_result
+  delegate_to: deploy
+  run_once: true
+  failed_when: generate_ca_result.rc != 0
+
+- name: Installer Consul Template
+  include_role:
+    name: consul-template
