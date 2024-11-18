@@ -6,41 +6,24 @@ node_prefix "" {
      policy = "write"
 }
 service_prefix "" {
-    policy = "read"
+    policy = "write"
 }
 agent_prefix "" {
-    policy = "read"
+    policy = "write"
 }
-
+key_prefix "" {
+    policy = "write"
+}
 key_prefix "vault/" {
     policy = "write"
 }
-
-key_prefix "splitfire/" {
-    policy = "read"
+service "" {
+  policy = "write"
 }
-
-service "vault" {
-    policy = "write"
-}
-
-service "consul" {
-    policy = "write"
-}
-
-agent_prefix "consul-" {
-    policy = "write"
-}
-
 session_prefix "" {
     policy = "write"
 }
-
-node "deploy" {
-    policy = "write"
-}
-
-node "traefic" {
+node "" {
     policy = "write"
 }
 

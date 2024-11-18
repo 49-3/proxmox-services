@@ -25,10 +25,4 @@
     enabled: true
     state: started
   become: true
-
-- name: W8 25s for consul template get certs
-  command: sleep 25
-
-- name: Reload Consul agent to apply new configuration
-  command: consul reload
-  become: true
+  notify: Restart Consul agent
