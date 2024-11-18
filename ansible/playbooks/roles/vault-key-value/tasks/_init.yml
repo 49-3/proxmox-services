@@ -12,6 +12,7 @@
 - name: Vérifier si le moteur K/V est déjà activé
   shell: |
     export VAULT_TOKEN="{{ vault_parent_token.stdout }}"
+    export VAULT_ADDR="{{ vault_address }}"
     vault secrets list -format=json
   args:
     executable: /bin/bash
@@ -25,6 +26,7 @@
 - name: Activer le moteur K/V si non activé
   shell: |
     export VAULT_TOKEN="{{ vault_parent_token.stdout }}"
+    export VAULT_ADDR="{{ vault_address }}"
     vault secrets enable -path=secret kv-v2
   args:
     executable: /bin/bash

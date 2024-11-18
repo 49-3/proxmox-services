@@ -1,4 +1,5 @@
 ---
 # defaults file for vault_key_value
 deploy_vault_secret_dir: "{{ secrets_dir }}/vault"
-vault_address: "{{ lookup('env', 'VAULT_ADDR') | default('', false) }}"
+network_interface: "ens33"
+vault_address: "http://{{ hostvars['vault-1']['ansible_'+network_interface]['ipv4']['address'] }}:8200"
