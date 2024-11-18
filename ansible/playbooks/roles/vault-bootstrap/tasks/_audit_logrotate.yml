@@ -26,6 +26,8 @@
     executable: /bin/bash
   register: audit_devices
   when: vault_mode == "server"
+  run_once: true
+  delegate_to: deploy
   changed_when: false
   become: yes
 
@@ -43,6 +45,8 @@
     - audit_devices.stdout is defined
     - '"file/" in audit_devices.stdout'
     - vault_mode == "server"
+  run_once: true
+  delegate_to: deploy
   become: yes
 
 - name: Activer le dispositif d'audit
@@ -53,6 +57,7 @@
   when:
     - vault_mode == "server"
   run_once: true
+  delegate_to: deploy
   become: yes
 
 - name: Copy logrotate vault rule
