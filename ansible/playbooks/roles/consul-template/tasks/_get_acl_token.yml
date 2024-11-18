@@ -13,6 +13,7 @@
 - name: Create an ACL token for Consul agent
   shell: |
     export CONSUL_HTTP_TOKEN="{{ consul_http_token.stdout }}"
+    export CONSUL_HTTP_ADDR="{{ consul_http_addr.stdout }}"
     consul acl token create -description "Token for Consul agent deploy" -policy-name=agents-policy | grep SecretID: | awk '{print $2}'
   args:
     executable: /bin/bash
@@ -27,6 +28,7 @@
 - name: Set Token as defautl token for consul agent
   shell: |
     export CONSUL_HTTP_TOKEN="{{ consul_http_token.stdout }}"
+    export CONSUL_HTTP_ADDR="{{ consul_http_addr.stdout }}"
     consul acl set-agent-token agent {{ hostvars[inventory_hostname]['consul_agent_token'] }}
   args:
     executable: /bin/bash
@@ -58,6 +60,7 @@
 - name: Set Token as defautl token for consul server and vaults
   shell: |
     export CONSUL_HTTP_TOKEN="{{ consul_http_token.stdout }}"
+    export CONSUL_HTTP_ADDR="{{ consul_http_addr.stdout }}"
     consul acl set-agent-token agent {{ hostvars[inventory_hostname]['consul_agent_token'] }}
   args:
     executable: /bin/bash

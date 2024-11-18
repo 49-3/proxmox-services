@@ -25,4 +25,9 @@
     enabled: true
     state: started
   become: true
-  notify: Restart Consul agent
+
+- name: Redémare Consul
+  systemd:
+    name: consul
+    state: restarted
+  become: true
