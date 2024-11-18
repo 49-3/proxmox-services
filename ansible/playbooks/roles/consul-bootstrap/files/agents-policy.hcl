@@ -35,5 +35,14 @@ agent_prefix "consul-" {
 session_prefix "" {
     policy = "write"
 }
+
+node "deploy" {
+    policy = "write"
+}
+
+node "traefic" {
+    policy = "write"
+}
+
 mesh = "write"
 acl  = "write"
