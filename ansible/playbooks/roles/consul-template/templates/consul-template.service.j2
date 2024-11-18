@@ -7,7 +7,7 @@ After=network.target
 ExecStart=/bin/bash {{ consul_template_script_dir }}/{{ consul_template_start_script_file }}
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
-User=consul
+User=root
 Group=consul
 Restart=on-failure
 
