@@ -13,7 +13,7 @@ template {
 }
 
 template {
-  source      = "/etc/consul-template.d/templates/consul-agent-ca.ctmpl"
+  source      = "/etc/consul-template.d/templates/server-ca.ctmpl"
   destination = "/etc/consul.d/tls/consul-agent-ca.pem"
   perms       = 0644
   command     = "systemctl reload consul"

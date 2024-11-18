@@ -149,14 +149,12 @@
   with_items:
     - server-cert.ctmpl
     - server-key.ctmpl
-    - consul-agent-ca.ctmpl
+    - server-ca.ctmpl
 
 - name: Copier la configuration de Consul Template
   template:
     src: consul-template.hcl.j2
     dest: "{{ consul_template_config_dir }}/consul-template.hcl"
-
-
 
 - name: Recharger systemd pour appliquer le nouveau service
   systemd:
