@@ -18,7 +18,7 @@
     executable: /bin/bash
   environment:
     VAULT_ADDR: "{{ vault_address }}"
-    VAULT_TOKEN: "{{ vault_token.stdout.stdout }}"
+    VAULT_TOKEN: "{{ vault_token.stdout }}"
   register: pki_check_result
   delegate_to: deploy
   run_once: true

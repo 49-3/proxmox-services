@@ -126,7 +126,7 @@
 
 - name: Get vault_token from deploy secrets
   shell: |
-    cat {{ deploy_vault_secret_dir }}/vault_token.txt 
+    cat {{ deploy_vault_secret_dir }}/vault_token.txt
   args:
     executable: /bin/bash
   register: vault_parent_token
@@ -149,7 +149,7 @@
   with_items:
     - server-cert.ctmpl
     - server-key.ctmpl
-    - consul-agent-ca-ctmpl
+    - consul-agent-ca.ctmpl
 
 - name: Copier la configuration de Consul Template
   template:
