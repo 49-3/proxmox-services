@@ -1,0 +1,3 @@
+{{ with secret "consul-pki/issue/consul-servers" }}
+{{ .Data.certificate }}
+{{ end }}

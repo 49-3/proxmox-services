@@ -1,0 +1,13 @@
+template {
+  source      = "{{ consul_template_templates_dir }}/server-cert.ctmpl"
+  destination = "/etc/consul.d/tls/consul-agent.pem"
+  perms       = 0644
+  command     = "systemctl reload consul"
+}
+
+template {
+  source      = "{{ consul_template_templates_dir }}/server-key.ctmpl"
+  destination = "/etc/consul.d/tls/consul-agent-key.pem"
+  perms       = 0600
+  command     = "systemctl reload consul"
+}

@@ -4,10 +4,11 @@ Documentation=https://github.com/hashicorp/consul-template
 After=network.target
 
 [Service]
-ExecStart={{ consul_template_install_path }} -config="{{ consul_template_config_dir }}"
+ExecStart=/bin/bash {{ consul_template_script_dir }}/{{ consul_template_start_script_file }} "
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
-User=root
+User=consul
+Group=consul
 Restart=on-failure
 
 [Install]

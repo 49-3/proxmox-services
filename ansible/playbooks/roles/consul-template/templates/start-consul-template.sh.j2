@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Définir l'adresse Vault
+export VAULT_ADDR="{{ vault_address }}"
+
+# Définir le token parent pour générer un nouveau token
+export VAULT_TOKEN="{{ vault_parent_token.stdout }}"
+
+# Générer un nouveau token pour Consul Template avec une durée de vie limitée
+NEW_TOKEN=$(vault token create -policy="consul-template" -ttl="24h" -format=json | jq -r '.auth.client_token')
+
+# Vérifier si la création du token a réussi
+if [ -z "$NEW_TOKEN" ]; then
+  echo "Erreur : Impossible de créer un nouveau token."
+  exit 1
+fi
+
+# Exporter le nouveau token pour Consul Template
+export VAULT_TOKEN="$NEW_TOKEN"
+
+# Lancer Consul Template avec la configuration appropriée
+consul-template -config /etc/consul-template.d/consul-template.hcl
