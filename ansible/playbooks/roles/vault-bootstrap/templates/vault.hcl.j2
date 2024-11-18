@@ -113,7 +113,7 @@ service_registration "{{ service_registration.name }}" {
 {% endif %}
 
 service_registration "consul" {
-  address = "http://127.0.0.1:8500"
+  address = "{{ proto }}://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
   service_id = "vault"
   service_name = "vault"
   token = "{{ consul_http_token.stdout }}"
