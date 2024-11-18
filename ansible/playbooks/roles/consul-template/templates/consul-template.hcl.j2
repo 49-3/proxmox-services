@@ -8,7 +8,7 @@ template {
 template {
   source      = "{{ consul_template_templates_dir }}/server-key.ctmpl"
   destination = "/etc/consul.d/tls/consul-agent-key.pem"
-  perms       = 0600
+  perms       = 0640
   command     = "systemctl reload consul"
 }
 
