@@ -74,13 +74,14 @@
     consul acl set-agent-token agent {{ agent_token_fact }}
   args:
     executable: /bin/bash
+  ignore_errors: true
 
 - name: Remove agent-server-acl.hcl
   ansible.builtin.file:
     path: "{{ consul_config_dir }}/agent-server-acl.hcl"
     state: absent
   when: consul_mode == "server"
-
+  
 - name: Remove agent-client-acl.hc
   ansible.builtin.file:
     path: "{{ consul_config_dir }}/agent-client-acl.hc"
