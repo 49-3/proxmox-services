@@ -25,3 +25,4 @@ deploy_vault_secret_dir: "/home/evil/secret/vault"
 
 vault_address: "{{ lookup('env', 'VAULT_ADDR') | default('', false) }}"
 consul_config_dir: "/etc/consul.d"
+consul_user_name: 'consul'

@@ -1,7 +1,7 @@
 - name: Get CONSUL_HTTP_TOKEN
   shell: |
     set -o pipefail
-    cat {{ secret_dir }}/consul/acl-token-bootstrap.json | jq -r ".SecretID"
+    cat {{ secrets_dir }}/consul/acl-token-bootstrap.json | jq -r ".SecretID"
   args:
     executable: /bin/bash
   register: consul_http_token
@@ -13,23 +13,16 @@
 - name: Create an ACL token for Consul agent
   shell: |
     export CONSUL_HTTP_TOKEN="{{ consul_http_token.stdout }}"
-    consul acl token create -description "Token for Consul agent deploy" -policy-name=agents-policy
+    consul acl token create -description "Token for Consul agent deploy" -policy-name=agents-policy | grep SecretID: | awk '{print $2}'
   args:
     executable: /bin/bash
   register: consul_agent_token
-  when: inventory_hostname not in ["consul-1", "consul-2", "consul-2", "vault-1", "vault-2"]
+  when: inventory_hostname not in ["consul-1", "consul-2", "consul-3", "vault-1", "vault-2"]
 
-- name: Get ACL token for Consul agent
-  shell: |
-    cat /etc/environment | grep CONSUL_HTTP_TOKEN | cut -d '=' -f 2
-  args:
-    executable: /bin/bash
-  register: consul_agent_token
-  when: inventory_hostname in ["consul-1", "consul-2", "consul-2", "vault-1", "vault-2"]
-
-- name: Set ACL token as a fact
+- name: Set ACL token as a fact for agents
   set_fact:
-    consul_agent_token: "{{ consul_agent_token.stdout | jq -r ".SecretID }}"
+    consul_agent_token: '{{ consul_agent_token.stdout }}'
+  when: inventory_hostname not in ["consul-1", "consul-2", "consul-3", "vault-1", "vault-2"]
 
 - name: Set Token as defautl token for consul agent
   shell: |
@@ -37,6 +30,7 @@
     consul acl set-agent-token agent {{ hostvars[inventory_hostname]['consul_agent_token'] }}
   args:
     executable: /bin/bash
+  when: inventory_hostname not in ["consul-1", "consul-2", "consul-3", "vault-1", "vault-2"]
 
 - name: Generate agent-acl.hcl configuration
   template:
@@ -45,4 +39,26 @@
     owner: root
     group: "{{ consul_user_name }}"
     mode: 0640
-  when: inventory_hostname not in ["consul-1", "consul-2", "consul-2", "vault-1", "vault-2"]
+  when: inventory_hostname not in ["consul-1", "consul-2", "consul-3", "vault-1", "vault-2"]
+  become: true
+
+- name: Get ACL token for Consul server and vault
+  shell: |
+    cat /etc/environment | grep CONSUL_HTTP_TOKEN | cut -d '=' -f 2
+  args:
+    executable: /bin/bash
+  register: consul_agent_token
+  when: inventory_hostname in ["consul-1", "consul-2", "consul-3", "vault-1", "vault-2"]
+
+- name: Set ACL token as a fact for Consul server and vault
+  set_fact:
+    consul_agent_token: '{{ consul_agent_token.stdout }}'
+  when: inventory_hostname in ["consul-1", "consul-2", "consul-3", "vault-1", "vault-2"]
+
+- name: Set Token as defautl token for consul server and vaults
+  shell: |
+    export CONSUL_HTTP_TOKEN="{{ consul_http_token.stdout }}"
+    consul acl set-agent-token agent {{ hostvars[inventory_hostname]['consul_agent_token'] }}
+  args:
+    executable: /bin/bash
+  when: inventory_hostname in ["consul-1", "consul-2", "consul-3", "vault-1", "vault-2"]

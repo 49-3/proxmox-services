@@ -17,6 +17,7 @@
     executable: /bin/bash
   register: secrets_list
   delegate_to: deploy
+  become: true
   run_once: true
   changed_when: false
   ignore_errors: true

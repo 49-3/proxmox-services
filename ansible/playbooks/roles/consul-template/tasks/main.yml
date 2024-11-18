@@ -19,13 +19,16 @@
   command: consul validate {{ consul_config_dir }}
   become: true
 
-- name: Reload Consul agent to apply new configuration
-  command: consul reload
-  become: true
-
 - name: Activer et démarrer Consul Template
   systemd:
     name: consul-template
     enabled: true
     state: started
+  become: true
+
+- name: W8 25s for consul template get certs
+  command: sleep 25
+
+- name: Reload Consul agent to apply new configuration
+  command: consul reload
   become: true
