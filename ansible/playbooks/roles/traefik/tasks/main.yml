@@ -78,6 +78,15 @@
   shell: cat /etc/environment | grep "CONSUL_HTTP_TOKEN" | cut -d '=' -f 2
   register: consul_http_token
 
+- name: Add traefik user to consul group
+  shell: |
+    usermod -aG consul traefik
+  args:
+    executable: /bin/bash
+  become: true
+  when:
+    - consul_http_token_exist.stdout == "1"
+
 - name: Create Traefik config file with consul
   ansible.builtin.template:
     src: traefik-consul.yml.j2
