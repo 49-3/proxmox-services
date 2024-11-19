@@ -24,10 +24,9 @@ vault_server_group: "{{ groups[vault_ansible_group] }}"
 # get envs from environment
 consul_http_token: "{{ lookup('env', 'CONSUL_HTTP_TOKEN') | default('', false) }}"
 consul_http_addr: "{{ lookup('env', 'CONSUL_HTTP_ADDR') | default('', false) }}"
-consul_ca_cert: "{{ lookup('env', 'CONSUL_CACERT') | default('', false) }}"
-consul_client_cert: "{{ lookup('env', 'CONSUL_CLIENT_CERT') | default('', false) }}"
-consul_client_key: "{{ lookup('env', 'CONSUL_CLIENT_KEY') | default('', false) }}"
-consul_tls_server_name: "{{ lookup('env', 'CONSUL_TLS_SERVER_NAME') | default('', false) }}"
+
+consul_config_dir: '/etc/consul.d'
+
 
 vault_service_name: 'vault'
 vault_user: 'vault'

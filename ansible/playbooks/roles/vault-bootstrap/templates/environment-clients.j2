@@ -1,7 +1,7 @@
-CONSUL_HTTP_TOKEN={{ consul_http_token }}
-CONSUL_HTTP_ADDR={{ consul_http_addr }}
-CONSUL_CACERT={{ consul_ca_cert }}
-CONSUL_CLIENT_CERT={{ consul_client_cert }}
-CONSUL_CLIENT_KEY={{ consul_client_key }}
-CONSUL_TLS_SERVER_NAME={{ consul_tls_server_name }}
+CONSUL_HTTP_TOKEN={{ consul_http_token.stdout }}
+CONSUL_HTTP_ADDR={{ consul_http_addr.stdout }}
+CONSUL_CACERT={{ consul_config_dir }}/tls/consul-agent-ca.pem
+CONSUL_CLIENT_CERT={{ consul_config_dir }}/tls/consul-agent.pem
+CONSUL_CLIENT_KEY={{ consul_config_dir }}/tls/consul-agent-key.pem
+CONSUL_TLS_SERVER_NAME={{ inventory_hostname }}.dc1.consul
 VAULT_ADDR=http://{{ hostvars['vault-1']['ansible_'+vault_network_interface]['ipv4']['address'] }}:8200
