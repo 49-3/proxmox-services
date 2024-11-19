@@ -32,7 +32,7 @@ providers:
   consulcatalog:
     refreshInterval: "10s"
     endpoint:
-      scheme: https
+      scheme: "https"
       address: "{{ consul_addr }}"
       token: "{{ consul_http_token.stdout }}"
       tls:
