@@ -60,7 +60,7 @@
     content: |
       [Resolve]
       DNS=127.0.0.1:8600
-      Domains=~consul
+      Domains='~consul'
     dest: "/etc/systemd/resolved.conf.d/consul.conf"
 
 - name: Remove /etc/systemd/resolved.conf
