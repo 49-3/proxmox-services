@@ -31,12 +31,13 @@
     rm -rf {{ consul_config_dir }}/certs/* && \
     cd {{ consul_config_dir }}/certs/ && \
     consul tls ca create && \
-    consul tls cert create -server -dc dc1 -domain consul -additional-dnsname=consul-1.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 -additional-ipaddress=192.168.1.177 && \
-    consul tls cert create -server -dc dc1 -domain consul -additional-dnsname=consul-2.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 -additional-ipaddress=192.168.1.177 && \
-    consul tls cert create -server -dc dc1 -domain consul -additional-dnsname=consul-3.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 -additional-ipaddress=192.168.1.177 && \
-    consul tls cert create -client -dc dc1 -domain consul -additional-dnsname=vault-1.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 -additional-ipaddress=192.168.1.177 && \
-    consul tls cert create -client -dc dc1 -domain consul -additional-dnsname=vault-2.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 -additional-ipaddress=192.168.1.177 && \
-    consul tls cert create -client -dc dc1 -domain consul -additional-dnsname=deploy.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 -additional-ipaddress=192.168.1.177
+    consul tls cert create -server -dc dc1 -domain consul -additional-dnsname=consul-1.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 -additional-ipaddress=192.168.1.170  -additional-ipaddress=192.168.1.177 && \
+    consul tls cert create -server -dc dc1 -domain consul -additional-dnsname=consul-2.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 -additional-ipaddress=192.168.1.170  -additional-ipaddress=192.168.1.177 && \
+    consul tls cert create -server -dc dc1 -domain consul -additional-dnsname=consul-3.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 -additional-ipaddress=192.168.1.170  -additional-ipaddress=192.168.1.177 && \
+    consul tls cert create -client -dc dc1 -domain consul -additional-dnsname=vault-1.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 -additional-ipaddress=192.168.1.170  -additional-ipaddress=192.168.1.177 && \
+    consul tls cert create -client -dc dc1 -domain consul -additional-dnsname=vault-2.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 -additional-ipaddress=192.168.1.170  -additional-ipaddress=192.168.1.177 && \
+    consul tls cert create -client -dc dc1 -domain consul -additional-dnsname=deploy.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 -additional-ipaddress=192.168.1.170  -additional-ipaddress=192.168.1.177 && \
+    consul tls cert create -client -dc dc1 -domain consul -additional-dnsname=traefik.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 -additional-ipaddress=192.168.1.170  -additional-ipaddress=192.168.1.177
   args:
     executable: /bin/bash
     creates: "{{ consul_config_dir }}/certs/consul-agent-ca.pem"
@@ -176,6 +177,24 @@
     owner: "root"
     group: "{{ consul_user_name }}"
   when: inventory_hostname == "deploy"
+
+- name: Upload certs to traefik
+  copy:
+    src: "{{ consul_local_tls_dir }}/dc1-client-consul-3.pem"
+    dest: "{{ consul_config_dir }}/tls/consul-agent.pem"
+    mode: 0640
+    owner: "root"
+    group: "{{ consul_user_name }}"
+  when: inventory_hostname == "traefik"
+
+- name: Upload consul-agent-key.pem to traefik
+  copy:
+    src: "{{ consul_local_tls_dir }}/dc1-client-consul-3-key.pem"
+    dest: "{{ consul_config_dir }}/tls/consul-agent-key.pem"
+    mode: 0640
+    owner: "root"
+    group: "{{ consul_user_name }}"
+  when: inventory_hostname == "traefik"
 
 - name: Get Gossip
   ansible.builtin.command:
