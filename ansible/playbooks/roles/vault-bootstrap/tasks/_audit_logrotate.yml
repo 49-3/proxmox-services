@@ -38,7 +38,9 @@
 
 - name: Désactiver le dispositif d'audit si déjà configuré
   shell: |
-    VAULT_ADDR=http://{{ hostvars['vault-1']['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }};VAULT_TOKEN={{ hostvars['deploy']['vault_token_fact'] }};vault audit disable file
+    export VAULT_ADDR=http://{{ hostvars['vault-1']['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
+    export VAULT_TOKEN={{ hostvars['deploy']['vault_token_fact'] }}
+    vault audit disable file
   args:
     executable: /bin/bash
   when:
@@ -51,7 +53,9 @@
 
 - name: Activer le dispositif d'audit
   shell: |
-    VAULT_ADDR=http://{{ hostvars['vault-1']['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }};VAULT_TOKEN={{ hostvars['deploy']['vault_token_fact'] }};vault audit enable file file_path={{ vault_log_dir }}/{{ audit_log_file }}
+    export VAULT_ADDR=http://{{ hostvars['vault-1']['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
+    export VAULT_TOKEN={{ hostvars['deploy']['vault_token_fact'] }}
+    vault audit enable file file_path={{ vault_log_dir }}/{{ audit_log_file }}
   args:
     executable: /bin/bash
   when:
