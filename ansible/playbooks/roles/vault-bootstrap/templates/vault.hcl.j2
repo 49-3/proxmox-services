@@ -105,7 +105,7 @@ license_path = "{{ vault_license_directory }}/vault.hclic"
 {% endif %}
 
 service_registration "consul" {
-  address = "{{ proto }}://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+  address = "{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
   service_id = "vault"
   service_name = "vault"
   token = "{{ consul_http_token.stdout }}"
