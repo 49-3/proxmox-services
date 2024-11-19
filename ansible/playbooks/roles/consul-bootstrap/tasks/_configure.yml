@@ -31,11 +31,11 @@
     rm -rf {{ consul_config_dir }}/certs/* && \
     cd {{ consul_config_dir }}/certs/ && \
     consul tls ca create && \
-    consul tls cert create -server -dc dc1 -domain consul -additional-dnsname={{ inventory_hostname }}.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 && \
-    consul tls cert create -server -dc dc1 -domain consul -additional-dnsname={{ inventory_hostname }}.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 && \
-    consul tls cert create -server -dc dc1 -domain consul -additional-dnsname={{ inventory_hostname }}.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 && \
-    consul tls cert create -client -dc dc1 -domain consul -additional-dnsname={{ inventory_hostname }}.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 && \
-    consul tls cert create -client -dc dc1 -domain consul -additional-dnsname={{ inventory_hostname }}.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165
+    consul tls cert create -server -dc dc1 -domain consul -additional-dnsname=consul-1.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 && \
+    consul tls cert create -server -dc dc1 -domain consul -additional-dnsname=consul-2.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 && \
+    consul tls cert create -server -dc dc1 -domain consul -additional-dnsname=consul-3.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 && \
+    consul tls cert create -client -dc dc1 -domain consul -additional-dnsname=vault-1.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165 && \
+    consul tls cert create -client -dc dc1 -domain consul -additional-dnsname=vault-2.dc1.consul -additional-ipaddress=192.168.1.161 -additional-ipaddress=192.168.1.162 -additional-ipaddress=192.168.1.163 -additional-ipaddress=192.168.1.164 -additional-ipaddress=192.168.1.165
   args:
     executable: /bin/bash
     creates: "{{ consul_config_dir }}/certs/consul-agent-ca.pem"
