@@ -88,9 +88,9 @@ vault_seal:
 # Conf for vault tls
 vault_tls_disable_client_certs: true
 # vault_tls_disable_client_certs: false
-vault_tls_ca_cert_file: 'tls/consul-agent-ca.pem'
-vault_tls_cert_file: 'tls/consul-agent.pem'
-vault_tls_key_file: 'tls/consul-agent-key.pem'
+# vault_tls_ca_cert_file: 'tls/consul-agent-ca.pem'
+# vault_tls_cert_file: 'tls/consul-agent.pem'
+# vault_tls_key_file: 'tls/consul-agent-key.pem'
 
 # Conf for licences
 # vault_license_file: 'change_me'
