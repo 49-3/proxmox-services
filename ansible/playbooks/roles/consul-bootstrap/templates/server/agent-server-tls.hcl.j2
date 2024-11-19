@@ -14,7 +14,6 @@ tls {
   https {
     verify_incoming = false     # N'exige pas de certificat client pour les connexions HTTPS
   }
-
   grpc {
     verify_incoming = false     # Si vous utilisez gRPC, ajustez également ce paramètre
   }
@@ -24,6 +23,6 @@ tls {
 }
 
 # Enable auto-encrypt for server nodes
-auto_encrypt {
-  allow_tls = true
-}
+#auto_encrypt {
+#  allow_tls = true
+#}

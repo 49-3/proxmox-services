@@ -24,6 +24,10 @@ vault_server_group: "{{ groups[vault_ansible_group] }}"
 # get envs from environment
 consul_http_token: "{{ lookup('env', 'CONSUL_HTTP_TOKEN') | default('', false) }}"
 consul_http_addr: "{{ lookup('env', 'CONSUL_HTTP_ADDR') | default('', false) }}"
+consul_ca_cert: "{{ lookup('env', 'CONSUL_CACERT') | default('', false) }}"
+consul_client_cert: "{{ lookup('env', 'CONSUL_CLIENT_CERT') | default('', false) }}"
+consul_client_key: "{{ lookup('env', 'CONSUL_CLIENT_KEY') | default('', false) }}"
+consul_tls_server_name: "{{ lookup('env', 'CONSUL_TLS_SERVER_NAME') | default('', false) }}"
 
 vault_service_name: 'vault'
 vault_user: 'vault'
@@ -84,9 +88,9 @@ vault_seal:
 # Conf for vault tls
 vault_tls_disable_client_certs: true
 # vault_tls_disable_client_certs: false
-# vault_tls_ca_cert_file: 'tls/consul-agent-ca.pem'
-# vault_tls_cert_file: 'tls/dc1-server-consul-0.pem'
-# vault_tls_key_file: 'tls/dc1-server-consul-0-key.pem'
+vault_tls_ca_cert_file: 'tls/consul-agent-ca.pem'
+vault_tls_cert_file: 'tls/consul-agent.pem'
+vault_tls_key_file: 'tls/consul-agent-key.pem'
 
 # Conf for licences
 # vault_license_file: 'change_me'

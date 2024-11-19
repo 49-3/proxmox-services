@@ -5,13 +5,13 @@
     export CONSUL_CACERT={{ consul_config_dir }}/tls/consul-agent-ca.pem
     export CONSUL_CLIENT_CERT={{ consul_config_dir }}/tls/consul-agent.pem
     export CONSUL_CLIENT_KEY={{ consul_config_dir }}/tls/consul-agent-key.pem
-    export CONSUL_TLS_SERVER_NAME=server.dc1.consul
+    export CONSUL_TLS_SERVER_NAME={{ inventory_hostname }}.dc1.consul
 
     consul acl bootstrap \
       -ca-file={{ consul_config_dir }}/tls/consul-agent-ca.pem \
       -client-cert={{ consul_config_dir }}/tls/consul-agent.pem \
       -client-key={{ consul_config_dir }}/tls/consul-agent-key.pem \
-      -tls-server-name="server.dc1.consul" \
+      -tls-server-name="{{ inventory_hostname }}.dc1.consul" \
       --format json >  {{ consul_config_dir }}/tokens/acl-token-bootstrap.json
   args:
     executable: /bin/bash

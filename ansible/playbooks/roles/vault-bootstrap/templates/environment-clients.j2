@@ -1,3 +1,7 @@
-CONSUL_HTTP_TOKEN={{ consul_http_token.stdout }}
-CONSUL_HTTP_ADDR={{ consul_http_addr.stdout }}
-VAULT_ADDR=http://{{ hostvars['vault-1']['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
+CONSUL_HTTP_TOKEN={{ consul_http_token }}
+CONSUL_HTTP_ADDR={{ consul_http_addr }}
+CONSUL_CACERT={{ consul_ca_cert }}
+CONSUL_CLIENT_CERT={{ consul_client_cert }}
+CONSUL_CLIENT_KEY={{ consul_client_key }}
+CONSUL_TLS_SERVER_NAME={{ consul_tls_server_name }}
+VAULT_ADDR=http://{{ hostvars['vault-1']['ansible_'+consul_network_interface]['ipv4']['address'] }}:8200

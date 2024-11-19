@@ -9,7 +9,7 @@ domain = "consul"
 node_name = "{{ inventory_hostname|regex_replace("\.", "_") }}"
 
 # Logging
-log_level = "INFO"
+log_level = "DEBUG"
 enable_syslog = true
 
 # Data persistence
@@ -30,9 +30,11 @@ retry_join = [
 
 # Ports
 ports {
-  http        = -1
+  http        = 8500
+  #http       = -1
   https       = 8443
-  grpc        = -1
+  grpc        = 8002
+  #grpc       = -1
   grpc_tls    = 8503
   dns         = 8600
 }
@@ -64,7 +66,6 @@ tls {
   https {
     verify_incoming = false     # N'exige pas de certificat client pour les connexions HTTPS
   }
-
   grpc {
     verify_incoming = false     # Si vous utilisez gRPC, ajustez également ce paramètre
   }
