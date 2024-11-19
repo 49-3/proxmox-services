@@ -23,6 +23,30 @@
       - systemd-resolved
     state: present
 
+- name: Créer le fichier 60-custom.conf
+  copy:
+    content: |
+      net.ipv6.conf.all.disable_ipv6 = 1
+      net.ipv6.conf.default.disable_ipv6 = 1
+      net.ipv6.conf.lo.disable_ipv6 = 1
+      net.ipv6.conf.{{ network_interface }}.disable_ipv6 = 1
+    dest: "/etc/sysctl.d/60-custom.conf"
+  become: true
+
+- name: Triger sysctl -p
+  shell: |
+    sysctl -p
+  args:
+    executable: /bin/bash
+  become: true
+
+- name: Triger systemctl restart procps
+  shell: |
+    systemctl restart procps
+  args:
+    executable: /bin/bash
+  become: true
+
 - name: Create resolved.conf.d directory
   file:
     path: "/etc/systemd/resolved.conf.d"
