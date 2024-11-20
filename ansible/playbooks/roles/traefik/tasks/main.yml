@@ -113,6 +113,14 @@
     group: traefik
     mode: "0744"
 
+- name: Copy .ens file to server
+  ansible.builtin.copy:
+    src: .envs
+    dest: /etc/traefik
+    owner: traefik
+    group: traefik
+    mode: "0744"
+
 - name: Copy systemd service file to server
   ansible.builtin.copy:
     src: traefik.service
