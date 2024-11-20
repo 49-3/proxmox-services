@@ -62,7 +62,7 @@
 
 - debug: msg="consul_http_token exist = {{ consul_http_token_exist.stdout }}"
   when:
-      - consul_http_token_exist.stdout == "1"
+    - consul_http_token_exist.stdout == "1"
 
 - name: Create Traefik config file whitout consul
   ansible.builtin.template:

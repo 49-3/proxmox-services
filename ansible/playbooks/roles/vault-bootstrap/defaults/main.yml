@@ -96,7 +96,7 @@ vault_tls_disable_client_certs: true
 # vault_license_string: 'change_me'
 
 # if Consul is used as storage backend
-consul_http_addr: '192.168.1.161'
+consul_addr: '192.168.1.161'
 consul_http_port: '8500'
 consul_scheme: 'http'
 consul_tls_directory: '/etc/consul.d/'
