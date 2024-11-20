@@ -22,6 +22,7 @@
     group: "{{ consul_user_name }}"
   with_items:
     - "{{ consul_config_dir }}"
+    - "{{ consul_config_dir }}/certs"
     - "{{ consul_config_dir }}/tls"
     - "{{ consul_config_dir }}/tokens"
     - "{{ consul_config_dir }}/policies"
@@ -31,13 +32,12 @@
     consul tls ca create
   args:
     executable: /bin/bash
-    chdir: "{{ consul_config_dir }}/tls"
-    creates: "{{ consul_config_dir }}/tls/consul-agent-ca.pem"
-  run_once: true
+    chdir: "{{ consul_config_dir }}/certs"
+    creates: "{{ consul_config_dir }}/certs/consul-agent-ca.pem"
   when: inventory_hostname == "consul-1"
   become: no
 
-- name: Fetch ca certificate locally
+- name: Fetch certificate locally
   include_tasks: "_local_get_certificates.yml"
 
 - name: Root certificate upload to masters
@@ -47,11 +47,18 @@
     mode: 0640
     owner: "root"
     group: "{{ consul_user_name }}"
-    when: inventory_hostname != "consul-1"
+
+- name: Root key upload to masters
+  copy:
+    src: "{{ consul_local_tls_dir }}/consul-agent-ca-key.pem"
+    dest: "{{ consul_config_dir }}/tls/consul-agent-ca-key.pem"
+    mode: 0640
+    owner: "root"
+    group: "{{ consul_user_name }}"
 
 - name: Generate server certificates
   shell: |
-    consul tls cert create -server -dc dc1 -domain consul
+    consul tls cert create -server -dc dc1 -domain consul -additional-dnsname={{ inventory_hostname }}.dc1.consul
   args:
     executable: /bin/bash
     chdir: "{{ consul_config_dir }}/tls/"
@@ -60,72 +67,38 @@
 
 - name: Generate nodes certificates
   shell: |
-    consul tls cert create -client -dc dc1 -domain consul
+    consul tls cert create -client -dc dc1 -domain consul -additional-dnsname={{ inventory_hostname }}.dc1.consul
   args:
     executable: /bin/bash
     chdir: "{{ consul_config_dir }}/tls/"
   become: yes
   when: consul_mode == "node"
 
-- name: copy consul-agent.pem to servers
-  copy:
-    src: "{{ consul_config_dir }}/tls/dc1-server-consul-0.pem"
-    dest: "{{ consul_config_dir }}/tls/consul-agent.pem"
-    mode: 0640
-    owner: "root"
-    group: "{{ consul_user_name }}"
+- name: Prepare tls files on servers
+  shell: |
+    mv dc1-server-consul-0.pem consul-agent.pem
+    mv dc1-server-consul-0-key.pem consul-agent-key.pem
+    rm -rf consul-agent-ca-key.pem
+    chown -R root:{{ consul_user_name }} ./
+    chmod -R 0640 ./
+  args:
+    chdir: "{{ consul_config_dir }}/tls"
+    executable: /bin/bash
   when: consul_mode == "server"
+  become: true
 
-- name: Remove the old certs from servers
-  ansible.builtin.file:
-    path: "{{ consul_config_dir }}/tls/dc1-server-consul-0.pem"
-    state: absent
-  when: consul_mode == "server"
-
-- name: coky consul-agent-key.pem to servers
-  copy:
-    src: "{{ consul_config_dir }}/tls/dc1-server-consul-0-key.pem"
-    dest: "{{ consul_config_dir }}/tls/consul-agent-key.pem"
-    mode: 0640
-    owner: "root"
-    group: "{{ consul_user_name }}"
-  when: consul_mode == "server"
-
-- name: Remove the old keys from servers
-  ansible.builtin.file:
-    path: "{{ consul_config_dir }}/tls/dc1-server-consul-0-key.pem"
-    state: absent
-  when: consul_mode == "server"
-
-- name: copy consul-agent.pem to clients
-  copy:
-    src: "{{ consul_config_dir }}/tls/dc1-client-consul-0.pem"
-    dest: "{{ consul_config_dir }}/tls/consul-agent.pem"
-    mode: 0640
-    owner: "root"
-    group: "{{ consul_user_name }}"
-  when: consul_mode == "client"
-
-- name: Remove the old certs from clients
-  ansible.builtin.file:
-    path: "{{ consul_config_dir }}/tls/dc1-client-consul-0.pem"
-    state: absent
-  when: consul_mode == "client"
-
-- name: coky consul-agent-key.pem to clients
-  copy:
-    src: "{{ consul_config_dir }}/tls/dc1-client-consul-0-key.pem"
-    dest: "{{ consul_config_dir }}/tls/consul-agent-key.pem"
-    mode: 0640
-    owner: "root"
-    group: "{{ consul_user_name }}"
-  when: consul_mode == "client"
-
-- name: Remove the old keys from clients
-  ansible.builtin.file:
-    path: "{{ consul_config_dir }}/tls/dc1-client-consul-0-key.pem"
-    state: absent
-  when: consul_mode == "client"
+- name: Prepare tls files on clients
+  shell: |
+    mv dc1-client-consul-0.pem consul-agent.pem
+    mv dc1-client-consul-0-key.pem consul-agent-key.pem
+    rm -rf consul-agent-ca-key.pem
+    chown -R root:{{ consul_user_name }} ./
+    chmod -R 0640 ./
+  args:
+    chdir: "{{ consul_config_dir }}/tls"
+    executable: /bin/bash
+  when: consul_mode == "node"
+  become: true
 
 - name: Get Gossip
   ansible.builtin.command:

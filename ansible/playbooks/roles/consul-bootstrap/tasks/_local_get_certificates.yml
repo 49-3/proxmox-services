@@ -10,7 +10,7 @@
 
 - name: Check if consul-agent-ca.pem exist
   stat:
-    path: "{{ consul_config_dir }}/tls/consul-agent-ca.pem"
+    path: "{{ consul_config_dir }}/certs/consul-agent-ca.pem"
   register: consul_agent_ca
 
 - name: Get certificate from consul-1
@@ -19,6 +19,11 @@
     dest: "{{ consul_local_tls_dir }}"
     mode: pull
   with_items:
-    - "{{ consul_config_dir }}/tls/consul-agent-ca.pem"
-    - "{{ consul_config_dir }}/tls/consul-agent-ca-key.pem"
+    - "{{ consul_config_dir }}/certs/consul-agent-ca.pem"
+    - "{{ consul_config_dir }}/certs/consul-agent-ca-key.pem"
   when: consul_agent_ca.stat.exists
+
+- name: Remove certs folder
+  ansible.builtin.file:
+    path: "{{ consul_config_dir }}/certs"
+    state: absent
