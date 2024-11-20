@@ -4,6 +4,10 @@ default: help
 help: ## list makefile targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
+.PHONY: traefik
+traefik: ## Launch consul-bootstrap playbook
+	bash -c "time ansible-playbook playbooks/traefik.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
+
 .PHONY: consul_bootstrap
 consul_bootstrap: ## Launch consul-bootstrap playbook
 	bash -c "time ansible-playbook playbooks/consul-bootstrap.yml --ssh-common-args='-o StrictHostKeyChecking=no'"

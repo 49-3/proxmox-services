@@ -1,11 +1,12 @@
 ---
+ansible_python_interpreter: "/usr/bin/python3"
+
 consul_addr: "192.168.1.161:8443"
 consul_tls_dir: "/etc/consul.d/tls"
-consul-agent-ca: "consul-agent-ca.pem"
-consul-agent: "consul-agent.pem"
-consul-agent-key: "consul-agent-key.pem"
+consul_agent_ca: "consul-agent-ca.pem"
+consul_agent: "consul-agent.pem"
+consul_agent_key: "consul-agent-key.pem"
 
-ansible_python_interpreter: /usr/bin/python3
 acme_email: "na.3@korporate.org"
 DOMAINNAME: "korporate.org"
 CLOUDFLARE_EMAIL: "na.3@korporate.org"

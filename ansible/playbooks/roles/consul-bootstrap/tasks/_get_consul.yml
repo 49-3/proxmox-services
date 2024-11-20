@@ -4,7 +4,7 @@
     name: "unzip"
     state: present
 
-- name: Stat promtail_binari_old_name
+- name: Stat consul_binari_old_name
   stat: path={{ consul_binary_path }}
   register: consul_stat
 
@@ -25,7 +25,7 @@
   delay: 5           # Délai entre chaque tentative en secondes
   register: download_result
   until: download_result is succeeded
-  
+
 - name: Unarchive
   unarchive:
     src: "{{ consul_archive_dest }}"

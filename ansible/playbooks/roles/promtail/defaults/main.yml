@@ -1,4 +1,5 @@
 ---
+ansible_python_interpreter: /usr/bin/python3
 promtail_cache_dir: "/var/cache/ansible"
 
 promtail_version: "3.2.1"

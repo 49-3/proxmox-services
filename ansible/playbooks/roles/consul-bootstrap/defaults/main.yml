@@ -1,4 +1,5 @@
 ---
+ansible_python_interpreter: /usr/bin/python3
 consul_cache_dir: "/var/cache/ansible"
 
 consul_version: "1.20.0"

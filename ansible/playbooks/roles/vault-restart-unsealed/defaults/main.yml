@@ -1,6 +1,6 @@
 ---
 # defaults file for vault-restart-unsealed
-
+ansible_python_interpreter: /usr/bin/python3
 vault_service_name: 'vault'
 vault_api_port: '8200'
 vault_network_interface: 'ens33'

@@ -1,5 +1,6 @@
 ---
 # defaults file for vault_agent_autauth
+ansible_python_interpreter: /usr/bin/python3
 # Adresse de Vault
 vault_address: "{{ lookup('env', 'VAULT_ADDR') | default('', false) }}"
 

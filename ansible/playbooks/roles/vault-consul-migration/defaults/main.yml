@@ -1,5 +1,6 @@
 ---
 # defaults file for vault_consul_migration
+ansible_python_interpreter: /usr/bin/python3
 consul_pki_path: "consul-pki"
 connect_pki_path: "connect-pki"
 consul_common_name: "consul-ca"
