@@ -58,7 +58,7 @@
 
 - name: Generate server certificates
   shell: |
-    consul tls cert create -server -dc dc1 -domain consul -additional-dnsname={{ inventory_hostname }}.dc1.consul
+    consul tls cert create -server -dc dc1 -domain consul -additional-dnsname={{ inventory_hostname }}.dc1.consul -additional-ipaddress={{ hostvars[inventory_hostname]['ansible_'+consul_network_interface]['ipv4']['address'] }}
   args:
     executable: /bin/bash
     chdir: "{{ consul_config_dir }}/tls/"
@@ -67,7 +67,7 @@
 
 - name: Generate nodes certificates
   shell: |
-    consul tls cert create -client -dc dc1 -domain consul -additional-dnsname={{ inventory_hostname }}.dc1.consul
+    consul tls cert create -client -dc dc1 -domain consul -additional-dnsname={{ inventory_hostname }}.dc1.consul -additional-ipaddress={{ hostvars[inventory_hostname]['ansible_'+consul_network_interface]['ipv4']['address'] }}
   args:
     executable: /bin/bash
     chdir: "{{ consul_config_dir }}/tls/"
@@ -80,7 +80,7 @@
     mv dc1-server-consul-0-key.pem consul-agent-key.pem
     rm -rf consul-agent-ca-key.pem
     chown -R root:{{ consul_user_name }} ./
-    chmod -R 0640 ./
+    chmod -R 0770 ./
   args:
     chdir: "{{ consul_config_dir }}/tls"
     executable: /bin/bash
@@ -93,7 +93,7 @@
     mv dc1-client-consul-0-key.pem consul-agent-key.pem
     rm -rf consul-agent-ca-key.pem
     chown -R root:{{ consul_user_name }} ./
-    chmod -R 0640 ./
+    chmod -R 0770 ./
   args:
     chdir: "{{ consul_config_dir }}/tls"
     executable: /bin/bash
