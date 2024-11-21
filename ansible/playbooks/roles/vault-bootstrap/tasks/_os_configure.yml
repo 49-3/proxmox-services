@@ -35,7 +35,6 @@
   with_items:
     - '{{ vault_home_directory }}'
     - '{{ vault_data_directory }}'
-    - '{{ vault_tls_directory }}'
     - '{{ vault_log_dir }}'
     - '{{ vault_license_directory }}'
     - '{{ vault_data_directory }}/data'
