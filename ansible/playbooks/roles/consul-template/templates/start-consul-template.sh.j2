@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Définir l'adresse Vault
-export VAULT_ADDR="http://{{ hostvars['vault-1']['ansible_'+network_interface]['ipv4']['address'] }}:8200"
+export VAULT_ADDR="https://{{ hostvars['vault-1']['ansible_'+network_interface]['ipv4']['address'] }}:8200"
+export VAULT_CACERT="{{ vault_ca_cert }}"
 
 # Définir le token parent pour générer un nouveau token
 export VAULT_TOKEN="{{ vault_parent_token.stdout }}"

@@ -4,4 +4,5 @@ CONSUL_CACERT={{ consul_config_dir }}/tls/consul-agent-ca.pem
 CONSUL_CLIENT_CERT={{ consul_config_dir }}/tls/consul-agent.pem
 CONSUL_CLIENT_KEY={{ consul_config_dir }}/tls/consul-agent-key.pem
 CONSUL_TLS_SERVER_NAME={{ inventory_hostname }}.dc1.consul
-VAULT_ADDR=http://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
+VAULT_ADDR=https://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
+VAULT_CACERT={{ consul_tls_directory }}/{{ consul_tls_ca_file }}

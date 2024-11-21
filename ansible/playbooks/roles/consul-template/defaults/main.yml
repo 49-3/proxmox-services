@@ -10,6 +10,8 @@ consul_template_sha256_url: "https://releases.hashicorp.com/consul-template/{{ c
 
 # Chemins d'installation et stockage
 
+vault_ca_cert: "/etc/consul.d/tls/consul-agent-ca.pem"
+
 consul_template_install_path: "/usr/local/bin/consul-template"
 consul_template_config_dir: "/etc/consul-template.d"
 consul_template_data_dir: "/var/lib/consul-template"

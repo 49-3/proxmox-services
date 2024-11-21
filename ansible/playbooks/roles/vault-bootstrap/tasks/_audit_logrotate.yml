@@ -19,7 +19,8 @@
 
 - name: Vérifier les dispositifs d'audit existants
   shell: |
-    export VAULT_ADDR=http://{{ hostvars['vault-1']['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
+    export VAULT_ADDR=https://{{ hostvars['vault-1']['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
+    export VAULT_CACERT={{ consul_tls_directory }}/{{ consul_tls_ca_file }}
     export VAULT_TOKEN={{ hostvars['deploy']['vault_token_fact'] }}
     vault audit list -format=json
   args:
@@ -38,7 +39,8 @@
 
 - name: Désactiver le dispositif d'audit si déjà configuré
   shell: |
-    export VAULT_ADDR=http://{{ hostvars['vault-1']['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
+    export VAULT_ADDR=https://{{ hostvars['vault-1']['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
+    export VAULT_CACERT={{ consul_tls_directory }}/{{ consul_tls_ca_file }}
     export VAULT_TOKEN={{ hostvars['deploy']['vault_token_fact'] }}
     vault audit disable file
   args:
@@ -53,7 +55,8 @@
 
 - name: Activer le dispositif d'audit
   shell: |
-    export VAULT_ADDR=http://{{ hostvars['vault-1']['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
+    export VAULT_ADDR=https://{{ hostvars['vault-1']['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}
+    export VAULT_CACERT={{ consul_tls_directory }}/{{ consul_tls_ca_file }}
     export VAULT_TOKEN={{ hostvars['deploy']['vault_token_fact'] }}
     vault audit enable file file_path={{ vault_log_dir }}/{{ audit_log_file }}
   args:
