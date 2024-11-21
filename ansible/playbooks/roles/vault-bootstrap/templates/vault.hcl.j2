@@ -65,7 +65,7 @@ storage "consul" {
 {% endif %}
   tls_cert_file   = "{{ consul_tls_directory }}/{{ consul_tls_cert_file }}"
   tls_key_file    = "{{ consul_tls_directory }}/{{ consul_tls_key_file }}"
-  tls_skip_verify = "{{ consul_tls_skip_verify }}"
+  tls_skip_verify = {{ consul_tls_skip_verify }}
   tls_server_name = "{{ consul_tls_server_name }}"
 {% endif %}
 }

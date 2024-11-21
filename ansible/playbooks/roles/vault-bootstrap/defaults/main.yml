@@ -105,6 +105,6 @@ consul_tls_ca_file: 'tls/consul-agent-ca.pem'
 consul_tls_cert_file: 'tls/consul-agent.pem'
 consul_tls_key_file: 'tls/consul-agent-key.pem'
 consul_tls_server_name: 'client.dc1.consul'
-consul_tls_skip_verify: false
+consul_tls_skip_verify: 'false'
 consul_vault_kv_path: 'vault/'
 consul_vault_acl_token: true

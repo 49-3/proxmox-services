@@ -29,5 +29,8 @@
 - name: Call _policies_acls.yml
   include_tasks: "_policies_acls.yml"
 
+- name: Change consul config for full tls
+  include_tasks: "_flush_config_tls.yml"
+
 - name: Flush handlers
   meta: flush_handlers
