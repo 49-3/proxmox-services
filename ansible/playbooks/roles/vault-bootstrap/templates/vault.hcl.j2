@@ -109,10 +109,10 @@ service_registration "consul" {
   scheme  = "{{ consul_scheme }}"
   service_id = "vault"
   service_name = "vault"
-  {% if consul_tls_cert_file is defined and consul_tls_key_file is defined %}
-  {% if consul_tls_ca_file is defined %}
+{% if consul_tls_cert_file is defined and consul_tls_key_file is defined %}
+{% if consul_tls_ca_file is defined %}
   tls_ca_file     = "{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
-  {% endif %}
+{% endif %}
   tls_cert_file   = "{{ consul_tls_directory }}/{{ consul_tls_cert_file }}"
   tls_key_file    = "{{ consul_tls_directory }}/{{ consul_tls_key_file }}"
   tls_skip_verify = "{{ consul_tls_skip_verify }}"

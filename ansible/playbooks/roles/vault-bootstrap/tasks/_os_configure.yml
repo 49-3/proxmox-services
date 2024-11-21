@@ -16,6 +16,15 @@
   when:
     - vault_create_account
 
+- name: Add vault user to consul group
+  shell: |
+    usermod -aG consul vault
+  args:
+    executable: /bin/bash
+  become: true
+  when:
+    - vault_create_account
+
 - name: Creating Vault directories
   ansible.builtin.file:
     state: directory
