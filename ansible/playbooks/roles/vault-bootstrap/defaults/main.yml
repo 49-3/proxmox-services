@@ -29,6 +29,19 @@ consul_http_addr: "{{ lookup('env', 'CONSUL_HTTP_ADDR') | default('', false) }}"
 consul_config_dir: '/etc/consul.d'
 
 
+# if Consul is used as storage backend
+consul_addr: '192.168.1.161'
+consul_http_port: '8443'
+consul_scheme: 'https'
+consul_tls_directory: '/etc/consul.d'
+consul_tls_ca_file: 'tls/consul-agent-ca.pem'
+consul_tls_cert_file: 'tls/consul-agent.pem'
+consul_tls_key_file: 'tls/consul-agent-key.pem'
+consul_tls_server_name: 'client.dc1.consul'
+consul_tls_skip_verify: 'false'
+consul_vault_kv_path: 'vault/'
+consul_vault_acl_token: true
+
 vault_service_name: 'vault'
 vault_user: 'vault'
 vault_group: 'vault'
@@ -41,7 +54,7 @@ vault_install_directory: '/usr/bin'
 vault_binary_path: '{{ vault_install_directory }}/vault'
 vault_archive_directory: '/tmp/vault'
 vault_log_dir: '/var/log/vault'
-vault_tls_directory: '{{ vault_data_directory }}/tls'
+vault_tls_directory: '{{ consul_tls_directory }}/tls'
 vault_license_directory: '{{ vault_data_directory }}/license'
 vault_config_file: '{{ vault_home_directory }}/vault.hcl'
 
@@ -86,25 +99,12 @@ vault_seal:
   type: 'shamir'
 
 # Conf for vault tls
-vault_tls_disable_client_certs: true
-# vault_tls_disable_client_certs: false
-# vault_tls_ca_cert_file: 'tls/consul-agent-ca.pem'
-# vault_tls_cert_file: 'tls/consul-agent.pem'
-# vault_tls_key_file: 'tls/consul-agent-key.pem'
+#vault_tls_disable_client_certs: true
+vault_tls_disable_client_certs: false
+vault_tls_ca_cert_file: 'consul-agent-ca.pem'
+vault_tls_cert_file: 'consul-agent.pem'
+vault_tls_key_file: 'consul-agent-key.pem'
 
 # Conf for licences
 # vault_license_file: 'change_me'
 # vault_license_string: 'change_me'
-
-# if Consul is used as storage backend
-consul_addr: '192.168.1.161'
-consul_http_port: '8443'
-consul_scheme: 'https'
-consul_tls_directory: '/etc/consul.d'
-consul_tls_ca_file: 'tls/consul-agent-ca.pem'
-consul_tls_cert_file: 'tls/consul-agent.pem'
-consul_tls_key_file: 'tls/consul-agent-key.pem'
-consul_tls_server_name: 'client.dc1.consul'
-consul_tls_skip_verify: 'false'
-consul_vault_kv_path: 'vault/'
-consul_vault_acl_token: true

@@ -3,9 +3,11 @@ listener "tcp" {
 {% set proto="https" %}
   address                  = "{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
   cluster_address          = "{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_cluster_port }}"
-  tls_cert_file            = "{{ vault_tls_directory }}/vault.crt"
-  tls_key_file             = "{{ vault_tls_directory }}/vault.key"
+  tls_cert_file            = "{{ vault_tls_directory }}/{{ vault_tls_cert_file }}"
+  tls_key_file             = "{{ vault_tls_directory }}/{{ vault_tls_key_file }}"
+  tls_client_ca_file       = "{{ vault_tls_directory }}/{{ vault_tls_ca_cert_file }}"
   tls_disable_client_certs = {{ vault_tls_disable_client_certs | lower }}
+  tls_disable              = false
 {% else %}
 {% set proto="http" %}
   address         = "{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
@@ -126,8 +128,8 @@ disable_cache = true
 disable_mlock = true
 log_format    = "json"
 
-api_addr      = "https://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
-cluster_addr  = "https://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_cluster_port }}"
+api_addr      = "{{ proto }}://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+cluster_addr  = "{{ proto }}://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_cluster_port }}"
 
 max_lease_ttl           = "10h"
 default_lease_ttl       = "10h"
