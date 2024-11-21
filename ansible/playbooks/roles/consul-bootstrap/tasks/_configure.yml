@@ -56,6 +56,14 @@
     owner: "root"
     group: "{{ consul_user_name }}"
 
+- name: Add ca to trusted ca
+  shell: |
+    cp {{ consul_config_dir }}/tls/consul-agent-ca.pem /usr/local/share/ca-certificates/consul-agent-ca.cr
+    update-ca-certificates
+  args:
+    executable: /bin/bash
+  become: yes
+
 - name: Generate server certificates
   shell: |
     consul tls cert create \
