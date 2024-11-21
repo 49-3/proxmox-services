@@ -36,9 +36,9 @@ providers:
       address: "{{ consul_addr }}"
       token: "{{ consul_http_token.stdout }}"
       tls:
-        ca: "{{ consul_tls_dir }}/{{ consul_agent_ca }}"
-        cert: "{{ consul_tls_dir }}/{{ consul_agent }}"
-        key: "{{ consul_tls_dir }}/{{ consul_agent_key }}"
+        ca: "{{ consul_tls_dir }}/consul-agent-ca.pem"
+        cert: "{{ consul_tls_dir }}/consul-agent.pem"
+        key: "{{ consul_tls_dir }}/consul-agent-key.pem"
 
 certificatesResolvers:
   dns-cloudflare:

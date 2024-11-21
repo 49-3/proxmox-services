@@ -126,8 +126,8 @@ disable_cache = true
 disable_mlock = true
 log_format    = "json"
 
-api_addr      = "http://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
-cluster_addr  = "http://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_cluster_port }}"
+api_addr      = "{{ proto }}://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+cluster_addr  = "{{ proto }}://{{ hostvars[inventory_hostname]['ansible_'+vault_network_interface]['ipv4']['address'] }}:{{ vault_cluster_port }}"
 
 max_lease_ttl           = "10h"
 default_lease_ttl       = "10h"
