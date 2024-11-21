@@ -1,5 +1,5 @@
 CONSUL_HTTP_TOKEN={{ hostvars['consul-1']['consul_http_token_fact'] }}
-CONSUL_HTTP_ADDR=https://{{ hostvars['consul-1']['ansible_'+consul_network_interface]['ipv4']['address'] }}:8443
+CONSUL_HTTP_ADDR=https://127.0.0.1:8443
 CONSUL_CACERT={{ consul_config_dir }}/tls/consul-agent-ca.pem
 CONSUL_CLIENT_CERT={{ consul_config_dir }}/tls/consul-agent.pem
 CONSUL_CLIENT_KEY={{ consul_config_dir }}/tls/consul-agent-key.pem
