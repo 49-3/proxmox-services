@@ -1,0 +1,51 @@
+---
+- name: Update grpc and http addresses and modify ports in agent-server-networking.hcl
+  block:
+    # Modifier grpc
+    - name: Set grpc to 127.0.0.1
+      ansible.builtin.replace:
+        path: /etc/consul.d/agent-server-networking.hcl
+        regexp: '^  grpc\s+=\s+".*"$'
+        replace: '  grpc = "127.0.0.1"'
+
+    # Modifier http
+    - name: Set http to 127.0.0.1
+      ansible.builtin.replace:
+        path: /etc/consul.d/agent-server-networking.hcl
+        regexp: '^  http\s+=\s+".*"$'
+        replace: '  http = "127.0.0.1"'
+
+    # Modifier la section ports
+    - name: Update ports configuration
+      ansible.builtin.replace:
+        path: /etc/consul.d/agent-server-networking.hcl
+        regexp: 'ports\s+{[^}]+}'
+        replace: |
+          ports {
+            http        = -1
+            #http        = 8500
+            https       = 8443
+            #grpc        = 8502
+            grpc        = -1
+            grpc_tls    = 8503
+            dns         = 8600
+          }
+  when: consul_mode == "server"
+  notify: Restart consul
+
+- name: Update ports configuration in consul.hcl
+  ansible.builtin.replace:
+    path: /etc/consul.d/consul.hcl
+    regexp: 'ports\s+{[^}]+}'
+    replace: |
+      ports {
+        #http        = 8500
+        http       = -1
+        https       = 8443
+        #grpc        = 8002
+        grpc       = -1
+        grpc_tls    = 8503
+        dns         = 8600
+      }
+  when: consul_mode == "node"
+  notify: Restart consul
