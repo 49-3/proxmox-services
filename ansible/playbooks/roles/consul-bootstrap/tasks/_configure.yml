@@ -62,26 +62,24 @@
       -server \
       -dc dc1 \
       -domain consul \
-      -additional-dnsname={{ inventory_hostname }}.dc1.consul \
-      -additional-dnsname=localhost \
-      -additional-dnsname={{ groups['consul_masters'] | map('extract', hostvars, ['inventory_hostname']) | join(',') }}.dc1.consul \
-      -additional-ipaddress={{ hostvars[inventory_hostname]['ansible_'+consul_network_interface]['ipv4']['address'] }}
+      {% for dns in san_consul_servers[inventory_hostname]['dns'] %}-additional-dnsname={{ dns }} {% endfor %} \
+      {% for ip in san_consul_servers[inventory_hostname]['ip'] %}-additional-ipaddress={{ ip }} {% endfor %} \
+      -additional-dnsname=*.service.consul
   args:
     executable: /bin/bash
     chdir: "{{ consul_config_dir }}/tls/"
   become: yes
   when: consul_mode == "server"
 
-- name: Generate nodes certificates
+- name: Generate node certificates
   shell: |
     consul tls cert create \
       -client \
       -dc dc1 \
       -domain consul \
-      -additional-dnsname={{ inventory_hostname }}.dc1.consul \
-      -additional-dnsname=localhost \
-      -additional-dnsname={{ groups['consul_nodes'] | map('extract', hostvars, ['inventory_hostname']) | join(',') }}.dc1.consul \
-      -additional-ipaddress={{ hostvars[inventory_hostname]['ansible_'+consul_network_interface]['ipv4']['address'] }}
+      {% for dns in san_consul_nodes[inventory_hostname]['dns'] %}-additional-dnsname={{ dns }} {% endfor %} \
+      {% for ip in san_consul_nodes[inventory_hostname]['ip'] %}-additional-ipaddress={{ ip }} {% endfor %} \
+      -additional-dnsname=*.service.consul
   args:
     executable: /bin/bash
     chdir: "{{ consul_config_dir }}/tls/"
