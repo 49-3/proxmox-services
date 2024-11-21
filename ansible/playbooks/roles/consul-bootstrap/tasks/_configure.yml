@@ -62,8 +62,14 @@
       -server \
       -dc dc1 \
       -domain consul \
-      {% for dns in san_consul_servers[inventory_hostname]['dns'] %}-additional-dnsname={{ dns }} {% endfor %} \
-      {% for ip in san_consul_servers[inventory_hostname]['ip'] %}-additional-ipaddress={{ ip }} {% endfor %} \
+      -additional-dnsname=localhost \
+      -additional-dnsname=server.dc1.consul \
+      -additional-dnsname=consul-1.dc1.consul \
+      -additional-dnsname=consul-2.dc1.consul \
+      -additional-dnsname=consul-3.dc1.consul \
+      -additional-ipaddress=192.168.1.161 \
+      -additional-ipaddress=192.168.1.162 \
+      -additional-ipaddress=192.168.1.163
       -additional-dnsname=*.service.consul
   args:
     executable: /bin/bash
@@ -77,8 +83,16 @@
       -client \
       -dc dc1 \
       -domain consul \
-      {% for dns in san_consul_nodes[inventory_hostname]['dns'] %}-additional-dnsname={{ dns }} {% endfor %} \
-      {% for ip in san_consul_nodes[inventory_hostname]['ip'] %}-additional-ipaddress={{ ip }} {% endfor %} \
+      -additional-dnsname=localhost \
+      -additional-dnsname=client.dc1.consul \
+      -additional-dnsname=deploy.dc1.consul \
+      -additional-dnsname=traefik.dc1.consul \
+      -additional-dnsname=vault-1.dc1.consul \
+      -additional-dnsname=vault-2.dc1.consul \
+      -additional-ipaddress=192.168.1.177 \
+      -additional-ipaddress=192.168.1.170 \
+      -additional-ipaddress=192.168.1.164 \
+      -additional-ipaddress=192.168.1.165 \
       -additional-dnsname=*.service.consul
   args:
     executable: /bin/bash
