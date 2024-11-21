@@ -9,3 +9,6 @@ secrets_user_name: 'evil'
 vault_home_directory: '/etc/vault.d'
 vault_ansible_group: 'vaults'
 vault_server_group: "{{ groups[vault_ansible_group] }}"
+
+consul_tls_directory: '/etc/consul.d'
+consul_tls_ca_file: 'tls/consul-agent-ca.pem'

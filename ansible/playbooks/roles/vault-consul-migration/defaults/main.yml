@@ -9,3 +9,6 @@ vault_config_dir: "/etc/vault.d"
 vault_policies_dir: "{{ vault_config_dir }}/policies"
 deploy_vault_secret_dir: "/home/evil/secret/vault"
 network_interface: "ens33"
+
+consul_tls_directory: '/etc/consul.d'
+consul_tls_ca_file: 'tls/consul-agent-ca.pem'

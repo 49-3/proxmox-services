@@ -1,7 +1,8 @@
 ---
 - name: Vérifier si vault-1 est initialisé
   shell: |
-    export VAULT_ADDR="http://{{ hostvars['vault-1']['ansible_' + vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+    export VAULT_ADDR="https://{{ hostvars['vault-1']['ansible_' + vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+    export VAULT_CACERT="{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
     vault status | grep Initialized | awk '{print $2}'
   args:
     executable: /bin/bash
@@ -12,7 +13,8 @@
 
 - name: Vérifier si vault-2 est initialisé
   shell: |
-    export VAULT_ADDR="http://{{ hostvars['vault-2']['ansible_' + vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+    export VAULT_ADDR="https://{{ hostvars['vault-2']['ansible_' + vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+    export VAULT_CACERT="{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
     vault status | grep Initialized | awk '{print $2}'
   args:
     executable: /bin/bash
@@ -25,7 +27,8 @@
   block:
     - name: Initialiser Vault sur vault-1
       shell: |
-        export VAULT_ADDR="http://{{ hostvars['vault-1']['ansible_' + vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+        export VAULT_ADDR="https://{{ hostvars['vault-1']['ansible_' + vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+        export VAULT_CACERT="{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
         vault operator init -key-shares={{ key_amount }} -key-threshold={{ key_min_to_unseal }} > {{ vault_home_directory }}/init.file
       args:
         executable: /bin/bash

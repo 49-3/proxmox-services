@@ -3,4 +3,7 @@
 ansible_python_interpreter: /usr/bin/python3
 deploy_vault_secret_dir: "{{ secrets_dir }}/vault"
 network_interface: "ens33"
-vault_address: "http://{{ hostvars['vault-1']['ansible_'+network_interface]['ipv4']['address'] }}:8200"
+vault_address: "https://{{ hostvars['vault-1']['ansible_'+network_interface]['ipv4']['address'] }}:8200"
+
+consul_tls_directory: '/etc/consul.d'
+consul_tls_ca_file: 'tls/consul-agent-ca.pem'
