@@ -1,0 +1,52 @@
+san_consul_servers:
+  consul-1:
+    dns:
+      - consul-1.dc1.consul
+      - localhost
+      - server.dc1.consul
+    ip:
+      - 192.168.1.161
+  consul-2:
+    dns:
+      - consul-2.dc1.consul
+      - localhost
+      - server.dc1.consul
+    ip:
+      - 192.168.1.162
+  consul-3:
+    dns:
+      - consul-3.dc1.consul
+      - localhost
+      - server.dc1.consul
+    ip:
+      - 192.168.1.163
+
+san_consul_nodes:
+  traefik:
+    dns:
+      - traefik.dc1.consul
+      - localhost
+      - client.dc1.consul
+    ip:
+      - 192.168.1.170
+  deploy:
+    dns:
+      - deploy.dc1.consul
+      - localhost
+      - client.dc1.consul
+    ip:
+      - 192.168.1.177
+  vault-1:
+    dns:
+      - vault-1.dc1.consul
+      - localhost
+      - client.dc1.consul
+    ip:
+      - 192.168.1.164
+  vault-2:
+    dns:
+      - vault-2.dc1.consul
+      - localhost
+      - client.dc1.consul
+    ip:
+      - 192.168.1.165
