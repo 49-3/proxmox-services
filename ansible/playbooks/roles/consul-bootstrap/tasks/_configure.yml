@@ -69,7 +69,7 @@
       -additional-dnsname=consul-3.dc1.consul \
       -additional-ipaddress=192.168.1.161 \
       -additional-ipaddress=192.168.1.162 \
-      -additional-ipaddress=192.168.1.163
+      -additional-ipaddress=192.168.1.163 \
       -additional-dnsname=*.service.consul
   args:
     executable: /bin/bash
