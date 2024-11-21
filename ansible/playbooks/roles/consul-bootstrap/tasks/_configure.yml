@@ -67,6 +67,10 @@
       -additional-dnsname=consul-1.dc1.consul \
       -additional-dnsname=consul-2.dc1.consul \
       -additional-dnsname=consul-3.dc1.consul \
+      -additional-dnsname=deploy.dc1.consul \
+      -additional-dnsname=traefik.dc1.consul \
+      -additional-dnsname=vault-1.dc1.consul \
+      -additional-dnsname=vault-2.dc1.consul \
       -additional-ipaddress=192.168.1.161 \
       -additional-ipaddress=192.168.1.162 \
       -additional-ipaddress=192.168.1.163 \
