@@ -36,3 +36,12 @@ retry_join = [
     {{ comma() }}"{{ hostvars[host]['ansible_'+consul_network_interface]['ipv4']['address'] }}"
     {%- endfor -%}
 ]
+
+# DNS Configuration
+dns_config {
+  allow_stale = true
+  enable_truncate = true
+}
+
+# DNS recursors
+recursors = [ "1.1.1.1" ]
