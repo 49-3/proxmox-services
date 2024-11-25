@@ -79,9 +79,9 @@
       -additional-dnsname=traefik.dc1.consul \
       -additional-dnsname=vault-1.dc1.consul \
       -additional-dnsname=vault-2.dc1.consul \
-      -additional-ipaddress=192.168.1.121.161 \
-      -additional-ipaddress=192.168.1.121.162 \
-      -additional-ipaddress=192.168.1.121.163 \
+      -additional-ipaddress=192.168.121.161 \
+      -additional-ipaddress=192.168.121.162 \
+      -additional-ipaddress=192.168.121.163 \
       -additional-dnsname=*.service.consul
   args:
     executable: /bin/bash
@@ -101,10 +101,10 @@
       -additional-dnsname=traefik.dc1.consul \
       -additional-dnsname=vault-1.dc1.consul \
       -additional-dnsname=vault-2.dc1.consul \
-      -additional-ipaddress=192.168.1.121.177 \
-      -additional-ipaddress=192.168.1.121.170 \
-      -additional-ipaddress=192.168.1.121.164 \
-      -additional-ipaddress=192.168.1.121.165 \
+      -additional-ipaddress=192.168.121.177 \
+      -additional-ipaddress=192.168.121.170 \
+      -additional-ipaddress=192.168.121.164 \
+      -additional-ipaddress=192.168.121.165 \
       -additional-dnsname=*.service.consul
   args:
     executable: /bin/bash
