@@ -1,49 +1,49 @@
 [alls]
-deploy  ansible_host=192.168.1.177
-consul-1 ansible_host=192.168.1.161
-consul-2 ansible_host=192.168.1.162
-consul-3 ansible_host=192.168.1.163
-vault-1 ansible_host=192.168.1.164
-vault-2 ansible_host=192.168.1.165
-traefik ansible_host=192.168.1.170
+deploy  ansible_host=192.168.121.177
+consul-1 ansible_host=192.168.121.161
+consul-2 ansible_host=192.168.121.162
+consul-3 ansible_host=192.168.121.163
+vault-1 ansible_host=192.168.121.164
+vault-2 ansible_host=192.168.121.165
+traefik ansible_host=192.168.121.170
 
 [promtails]
 ; loki ansible_host=10.0.30.22  => to be installed on loki playbook or not ??
-consul-1 ansible_host=192.168.1.161
-consul-2 ansible_host=192.168.1.162
-consul-3 ansible_host=192.168.1.163
-vault-1 ansible_host=192.168.1.164
-vault-2 ansible_host=192.168.1.165
-traefik ansible_host=192.168.1.170
-; runner ansible_host=192.168.1.166
-; staging ansible_host=192.168.1.167
+consul-1 ansible_host=192.168.121.161
+consul-2 ansible_host=192.168.121.162
+consul-3 ansible_host=192.168.121.163
+vault-1 ansible_host=192.168.121.164
+vault-2 ansible_host=192.168.121.165
+traefik ansible_host=192.168.121.170
+; runner ansible_host=192.168.121.166
+; staging ansible_host=192.168.121.167
 
 [k3ds]
-; runner ansible_host=192.168.1.166
-; staging ansible_host=192.168.1.167
+; runner ansible_host=192.168.121.166
+; staging ansible_host=192.168.121.167
 
 ; [runners]
-; runner ansible_host=192.168.1.166
+; runner ansible_host=192.168.121.166
 
 ; [stagings]
-; staging ansible_host=192.168.1.167
+; staging ansible_host=192.168.121.167
 
 [traefiks]
-traefik ansible_host=192.168.1.170
+traefik ansible_host=192.168.121.170
 
 [vaults]
-vault-1 ansible_host=192.168.1.164
-vault-2 ansible_host=192.168.1.165
+vault-1 ansible_host=192.168.121.164
+vault-2 ansible_host=192.168.121.165
 
 [consul_nodes]
-vault-1 ansible_host=192.168.1.164
-vault-2 ansible_host=192.168.1.165
-deploy  ansible_host=192.168.1.177
-traefik ansible_host=192.168.1.170
-; runner ansible_host=192.168.1.166
-; staging ansible_host=192.168.1.167
+vault-1 ansible_host=192.168.121.164
+vault-2 ansible_host=192.168.121.165
+deploy  ansible_host=192.168.121.177
+traefik ansible_host=192.168.121.170
+; runner ansible_host=192.168.121.166
+; staging ansible_host=192.168.121.167
 
 [consul_masters]
-consul-1 ansible_host=192.168.1.161
-consul-2 ansible_host=192.168.1.162
-consul-3 ansible_host=192.168.1.163
+consul-1 ansible_host=192.168.121.161
+consul-2 ansible_host=192.168.121.162
+consul-3 ansible_host=192.168.121.163
