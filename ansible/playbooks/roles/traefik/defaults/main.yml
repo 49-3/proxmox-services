@@ -1,7 +1,7 @@
 ---
 ansible_python_interpreter: "/usr/bin/python3"
 
-consul_addr: "192.168.1.161:8443"
+consul_addr: "192.168.1.121.161:8443"
 consul_tls_dir: "/etc/consul.d/tls"
 consul_agent_ca: "consul-agent-ca.pem"
 consul_agent: "consul-agent.pem"
