@@ -1,5 +1,0 @@
----
-# playbooks/roles/consul_template/tasks/main.yml
-
-- import_tasks: _installation.yml
-- import_tasks: _configuration.yml
