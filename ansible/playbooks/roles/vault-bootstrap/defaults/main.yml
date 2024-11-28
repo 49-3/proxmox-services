@@ -54,7 +54,7 @@ vault_install_directory: '/usr/bin'
 vault_binary_path: '{{ vault_install_directory }}/vault'
 vault_archive_directory: '/tmp/vault'
 vault_log_dir: '/var/log/vault'
-vault_tls_directory: '{{ consul_tls_directory }}/tls'
+vault_tls_directory: '{{ consul_tls_directory }}'
 vault_license_directory: '{{ vault_data_directory }}/license'
 vault_config_file: '{{ vault_home_directory }}/vault.hcl'
 
