@@ -1,0 +1,58 @@
+---
+# playbooks/roles/consul_template/tasks/_configuration.yml
+
+- name: Create consul-template templates directory
+  file:
+    path: "{{ consul_template_templates_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Create consul-template approle directory
+  file:
+    path: "/etc/consul-template/approle"
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+
+- name: Deploy consul-template configuration
+  template:
+    src: consul-template-config.hcl.j2
+    dest: "{{ consul_template_config_path }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Deploy consul-template RoleID
+  copy:
+    content: "{{ consul_template_role_id }}"
+    dest: "/etc/consul-template/approle/role_id"
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Deploy consul-template SecretID
+  copy:
+    content: "{{ consul_template_secret_id }}"
+    dest: "/etc/consul-template/approle/secret_id"
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Deploy consul-template systemd service
+  template:
+    src: consul-template.service.j2
+    dest: "/etc/systemd/system/consul-template.service"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+
+- name: Enable and start consul-template service
+  systemd:
+    name: consul-template
+    state: started
+    enabled: yes

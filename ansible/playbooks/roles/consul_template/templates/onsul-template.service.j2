@@ -1,0 +1,13 @@
+# consul-template.service.j2
+
+[Unit]
+Description=Consul Template
+After=network.target
+
+[Service]
+User=root
+ExecStart={{ consul_template_install_path }}/consul-template -config={{ consul_template_config_path }}
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

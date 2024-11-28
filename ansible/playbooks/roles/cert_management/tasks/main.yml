@@ -1,0 +1,4 @@
+---
+# playbooks/roles/cert_management/tasks/main.yml
+
+- import_tasks: _deploy_certs.yml

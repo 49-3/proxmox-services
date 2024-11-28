@@ -1,0 +1,99 @@
+---
+# playbooks/roles/cert_management/tasks/_deploy_certs.yml
+
+- name: Générer un certificat via Vault
+  command: >
+    vault write pki/issue/internal-services
+    common_name="{{ dns_name }}"
+    alt_names="{{ dns_name }}"
+    ip_sans="{{ ip_SANs }}"
+    format=pem
+    ttl="24h"
+  environment:
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_TOKEN: "{{ vault_token }}"
+  register: vault_cert_response
+
+- name: Extraire le certificat depuis la réponse Vault
+  set_fact:
+    cert_pem: "{{ vault_cert_response.stdout | from_json | json_query('data.certificate') }}"
+    private_key_pem: "{{ vault_cert_response.stdout | from_json | json_query('data.private_key') }}"
+    issuing_ca_pem: "{{ vault_cert_response.stdout | from_json | json_query('data.issuing_ca') }}"
+
+- name: Déployer le certificat sur Consul
+  copy:
+    content: "{{ cert_pem }}"
+    dest: "/etc/consul.d/tls/consul-agent.pem"
+    owner: consul
+    group: consul
+    mode: '0644'
+
+- name: Déployer la clé privée sur Consul
+  copy:
+    content: "{{ private_key_pem }}"
+    dest: "/etc/consul.d/tls/consul-agent-key.pem"
+    owner: consul
+    group: consul
+    mode: '0600'
+
+- name: Déployer le CA sur Consul
+  copy:
+    content: "{{ issuing_ca_pem }}"
+    dest: "/etc/consul.d/tls/consul-agent-ca.pem"
+    owner: consul
+    group: consul
+    mode: '0644'
+
+- name: Déployer le certificat sur Vault
+  copy:
+    content: "{{ cert_pem }}"
+    dest: "/etc/vault.d/tls/consul-agent.pem"
+    owner: vault
+    group: vault
+    mode: '0644'
+
+- name: Déployer la clé privée sur Vault
+  copy:
+    content: "{{ private_key_pem }}"
+    dest: "/etc/vault.d/tls/consul-agent-key.pem"
+    owner: vault
+    group: vault
+    mode: '0600'
+
+- name: Déployer le CA sur Vault
+  copy:
+    content: "{{ issuing_ca_pem }}"
+    dest: "/etc/vault.d/tls/consul-agent-ca.pem"
+    owner: vault
+    group: vault
+    mode: '0644'
+
+- name: Déployer les variables d'environnement pour les serveurs
+  template:
+    src: environment_server.j2
+    dest: /etc/environment
+    owner: root
+    group: root
+    mode: '0644'
+  when: cert_mode in ["consul_server", "vault_server"]
+
+- name: Déployer les variables d'environnement pour les clients
+  template:
+    src: environment_client.j2
+    dest: /etc/environment
+    owner: root
+    group: root
+    mode: '0644'
+  when: cert_mode == "client"
+
+- name: Redémarrer Consul pour appliquer les nouveaux certificats
+  service:
+    name: consul
+    state: restarted
+  when: "'consul' in service_name"
+
+- name: Redémarrer Vault pour appliquer les nouveaux certificats
+  service:
+    name: vault
+    state: restarted
+  when: "'vault' in service_name"

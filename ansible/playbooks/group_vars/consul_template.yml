@@ -1,0 +1,11 @@
+---
+consul_template_version: "0.39.1"
+consul_template_sha256: "b77c7550defda78c62b036c734e7faceb7f89519dc12406db84f2c3af06bc5fb"  # Remplacez par le checksum réel
+consul_template_download_url: "https://releases.hashicorp.com/consul-template/{{ consul_template_version }}/consul-template_{{ consul_template_version }}_linux_amd64.zip"
+consul_template_download_dir: "/tmp/consul-template-download"
+consul_template_extract_dir: "/tmp/consul-template-extract"
+consul_template_archive_name: "consul-template_{{ consul_template_version }}_linux_amd64.zip"
+consul_template_install_path: "/usr/local/bin"  # Ajustez selon vos besoins
+consul_template_installation_required: true
+consul_template_templates_dir: "/etc/consul-template/templates"
+consul_template_config_path: "/etc/consul-template/config.hcl"
