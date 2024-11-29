@@ -1,7 +1,6 @@
 ---
 # tasks file for vault_approle_setup
 - import_tasks: _detect_active_vault.yml
-# - import_tasks: _create_policy.yml
-# - import_tasks: _create_approle.yml
-# - import_tasks: _renew_secret_id.yml
-# - import_tasks: _pki_setup.yml
+- import_tasks: _create_policy.yml
+- import_tasks: _create_approle.yml
+- import_tasks: _pki_setup.yml

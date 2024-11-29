@@ -2,25 +2,29 @@
 # playbooks/roles/vault_apprle_setup/tasks/_pki_setup.yml
 
 - name: Vérifier si le moteur PKI est déjà activé
-  command: vault secrets list -format=json
-  register: secrets_list
+  shell: |
+    vault secrets list | grep pki/ | wc -l
+  register: pki_status
   environment:
-    VAULT_ADDR: "{{ vault_addr }}"
-    VAULT_TOKEN: "{{ vault_root_token }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   changed_when: false
+  when:
+    - active_vault_host is defined
 
-- name: Définir si le moteur PKI est activé
-  set_fact:
-    pki_enabled: "{{ 'pki/' in secrets_list.stdout | from_json }}"
+- name: Display Pki status
+  debug:
+    msg: >
+      Pki is {{ 'enabled' if pki_status.stdout == "1" else 'not enabled' }} in Vault
+  when: active_vault_host is defined
 
 - name: Activer le moteur PKI sur Vault actif si non activé
   command: >
     vault secrets enable -path=pki pki
-  when: not pki_enabled
+  when:
+    - active_vault_host is defined
+    - pki_status.stdout == "0"
   environment:
-    VAULT_ADDR: "{{ vault_addr }}"
-    VAULT_TOKEN: "{{ vault_root_token }}"
-  delegate_to: "{{ active_vault_host }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   run_once: true
   register: pki_enable_output
 
@@ -29,9 +33,9 @@
     vault write pki/config/urls
       issuing_certificates="{{ vault_addr }}/v1/pki/ca"
       crl_distribution_points="{{ vault_addr }}/v1/pki/crl"
-  when: not pki_enabled
+  when:
+    - active_vault_host is defined
+    - pki_status.stdout == "0"
   environment:
-    VAULT_ADDR: "{{ vault_addr }}"
-    VAULT_TOKEN: "{{ vault_root_token }}"
-  delegate_to: "{{ active_vault_host }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   run_once: true

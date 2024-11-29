@@ -1,19 +1,17 @@
 ---
-# playbooks/roles/vault_apprle_setup/tasks/_detect_active_vault.yml
+# playbooks/roles/vault_apprle_setup/tasks/_create_policy.yml
 
-- name: Détecter le nœud Vault actif
-  command: vault status -format=json
-  register: vault_status
-  environment:
-    VAULT_ADDR: "https://{{ item }}:{{ vault_api_port }}"
-    VAULT_TOKEN: "{{ vault_root_token }}"
-  ignore_errors: yes
-  delegate_to: "{{ item }}"
-  loop: "{{ groups['vaults'] }}"
-  register: vault_status_results
+- name: Copier la politique consul-template dans le répertoire temporaire
+  copy:
+    src: consul-template-policy.hcl
+    dest: /tmp/consul-template-policy.hcl
+  when: active_vault_host is defined
 
-- name: Définir le nœud Vault actif
-  set_fact:
-    active_vault_host: "{{ item.item }}"
-  when: item.stdout | from_json | json_query('ha_mode') == 'active'
-  loop: "{{ vault_status_results.results }}"
+- name: Créer la politique consul-template dans Vault
+  shell: |
+    export VAULT_TOKEN="{{ vault_parent_token.stdout }}"
+    vault policy write consul-template-policy /tmp/consul-template-policy.hcl
+  args:
+    executable: /bin/bash
+    removes: /tmp/consul-template-policy.hcl
+  when: active_vault_host is defined
