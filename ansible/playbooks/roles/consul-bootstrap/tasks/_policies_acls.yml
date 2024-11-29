@@ -41,6 +41,8 @@
   args:
     executable: /bin/bash
   register: consul_agent_token
+  retries: 3
+  delay: 10
   ignore_errors: true
 
 - name: Get agent token from json file
