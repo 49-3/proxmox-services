@@ -1,0 +1,19 @@
+---
+# playbooks/roles/vault_apprle_setup/tasks/_detect_active_vault.yml
+
+- name: Détecter le nœud Vault actif
+  command: vault status -format=json
+  register: vault_status
+  environment:
+    VAULT_ADDR: "https://{{ item }}:{{ vault_api_port }}"
+    VAULT_TOKEN: "{{ vault_root_token }}"
+  ignore_errors: yes
+  delegate_to: "{{ item }}"
+  loop: "{{ groups['vaults'] }}"
+  register: vault_status_results
+
+- name: Définir le nœud Vault actif
+  set_fact:
+    active_vault_host: "{{ item.item }}"
+  when: item.stdout | from_json | json_query('ha_mode') == 'active'
+  loop: "{{ vault_status_results.results }}"

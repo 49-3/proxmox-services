@@ -1,0 +1,7 @@
+- name: install and configure avault approle for consul-template
+  hosts: vaults
+  become: yes
+  vars:
+    secrets_dir: "/home/evil/secret"
+  roles:
+    - vault-approle-setup

@@ -1,0 +1,40 @@
+---
+# playbooks/roles/vault_apprle_setup/tasks/_create_approle.yml
+
+- name: Créer l'AppRole consul-template dans Vault
+  command: >
+    vault write auth/approle/role/consul-template-role
+    token_policies="consul-template-policy"
+    token_ttl=1h
+    token_max_ttl=4h
+    secret_id_ttl=24h
+    secret_id_num_uses=10
+    bind_secret_id=true
+  environment:
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_TOKEN: "{{ vault_root_token }}"
+  register: approle_creation
+  changed_when: "'key' in approle_creation.stdout"
+
+- name: Récupérer le RoleID de l'AppRole consul-template
+  command: vault read -field=role_id auth/approle/role/consul-template-role/role-id
+  environment:
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_TOKEN: "{{ vault_root_token }}"
+  register: role_id_output
+
+- name: Récupérer le SecretID de l'AppRole consul-template
+  command: vault write -field=secret_id auth/approle/role/consul-template-role/secret-id
+  environment:
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_TOKEN: "{{ vault_root_token }}"
+  register: secret_id_output
+
+- name: Générer le fichier de credentials consul_template_approle_credentials.yml
+  copy:
+    dest: "./playbooks/consul_template_approle_credentials.yml"
+    content: |
+      ---
+      consul_template_role_id: "{{ role_id_output.stdout }}"
+      consul_template_secret_id: "{{ secret_id_output.stdout }}"
+    mode: '0600'

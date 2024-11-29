@@ -4,4 +4,3 @@
 - import_playbook: ./playbooks/traefik.yml
 - import_playbook: ./playbooks/vault-bootstrap.yml
 - import_playbook: ./playbooks/vault-key-value.yml
-# - import_playbook: ./playbooks/vault-consul-migration.yml

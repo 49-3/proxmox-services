@@ -1,0 +1,31 @@
+---
+# playbooks/roles/vault_apprle_setup/tasks/_detect_active_vault.yml
+- name: Get vault_token from deploy secrets
+  shell: |
+    cat {{ deploy_vault_secret_dir }}/vault_token.txt
+  args:
+    executable: /bin/bash
+  register: vault_parent_token
+  delegate_to: deploy
+  run_once: true
+  become: yes
+
+- name: Détecter le nœud Vault actif
+  shell: |
+    export VAULT_TOKEN="{{ vault_parent_token.stdout }}"
+    export VAULT_ADDR=export VAULT_ADDR="https://{{ hostvars[inventory_hostname]['ansible_' + network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+    export VAULT_CACERT="{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
+    vault status -format=json
+  args:
+    executable: /bin/bash
+  register: vault_status
+  ignore_errors: yes
+  delegate_to: "{{ item }}"
+  loop: "{{ groups['vaults'] }}"
+  register: vault_status_results
+
+- name: Définir le nœud Vault actif
+  set_fact:
+    active_vault_host: "{{ item.item }}"
+  when: item.stdout | from_json | json_query('ha_mode') == 'active'
+  loop: "{{ vault_status_results.results }}"
