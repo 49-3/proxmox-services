@@ -25,7 +25,6 @@
     - pki_status.stdout == "0"
   environment:
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
-  run_once: true
   register: pki_enable_output
 
 - name: Configurer le TTL et le maximum TTL pour le moteur PKI
@@ -38,4 +37,3 @@
     - pki_status.stdout == "0"
   environment:
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
-  run_once: true

@@ -22,6 +22,8 @@
     vault auth enable approle
   args:
     executable: /bin/bash
+  environment:
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   when:
     - active_vault_host is defined
     - approle_enabled.stdout == "0"

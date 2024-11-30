@@ -10,3 +10,5 @@ ansible_folder_path: "/home/evil/proxmox-services/ansible"
 
 consul_tls_directory: '/etc/consul.d/tls'
 consul_tls_ca_file: 'consul-agent-ca.pem'
+
+vault_addr: "{{ lookup('env', 'VAULT_ADDR') | default('', false) }}"
