@@ -12,11 +12,15 @@
 
 - name: Détecter le nœud Vault actif
   shell: |
-    export VAULT_TOKEN="{{ vault_parent_token.stdout }}"
     vault status | grep "active" | wc -l
+  environment:
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   args:
     executable: /bin/bash
   register: vault_status
+  retries: 10
+  delay: 5
+  until: vault_status.stdout.strip() == "1"
   ignore_errors: yes
 
 - name: Définir le nœud Vault actif
