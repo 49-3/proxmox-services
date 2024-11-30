@@ -23,8 +23,8 @@
   args:
     executable: /bin/bash
   when:
-    - not approle_enabled
     - active_vault_host is defined
+    - approle_enabled.stdout == "0"
 
 - name: check if approle consul-template is already writed
   shell: |
