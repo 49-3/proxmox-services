@@ -1,5 +1,5 @@
 ---
-- name: Install vault
+- name: Active key/value on vault
   hosts: vaults
   become: yes
   vars:
