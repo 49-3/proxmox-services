@@ -1,26 +1,26 @@
 vault {
   address = "{{ vault_addr }}"
   ca_file = "{{ vault_tls_directory }}/{{ vault_tls_ca_cert_file }}"
-  token_file = "/etc/vault.d/token"
+  token_file = "{{ vault_token_file }}"
 }
 
 template {
   source      = "{{ consul_template_templates_dir }}/server-cert.ctmpl"
-  destination = "/etc/consul.d/tls/consul-agent.pem"
+  destination = "{{ consul_tls_directory }}/{{ consul_tls_cert_file }}"
   perms       = 0644
   command     = "systemctl reload consul"
 }
 
 template {
   source      = "{{ consul_template_templates_dir }}/server-key.ctmpl"
-  destination = "/etc/consul.d/tls/consul-agent-key.pem"
+  destination = "{{ consul_tls_directory }}/{{ consul_tls_key_file }}"
   perms       = 0640
   command     = "systemctl reload consul"
 }
 
 template {
-  source      = "/etc/consul-template.d/templates/server-ca.ctmpl"
-  destination = "/etc/consul.d/tls/consul-agent-ca.pem"
+  source      = "{{ consul_template_templates_dir }}/server-ca.ctmpl"
+  destination = "{{ consul_tls_directory }}/{{ consul_tls_ca_cert_file }}"
   perms       = 0644
   command     = "systemctl reload consul"
 }
