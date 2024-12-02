@@ -27,6 +27,10 @@
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   register: pki_enable_output
 
+- name: Pause de 5s
+  command: sleep 5
+  run_once: true
+
 - name: Configurer le TTL et le maximum TTL pour le moteur PKI
   command: >
     vault write pki/config/urls

@@ -1,9 +1,5 @@
 ---
 # playbooks/roles/vault_apprle_setup/tasks/_detect_active_vault.yml
-- name: Pause de 25s
-  command: sleep 25
-  run_once: true
-
 - name: Get vault_token from deploy secrets
   shell: |
     cat {{ deploy_vault_secret_dir }}/vault_token.txt
@@ -22,9 +18,6 @@
   args:
     executable: /bin/bash
   register: vault_status
-  retries: 10
-  delay: 5
-  until: vault_status.stdout.strip() == "1"
   ignore_errors: yes
 
 - name: Définir le nœud Vault actif
