@@ -1,0 +1,12 @@
+---
+# defaults file for vault-pki-setup
+
+ansible_python_interpreter: /usr/bin/python3
+deploy_vault_secret_dir: "{{ secrets_dir }}/vault"
+network_interface: "ens33"
+vault_api_port: "8200"
+pki_allowed_domains: "consul"
+pki_role_max_ttl: "72h"
+pki_ttl: "87600h"
+
+vault_addr: "{{ lookup('env', 'VAULT_ADDR') | default('', false) }}"

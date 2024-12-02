@@ -44,6 +44,19 @@ consul_renew_certs: ## Launch vault-key-value playbook
 vault_approle_setup: ## Launch vault-key-value playbook
 	bash -c "time ansible-playbook playbooks/vault-approle-setup.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
+.PHONY: vault_pki_setup
+vault_pki_setup: ## Launch vault-key-value playbook
+	bash -c "time ansible-playbook playbooks/vault-pki-setup.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
+
+
+.PHONY: vault_agent_setup
+vault_agent_setup: ## Launch vault-key-value playbook
+	bash -c "time ansible-playbook playbooks/vault-agent-setup.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
+
+.PHONY: consul-template
+consul-template: ## Launch vault-key-value playbook
+	bash -c "time ansible-playbook playbooks/consul-template.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
+
 .PHONY: re
 re: ## clear secret and run ansible on site.yml
 	rm -rf ~/secret/* ; bash -c "time ansible-playbook site.yml --ssh-common-args='-o StrictHostKeyChecking=no'"

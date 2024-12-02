@@ -4,15 +4,15 @@ auto_auth {
   method "approle" {
     mount_path = "auth/approle"
     config = {
-      role_id_file_path = "/etc/vault.d/role_id"
-      secret_id_file_path = "/etc/vault.d/secret_id"
+      role_id_file_path = "{{ role_id_file_path }}"
+      secret_id_file_path = "{{ secret_id_file_path }}"
       remove_secret_id_file_after_reading = false
     }
   }
 
   sink "file" {
     config = {
-      path = "/etc/vault.d/agent-token"
+      path = "{{ sink_path }}"
     }
   }
 }

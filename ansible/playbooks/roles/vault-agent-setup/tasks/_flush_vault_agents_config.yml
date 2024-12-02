@@ -6,7 +6,7 @@
     owner: root
     group: root
     mode: '0644'
-  when: alls:!vaults
+  when: "'vaults' not in group_names"
 
 - name: Créer le répertoire tls de Vault Agent
   file:
@@ -23,16 +23,16 @@
     owner: root
     group: root
     mode: '0644'
-  when: alls:!vaults
+  when: "'vaults' not in group_names"
 
 - name: Reload le daemon systemd
   systemd:
     daemon_reload: yes
-  when: alls:!vaults
+  when: "'vaults' not in group_names"
 
 - name: Activer et démarrer Vault Agent
   systemd:
     name: vault-agent
     enabled: yes
     state: started
-  when: alls:!vaults
+  when: "'vaults' not in group_names"

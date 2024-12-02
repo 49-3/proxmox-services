@@ -27,11 +27,11 @@
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   register: pki_enable_output
 
-- name: Pause de 5s
-  command: sleep 5
+- name: Pause de 52s
+  command: sleep 52
   run_once: true
 
-- name: Configurer le TTL et le maximum TTL pour le moteur PKI
+- name: Configurer les URLs du moteur PKI
   command: >
     vault write pki/config/urls
       issuing_certificates="{{ vault_addr }}/v1/pki/ca"
@@ -57,7 +57,7 @@
 - name: Configurer le CA racine dans le moteur PKI
   command: >
     vault write pki/config/ca pem_bundle="{{ pki_root_cert.stdout }}"
- when:
+  when:
     - active_vault_host is defined
     - pki_status.stdout == "0"
   environment:
@@ -66,9 +66,6 @@
 - name: Générer le CRL
   command: >
     vault write pki/crl
-  environment:
-    VAULT_ADDR: "{{ vault_addr }}"
-    VAULT_TOKEN: "{{ vault_root_token }}"
   register: pki_crl
   when:
     - active_vault_host is defined

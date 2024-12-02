@@ -1,0 +1,7 @@
+---
+# defaults file for vault-agent-setup
+vault_addr: "{{ lookup('env', 'VAULT_ADDR') | default('', false) }}"
+deploy_vault_secret_dir: "{{ secrets_dir }}/vault"
+role_id_file_path: "/etc/vault.d/role_id"
+secret_id_file_path: "/etc/vault.d/secret_id"
+sink_path: "/etc/vault.d/agent-token"
