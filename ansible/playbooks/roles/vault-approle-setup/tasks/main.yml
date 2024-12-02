@@ -3,4 +3,6 @@
 - import_tasks: _detect_active_vault.yml
 - import_tasks: _create_policy.yml
 - import_tasks: _create_approle.yml
-- import_tasks: _pki_setup.yml
+- import_tasks: _deploy_credentials.yml
+- import_tasks: _flush_vault_agents_config.yml
+# - import_tasks: _pki_setup.yml

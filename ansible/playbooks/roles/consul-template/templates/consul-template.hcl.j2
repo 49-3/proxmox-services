@@ -1,3 +1,9 @@
+vault {
+  address = "{{ vault_addr }}"
+  ca_file = "{{ vault_tls_directory }}/{{ vault_tls_ca_cert_file }}"
+  token_file = "/etc/vault.d/token"
+}
+
 template {
   source      = "{{ consul_template_templates_dir }}/server-cert.ctmpl"
   destination = "/etc/consul.d/tls/consul-agent.pem"

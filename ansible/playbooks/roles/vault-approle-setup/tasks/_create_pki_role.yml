@@ -1,0 +1,17 @@
+---
+- name: Créer un rôle PKI pour consul-template
+  command: >
+    vault write pki/roles/consul-template-role
+      allowed_domains="{{ pki_allowed_domains }}"
+      allow_subdomains=true
+      max_ttl="{{ pki_role_max_ttl }}"
+  environment:
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+  register: pki_role_create
+  changed_when: "'role' in pki_role_create.stdout"
+
+- name: Vérifier la création du rôle PKI
+  debug:
+    msg: "Rôle PKI pour consul-template créé avec succès."
+  when: pki_role_create.changed
+  

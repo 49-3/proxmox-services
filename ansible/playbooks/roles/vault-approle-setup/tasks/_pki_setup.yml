@@ -41,3 +41,42 @@
     - pki_status.stdout == "0"
   environment:
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Générer le certificat CA racine
+  command: >
+    vault write -field=certificate pki/root/generate/internal
+      common_name="{{ pki_common_name }}"
+      ttl="{{ pki_ttl }}"
+  register: pki_root_cert
+  when:
+    - active_vault_host is defined
+    - pki_status.stdout == "0"
+  environment:
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Configurer le CA racine dans le moteur PKI
+  command: >
+    vault write pki/config/ca pem_bundle="{{ pki_root_cert.stdout }}"
+ when:
+    - active_vault_host is defined
+    - pki_status.stdout == "0"
+  environment:
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Générer le CRL
+  command: >
+    vault write pki/crl
+  environment:
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_TOKEN: "{{ vault_root_token }}"
+  register: pki_crl
+  when:
+    - active_vault_host is defined
+    - pki_status.stdout == "0"
+  environment:
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Vérifier la génération du CRL
+  debug:
+    msg: "CRL généré avec succès."
+  when: pki_crl.changed

@@ -5,29 +5,26 @@
 - name: Configure service consul-template
   import_tasks: _service_configure.yml
 
-- name: Get an agent consul ACL token
-  import_tasks: _get_acl_token.yml
-
 - name: Copie les templates
   import_tasks: _templates.yml
 
-- name: Recharger systemd pour appliquer le nouveau service
-  systemd:
-    daemon_reload: true
+# - name: Recharger systemd pour appliquer le nouveau service
+#   systemd:
+#     daemon_reload: true
 
-- name: Ensure Consul configuration is valid
-  command: consul validate {{ consul_config_dir }}
-  become: true
+# - name: Ensure Consul configuration is valid
+#   command: consul validate {{ consul_config_dir }}
+#   become: true
 
-- name: Activer et démarrer Consul Template
-  systemd:
-    name: consul-template
-    enabled: true
-    state: started
-  become: true
+# - name: Activer et démarrer Consul Template
+#   systemd:
+#     name: consul-template
+#     enabled: true
+#     state: started
+#   become: true
 
-- name: Redémare Consul
-  systemd:
-    name: consul
-    state: restarted
-  become: true
+# - name: Redémare Consul
+#   systemd:
+#     name: consul
+#     state: restarted
+#   become: true
