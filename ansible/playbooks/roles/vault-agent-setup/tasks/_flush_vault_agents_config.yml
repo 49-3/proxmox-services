@@ -26,5 +26,5 @@
   systemd:
     name: vault-agent
     enabled: yes
-    state: started
+    state: restarted
   when: "'vaults' not in group_names"
