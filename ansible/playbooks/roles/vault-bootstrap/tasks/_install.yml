@@ -50,9 +50,10 @@
   run_once: true
   become:  "{{ vault_privileged_install }}"
   tags: installation
-  when: not vault_package.stat.exists | bool
   delegate_to: deploy
-  when: installation_required
+  when:
+    - not vault_package.stat.exists | bool
+    - installation_required
 
 - name: Unarchive Vault (local)
   unarchive:

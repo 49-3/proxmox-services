@@ -1,11 +1,13 @@
 ---
 - name: Créer un rôle PKI pour consul-template
   command: >
-    vault write pki/roles/vault-agent-role
+    vault write pki/roles/consul-template
       allowed_domains="{{ pki_allowed_domains }}"
       allow_subdomains=true
       max_ttl="{{ pki_role_max_ttl }}"
   environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   register: pki_role_create
   changed_when: "'role' in pki_role_create.stdout"

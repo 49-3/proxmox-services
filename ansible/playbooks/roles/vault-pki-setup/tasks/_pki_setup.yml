@@ -6,6 +6,8 @@
     vault secrets list | grep pki/ | wc -l
   register: pki_status
   environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   changed_when: false
   when:
@@ -24,34 +26,46 @@
     - active_vault_host is defined
     - pki_status.stdout == "0"
   environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   register: pki_enable_output
 
-- name: Pause de 52s
-  command: sleep 52
-  run_once: true
+- name: Configuration du ttl max pour le pki
+  command: >
+    vault secrets tune -max-lease-ttl={{ ca_pki_ttl }} pki
+  when:
+    - active_vault_host is defined
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
 
 - name: Configurer les URLs du moteur PKI
   command: >
     vault write pki/config/urls
-      issuing_certificates="{{ vault_addr }}/v1/pki/ca"
-      crl_distribution_points="{{ vault_addr }}/v1/pki/crl"
+      issuing_certificates="{{ vault_proxy_addr }}/v1/pki/ca"
+      crl_distribution_points="{{ vault_proxy_addr }}/v1/pki/crl"
   when:
     - active_vault_host is defined
     - pki_status.stdout == "0"
   environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
 
 - name: Générer le certificat CA racine
   command: >
     vault write -field=certificate pki/root/generate/internal
-      common_name="{{ pki_common_name }}"
-      ttl="{{ pki_ttl }}"
+      common_name="{{ ca_pki_common_name }}"
+      ttl="{{ ca_pki_ttl }}"
   register: pki_root_cert
   when:
     - active_vault_host is defined
     - pki_status.stdout == "0"
   environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
 
 - name: Configurer le CA racine dans le moteur PKI
@@ -61,19 +75,27 @@
     - active_vault_host is defined
     - pki_status.stdout == "0"
   environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
 
 - name: Générer le CRL
   command: >
-    vault write pki/crl
+    vault write -force pki/tidy tidy_cert_store=true tidy_revoked_certs=true
   register: pki_crl
   when:
     - active_vault_host is defined
     - pki_status.stdout == "0"
   environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Check CRL
+  command: vault read pki/cert/crl
+  register: crl_status
 
 - name: Vérifier la génération du CRL
   debug:
-    msg: "CRL généré avec succès."
-  when: pki_crl.changed
+    msg: "CRL généré avec succès.\n {{ crl_status.stdout  }}"
+  when: crl_status is defined

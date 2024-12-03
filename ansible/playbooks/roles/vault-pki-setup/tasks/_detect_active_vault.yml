@@ -14,6 +14,8 @@
   shell: |
     vault status | grep "active" | wc -l
   environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   args:
     executable: /bin/bash
