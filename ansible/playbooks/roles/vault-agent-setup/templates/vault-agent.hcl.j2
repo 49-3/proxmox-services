@@ -1,5 +1,11 @@
 pid_file = "/var/run/vault-agent.pid"
 
+listener "tcp" {
+  address       = "127.0.0.1:8201"
+  tls_cert_file = "{{ consul_tls_directory }}/{{ consul_tls_cert_file }}"
+  tls_key_file  = "{{ consul_tls_directory }}/{{ consul_tls_key_file }}"
+}
+
 auto_auth {
   method "approle" {
     mount_path = "auth/approle"
@@ -21,8 +27,11 @@ cache {
   use_auto_auth_token = true
 }
 
-template {
-  source      = "/etc/consul-template/templates/service_cert.tpl"
-  destination = "/etc/consul-template/tls/consul-agent.pem"
-  command     = "systemctl restart consul"
+proxy {
+  upstreams = [
+    {
+      destination = "{{ vault_principal_addr }}"  # Adresse de votre serveur Vault principal
+      prefix      = "/"
+    }
+  ]
 }

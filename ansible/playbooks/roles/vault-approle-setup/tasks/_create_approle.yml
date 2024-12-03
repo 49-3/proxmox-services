@@ -34,7 +34,7 @@
 
 - name: check if approle consul-template is already writed
   shell: |
-    vault read auth/approle/role/consul-template-role | grep consul-template-policy | wc -l
+    vault read auth/approle/role/vault-agent-role | grep consul-template-policy | wc -l
   register: approle_already_writed
   environment:
     VAULT_ADDR: "https://{{ hostvars[inventory_hostname]['ansible_'+network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
@@ -52,7 +52,7 @@
 
 - name: Créer l'AppRole consul-template dans Vault
   shell: |
-    vault write auth/approle/role/consul-template-role \
+    vault write auth/approle/role/vault-agent-role \
     token_policies="consul-template-policy" \
     token_ttl=5m \
     token_max_ttl=30m \
