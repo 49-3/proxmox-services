@@ -6,8 +6,8 @@
     vault auth list | grep 'approle/' | wc -l
   register: approle_enabled
   environment:
-    VAULT_ADDR: "{{ vault_addr.stdout }}"
-    VAULT_CACERT: "{{ vault_ca_cert.stdout }}"
+    VAULT_ADDR: "https://{{ hostvars[inventory_hostname]['ansible_'+network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+    VAULT_CACERT: "{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   failed_when: approle_enabled.rc != 0
   when: active_vault_host is defined
@@ -25,8 +25,8 @@
   args:
     executable: /bin/bash
   environment:
-    VAULT_ADDR: "{{ vault_addr.stdout }}"
-    VAULT_CACERT: "{{ vault_ca_cert.stdout }}"
+    VAULT_ADDR: "https://{{ hostvars[inventory_hostname]['ansible_'+network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+    VAULT_CACERT: "{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   when:
     - active_vault_host is defined
@@ -37,8 +37,8 @@
     vault read auth/approle/role/consul-template-role | grep consul-template-policy | wc -l
   register: approle_already_writed
   environment:
-    VAULT_ADDR: "{{ vault_addr.stdout }}"
-    VAULT_CACERT: "{{ vault_ca_cert.stdout }}"
+    VAULT_ADDR: "https://{{ hostvars[inventory_hostname]['ansible_'+network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+    VAULT_CACERT: "{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   failed_when: approle_already_writed.rc != 0
   when: active_vault_host is defined
@@ -58,8 +58,8 @@
     token_max_ttl=30m \
     secret_id_ttl=0
   environment:
-    VAULT_ADDR: "{{ vault_addr.stdout }}"
-    VAULT_CACERT: "{{ vault_ca_cert.stdout }}"
+    VAULT_ADDR: "https://{{ hostvars[inventory_hostname]['ansible_'+network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+    VAULT_CACERT: "{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   args:
     executable: /bin/bash

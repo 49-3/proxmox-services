@@ -14,8 +14,8 @@
   shell: |
     vault status | grep "active" | wc -l
   environment:
-    VAULT_ADDR: "{{ vault_addr.stdout }}"
-    VAULT_CACERT: "{{ vault_ca_cert.stdout }}"
+    VAULT_ADDR: "https://{{ hostvars[inventory_hostname]['ansible_'+network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+    VAULT_CACERT: "{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   args:
     executable: /bin/bash

@@ -9,10 +9,11 @@
 
 - name: Créer la politique consul-template dans Vault
   shell: |
-    export VAULT_TOKEN="{{ vault_parent_token.stdout }}"
-    export VAULT_ADDR="{{ vault_addr.stdout }}"
-    export VAULT_CACERT="{{ vault_ca_cert.stdout }}"
     vault policy write consul-template-policy /tmp/consul-template-policy.hcl
+  environment:
+    VAULT_ADDR: "https://{{ hostvars[inventory_hostname]['ansible_'+network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
+    VAULT_CACERT: "{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   args:
     executable: /bin/bash
     removes: /tmp/consul-template-policy.hcl
