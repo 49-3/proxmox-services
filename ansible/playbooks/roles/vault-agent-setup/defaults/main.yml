@@ -6,6 +6,8 @@ role_id_file_path: "/etc/vault.d/role_id"
 secret_id_file_path: "/etc/vault.d/secret_id"
 sink_path: "/etc/vault.d/agent-token"
 
+vault_addr: "https://192.168.121.164:8200"
+
 network_interface: "ens33"
 vault_api_port: "8200"
 consul_tls_directory: '/etc/consul.d/tls'
