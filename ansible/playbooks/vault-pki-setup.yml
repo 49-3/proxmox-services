@@ -1,0 +1,7 @@
+- name: install and configure approle on Vault
+  hosts: vaults
+  become: yes
+  vars:
+    secrets_dir: "/home/evil/secret"
+  roles:
+    - vault-pki-setup
