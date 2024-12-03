@@ -5,7 +5,7 @@
 - import_playbook: ./playbooks/vault-bootstrap.yml
 - import_playbook: ./playbooks/vault-key-value.yml
 - import_playbook: ./playbooks/vault-approle-setup.yml
-# - import_playbook: ./playbooks/vault-agent-setup.yml
+- import_playbook: ./playbooks/vault-agent-setup.yml
 # - import_playbook: ./playbooks/consul-template-setup.yml
 # - import_playbook: ./playbooks/consul-vault-migration.yml
 # - import_playbook: ./playbooks/consul-template-activation.yml

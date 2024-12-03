@@ -3,10 +3,24 @@
   file:
     path: "{{ consul_local_tls_dir }}"
     state: directory
+    owner: "{{ sercrets_dir_owner }}"
+    group: "{{ sercrets_dir_owner }}"
     mode: 0750
-  delegate_to: localhost
+  delegate_to: deploy
+  ignore_errors: true
   run_once: true
-  become: no
+  become: true
+
+- name: Unock secret on deploy
+  file:
+    path: "{{ secrets_dir }}"
+    owner: "{{ sercrets_dir_owner }}"
+    recurse: true
+    group: "{{ sercrets_dir_owner }}"
+    mode: "0755"
+  delegate_to: deploy
+  become: true
+  run_once: true
 
 - name: Check if consul-agent-ca.pem exist
   stat:
