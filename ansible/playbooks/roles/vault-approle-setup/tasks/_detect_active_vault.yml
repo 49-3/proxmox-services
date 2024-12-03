@@ -10,9 +10,6 @@
   run_once: true
   become: yes
 
-- name: Sleep 1min
-  command: sleep 60
-
 - name: Détecter le nœud Vault actif
   shell: |
     vault status | grep "active" | wc -l
