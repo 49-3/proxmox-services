@@ -10,6 +10,9 @@
   run_once: true
   become: yes
 
+- name: Sleep 1min
+  command: sleep 60
+
 - name: Détecter le nœud Vault actif
   shell: |
     vault status | grep "active" | wc -l
@@ -18,12 +21,15 @@
   args:
     executable: /bin/bash
   register: vault_status
+  until: vault_status.stdout | trim == "1"
+  retries: 5
+  delay: 5
   ignore_errors: yes
 
 - name: Définir le nœud Vault actif
   set_fact:
     active_vault_host: "{{ inventory_hostname }}"
-  when: vault_status.stdout == "1"
+  when: vault_status.stdout | trim == "1"
 
 - debug: msg="{{ active_vault_host }} is active"
   when:

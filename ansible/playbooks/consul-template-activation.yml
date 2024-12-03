@@ -1,7 +1,7 @@
 - name: install and configure vault agents on all clients
-  hosts: vaults
+  hosts: alls
   become: yes
   vars:
     secrets_dir: "/home/evil/secret"
   roles:
-    - vault-agent-setup
+    - consul-template-activation
