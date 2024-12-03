@@ -11,6 +11,7 @@
   shell: |
     export VAULT_TOKEN="{{ vault_parent_token.stdout }}"
     export VAULT_ADDR="{{ vault_addr.stdout }}"
+    export VAULT_CACERT="{{ vault_ca_cert.stdout }}"
     vault policy write consul-template-policy /tmp/consul-template-policy.hcl
   args:
     executable: /bin/bash

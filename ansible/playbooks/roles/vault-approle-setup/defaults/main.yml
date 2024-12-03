@@ -16,3 +16,4 @@ consul_tls_directory: '/etc/consul.d/tls'
 consul_tls_ca_file: 'consul-agent-ca.pem'
 
 vault_addr: "{{ lookup('env', 'VAULT_ADDR') | default('https://192.168.121.164:8200', true) }}"
+vault_ca_cert: "{{ lookup('env', 'VAULT_ADDR') | default('/etc/consul.d/tls/consul-agent-ca.pem', true) }}"

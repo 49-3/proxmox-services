@@ -7,6 +7,7 @@
   register: approle_enabled
   environment:
     VAULT_ADDR: "{{ vault_addr.stdout }}"
+    VAULT_CACERT: "{{ vault_ca_cert.stdout }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   failed_when: approle_enabled.rc != 0
   when: active_vault_host is defined
@@ -25,6 +26,7 @@
     executable: /bin/bash
   environment:
     VAULT_ADDR: "{{ vault_addr.stdout }}"
+    VAULT_CACERT: "{{ vault_ca_cert.stdout }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   when:
     - active_vault_host is defined
@@ -36,6 +38,7 @@
   register: approle_already_writed
   environment:
     VAULT_ADDR: "{{ vault_addr.stdout }}"
+    VAULT_CACERT: "{{ vault_ca_cert.stdout }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   failed_when: approle_already_writed.rc != 0
   when: active_vault_host is defined
@@ -56,6 +59,7 @@
     secret_id_ttl=0
   environment:
     VAULT_ADDR: "{{ vault_addr.stdout }}"
+    VAULT_CACERT: "{{ vault_ca_cert.stdout }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   args:
     executable: /bin/bash

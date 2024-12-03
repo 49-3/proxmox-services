@@ -15,6 +15,7 @@
     vault status | grep "active" | wc -l
   environment:
     VAULT_ADDR: "{{ vault_addr.stdout }}"
+    VAULT_CACERT: "{{ vault_ca_cert.stdout }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   args:
     executable: /bin/bash
