@@ -25,7 +25,7 @@
 - name: Restart vault serveur
   systemd:
     name: "vault"
-    state: restarted
+    state: reload
     enabled: yes
     daemon_reload: yes
   when: vault_mode == "server"
