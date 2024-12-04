@@ -1,7 +1,7 @@
 ---
 - name: Créer un rôle PKI pour consul-template
   command: >
-    vault write pki/roles/consul-template
+    vault write pki/roles/vault-agents
       allowed_domains="{{ pki_allowed_domains }}"
       allow_subdomains=true
       max_ttl="{{ pki_role_max_ttl }}"

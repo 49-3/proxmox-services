@@ -2,11 +2,20 @@
 - name: Déployer la configuration de Vault Agent
   template:
     src: "vault-agent.hcl.j2"
-    dest: "/etc/vault.d/vault-agent.hcl"
+    dest: "/etc/vault.d/vault-agent-client.hcl"
     owner: root
     group: root
     mode: '0644'
   when: "'vaults' not in group_names"
+
+- name: Déployer la configuration de Vault Agent
+  template:
+    src: "vault-agent.hcl.j2"
+    dest: "/etc/vault.d/vault-agent-server.hcl"
+    owner: root
+    group: root
+    mode: '0644'
+  when: "'vaults' in group_names"
 
 - name: Déployer le service systemd pour Vault Agent
   template:
@@ -15,16 +24,13 @@
     owner: root
     group: root
     mode: '0644'
-  when: "'vaults' not in group_names"
 
 - name: Reload le daemon systemd
   systemd:
     daemon_reload: yes
-  when: "'vaults' not in group_names"
 
 - name: Activer et démarrer Vault Agent
   systemd:
     name: vault-agent
     enabled: yes
     state: restarted
-  when: "'vaults' not in group_names"
