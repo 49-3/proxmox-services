@@ -5,30 +5,20 @@
   args:
     executable: /bin/bash
   register: certs_status
-
-- name: check certs_status
-  debug:
-    msg: "certs_status= {{ certs_status.stdout }}"
-
-- name: Redémarrer Vault Agent jusqu'à ce que 3 certificats soient présents
-  shell: |
-    if [ $(ls {{ consul_tls_tmp_directory }} | wc -l) -ne 3 ]; then
-      systemctl restart vault-agent.service
-      echo "0"
-    else
-      echo "1"
-    fi
-  register: vault_agent_restart
-  retries: 5
+  retries: 10
   delay: 15
-  until: vault_agent_restart.stdout == "1"
-  when: certs_status.stdout != "3"
+  until: certs_status.stdout != "3"
 
 - name: Verifie la presence des nvx certificats
   shell: |
     ls {{ consul_tls_tmp_directory }} | wc -l
   args:
     executable: /bin/bash
+  register: certs_nb_lst_check
+
+- name: check certs_status
+  debug:
+    msg: "certs_status= {{ certs_nb_lst_check.stdout }}"
 
 - name: Remplacer les cerificats
   shell: |
