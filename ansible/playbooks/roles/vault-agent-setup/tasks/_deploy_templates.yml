@@ -8,6 +8,7 @@
     state: directory
   with_items:
     - "{{ vault_agent_templates_dir }}"
+    
 
 - name: Copier les templates de certificat
   copy:
