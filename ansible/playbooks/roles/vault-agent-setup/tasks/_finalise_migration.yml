@@ -10,6 +10,26 @@
   debug:
     msg: "certs_status= {{ certs_status.stdout }}"
 
+- name: Redémarrer Vault Agent jusqu'à ce que 3 certificats soient présents
+  shell: |
+    if [ $(ls {{ consul_tls_tmp_directory }} | wc -l) -ne 3 ]; then
+      systemctl restart vault-agent.service
+      echo "0"
+    else
+      echo "1"
+    fi
+  register: vault_agent_restart
+  retries: 5
+  delay: 15
+  until: vault_agent_restart.stdout == "1"
+  when: certs_status.stdout != "3"
+
+- name: Verifie la presence des nvx certificats
+  shell: |
+    ls {{ consul_tls_tmp_directory }} | wc -l
+  args:
+    executable: /bin/bash
+
 - name: Remplacer les cerificats
   shell: |
     mv {{ consul_tls_tmp_directory }}/* {{ consul_tls_directory }}
@@ -17,7 +37,6 @@
     chmod -R 750 {{ consul_tls_directory }}
   args:
     executable: /bin/bash
-  when: certs_status.stdout == "3"
 
 - name: Reload consul
   systemd:
