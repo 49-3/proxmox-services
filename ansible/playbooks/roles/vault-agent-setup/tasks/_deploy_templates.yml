@@ -1,0 +1,22 @@
+---
+- name: Créer les répertoire de vault_agent Template
+  file:
+    path: "{{ item }}"
+    mode: 0750
+    owner: "root"
+    group: "vault"
+    state: directory
+  with_items:
+    - "{{ vault_agent_templates_dir }}"
+
+- name: Copier les templates de certificat
+  copy:
+    src: "{{ item }}"
+    dest: "{{ vault_agent_templates_dir }}/{{ item }}"
+    owner: "root"
+    group: "vault"
+    mode: 0750
+  with_items:
+    - consul-cert.ctmpl
+    - consul-key.ctmpl
+    - consul-ca.ctmpl

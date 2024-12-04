@@ -35,3 +35,30 @@ proxy {
     }
   ]
 }
+
+template_config {
+  static_secret_render_interval = "10m"
+  exit_on_retry_failure = true
+  max_connections_per_host = 20
+}
+
+template {
+  source      = "{{ vault_agent_templates_dir }}/consul-cert.ctmpl"
+  destination = "{{ consul_tls_directory }}/{{ consul_tls_cert_file }}"
+  perms       = 0644
+  command     = "systemctl restart consul && ystemctl restart vault-agent.service"
+}
+
+template {
+  source      = "{{ vault_agent_templates_dir }}/consul-key.ctmpl"
+  destination = "{{ consul_tls_directory }}/{{ consul_tls_key_file }}"
+  perms       = 0640
+  command     = "systemctl restart consul && ystemctl restart vault-agent.service"
+}
+
+template {
+  source      = "{{ vault_agent_templates_dir }}/consul-ca.ctmpl"
+  destination = "{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
+  perms       = 0644
+  command     = "systemctl restart consul && ystemctl restart vault-agent.service"
+}
