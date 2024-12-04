@@ -99,10 +99,21 @@
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
 
 - name: Check CRL
-  command: vault read pki/cert/crl
+  command: >
+    vault read pki/cert/crl
+  when:
+    - pki_status.stdout == "0"
+  delegate_to: deploy
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+  run_once: true
   register: crl_status
 
 - name: Vérifier la génération du CRL
   debug:
     msg: "CRL généré avec succès.\n {{ crl_status.stdout  }}"
-  when: crl_status is defined
+  when:
+    - pki_status.stdout == "0"
+    - crl_status is defined

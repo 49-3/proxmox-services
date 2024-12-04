@@ -77,6 +77,7 @@
       -additional-dnsname=consul-3.dc1.consul \
       -additional-dnsname=deploy.dc1.consul \
       -additional-dnsname=traefik.dc1.consul \
+      -additional-dnsname=teleport.dc1.consul \
       -additional-dnsname=vault-1.dc1.consul \
       -additional-dnsname=vault-2.dc1.consul \
       -additional-ipaddress=192.168.121.161 \
@@ -101,10 +102,12 @@
       -additional-dnsname=traefik.dc1.consul \
       -additional-dnsname=vault-1.dc1.consul \
       -additional-dnsname=vault-2.dc1.consul \
+      -additional-dnsname=teleport.dc1.consul \
       -additional-ipaddress=192.168.121.177 \
       -additional-ipaddress=192.168.121.170 \
       -additional-ipaddress=192.168.121.164 \
       -additional-ipaddress=192.168.121.165 \
+      -additional-ipaddress=192.168.121.100 \
       -additional-dnsname=*.service.consul
   args:
     executable: /bin/bash

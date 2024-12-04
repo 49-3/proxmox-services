@@ -1,4 +1,4 @@
-- name: install and configure approle on Vault
+- name: install and configure pki on Vault
   hosts: vaults
   become: yes
   vars:
