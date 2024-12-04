@@ -54,8 +54,8 @@
   shell: |
     vault write auth/approle/role/vault-agent-role \
     token_policies="consul-template-policy" \
-    token_ttl=5m \
-    token_max_ttl=30m \
+    token_ttl=24h \
+    token_max_ttl=72h \
     secret_id_ttl=0
   environment:
     VAULT_ADDR: "https://{{ hostvars[inventory_hostname]['ansible_'+network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
