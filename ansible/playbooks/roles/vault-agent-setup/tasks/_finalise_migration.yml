@@ -1,24 +1,16 @@
 ---
-- name: Verifie la presence des nvx certificats
-  shell: |
-    ls {{ consul_tls_tmp_directory }} | wc -l
-  args:
-    executable: /bin/bash
-  register: certs_status
+- name: Trouve le nombre de certificats
+  find:
+    paths: "{{ consul_tls_tmp_directory }}"
+    file_type: file
+  register: found_certs
   retries: 10
   delay: 15
-  until: certs_status.stdout != "3"
+  until: found_certs.matched != 3
 
-- name: Verifie la presence des nvx certificats
-  shell: |
-    ls {{ consul_tls_tmp_directory }} | wc -l
-  args:
-    executable: /bin/bash
-  register: certs_nb_lst_check
-
-- name: check certs_status
+- name: Affiche le nombre de certificats trouvés
   debug:
-    msg: "certs_status= {{ certs_nb_lst_check.stdout }}"
+    msg: "Nombre de certificats : {{ found_certs.matched }}"
 
 - name: Remplacer les cerificats
   shell: |
