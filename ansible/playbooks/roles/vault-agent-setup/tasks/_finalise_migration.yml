@@ -1,12 +1,42 @@
 ---
-# - name: Supprimer les Certificats et Clés Anciens
-#   ansible.builtin.file:
-#     path: '{{ item }}'
-#     state: absent
-#   with_items:
-#   - '{{ consul_tls_directory }}/{{ consul_tls_ca_file }}'
-#   - '{{ consul_tls_directory }}/{{ consul_tls_cert_file }}'
-#   - '{{ consul_tls_directory }}/{{ consul_tls_key_file }}'
+- name: Verifie la presence des nvx certificats
+  shell: |
+    ls {{ consul_tls_tmp_directory }} | wc -l
+  args:
+    executable: /bin/bash
+  register: certs_status
+
+- name: Remplacer les cerificats
+  shell: |
+    mv {{ consul_tls_tmp_directory }}/* {{ consul_tls_directory }}
+    chown -R root:consul {{ consul_tls_directory }}
+    chmod -R 750 {{ consul_tls_directory }}
+  args:
+    executable: /bin/bash
+  when: certs_status.stdout == "3"
+
+- name: Restart vault-agent.service
+  systemd:
+    name: "consul"
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+
+- name: Restart vault serveur
+  systemd:
+    name: "vault"
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+  when: vault_mode == "server"
+
+- name: Déployer la configuration de Vault Agent finale
+  template:
+    src: "{{ vault_mode }}/vault-agent-approle.hcl.j2"
+    dest: "/etc/vault.d/vault-agent.hcl"
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: Restart vault-agent.service
   systemd:
@@ -14,3 +44,10 @@
     state: restarted
     enabled: yes
     daemon_reload: yes
+
+- name: Supprimer le dossier de Certificats temporaire
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+  - "{{ consul_tls_tmp_directory }}"

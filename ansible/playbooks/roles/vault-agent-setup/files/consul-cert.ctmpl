@@ -1,3 +1,0 @@
-{{ with secret "pki/issue/vault-agent-auth" "common_name={{ inventory_hostname }}.consul" "ttl=24h" }}
-{{ .Data.certificate }}
-{{ end }}

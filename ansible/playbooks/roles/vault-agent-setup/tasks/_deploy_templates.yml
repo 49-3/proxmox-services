@@ -8,7 +8,17 @@
     state: directory
   with_items:
     - "{{ vault_agent_templates_dir }}"
-    
+
+- name: Déployer le fichier consul-template
+  template:
+    src: "{{ item }}"
+    dest: "{{ vault_agent_templates_dir }}/{{ item | regex_replace('\\.j2$', '') }}"
+    owner: "root"
+    group: "vault"
+    mode: '0750'
+  with_items:
+    - consul-cert.ctmpl.j2
+    - consul-key.ctmpl.j2
 
 - name: Copier les templates de certificat
   copy:
@@ -16,8 +26,6 @@
     dest: "{{ vault_agent_templates_dir }}/{{ item }}"
     owner: "root"
     group: "vault"
-    mode: 0750
+    mode: '0750'
   with_items:
-    - consul-cert.ctmpl
-    - consul-key.ctmpl
     - consul-ca.ctmpl

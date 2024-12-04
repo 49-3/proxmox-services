@@ -1,11 +1,5 @@
 pid_file = "/var/run/vault-agent.pid"
 
-listener "tcp" {
-  address       = "127.0.0.1:8201"
-  tls_cert_file = "{{ consul_tls_directory }}/{{ consul_tls_cert_file }}"
-  tls_key_file  = "{{ consul_tls_directory }}/{{ consul_tls_key_file }}"
-}
-
 auto_auth {
   method "approle" {
     mount_path = "auth/approle"
@@ -27,15 +21,6 @@ cache {
   use_auto_auth_token = true
 }
 
-proxy {
-  upstreams = [
-    {
-      destination = "{{ vault_principal_addr }}"  # Adresse de votre serveur Vault principal
-      prefix      = "/"
-    }
-  ]
-}
-
 template_config {
   static_secret_render_interval = "10m"
   exit_on_retry_failure = true
@@ -44,21 +29,21 @@ template_config {
 
 template {
   source      = "{{ vault_agent_templates_dir }}/consul-cert.ctmpl"
-  destination = "{{ consul_tls_directory }}/{{ consul_tls_cert_file }}"
+  destination = "{{ consul_tls_tmp_directory }}/{{ consul_tls_cert_file }}"
   perms       = 0644
-  command     = "systemctl restart consul && ystemctl restart vault-agent.service"
+  command     = "systemctl restart consul"
 }
 
 template {
   source      = "{{ vault_agent_templates_dir }}/consul-key.ctmpl"
-  destination = "{{ consul_tls_directory }}/{{ consul_tls_key_file }}"
+  destination = "{{ consul_tls_tmp_directory }}/{{ consul_tls_key_file }}"
   perms       = 0640
-  command     = "systemctl restart consul && ystemctl restart vault-agent.service"
+  command     = "systemctl restart consul"
 }
 
 template {
   source      = "{{ vault_agent_templates_dir }}/consul-ca.ctmpl"
-  destination = "{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
+  destination = "{{ consul_tls_tmp_directory }}/{{ consul_tls_ca_file }}"
   perms       = 0644
-  command     = "systemctl restart consul && ystemctl restart vault-agent.service"
+  command     = "systemctl restart consul"
 }
