@@ -1,12 +1,4 @@
 ---
-- name: Déployer la configuration de Vault Agent finale
-  template:
-    src: "{{ vault_mode }}/vault-agent-approle.hcl.j2"
-    dest: "/etc/vault.d/vault-agent.hcl"
-    owner: root
-    group: root
-    mode: '0644'
-
 - name: Verifie la presence des nvx certificats
   shell: |
     ls {{ consul_tls_tmp_directory }} | wc -l
@@ -42,16 +34,24 @@
     daemon_reload: yes
   when: vault_mode == "server"
 
-- name: Restart vault-agent.service
-  systemd:
-    name: "vault-agent.service"
-    state: restarted
-    enabled: yes
-    daemon_reload: yes
-
 - name: Supprimer le dossier de Certificats temporaire
   ansible.builtin.file:
     path: '{{ item }}'
     state: absent
   with_items:
   - "{{ consul_tls_tmp_directory }}"
+
+- name: Déployer la configuration de Vault Agent finale
+  template:
+    src: "{{ vault_mode }}/vault-agent-approle.hcl.j2"
+    dest: "/etc/vault.d/vault-agent.hcl"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Restart vault-agent.service
+  systemd:
+    name: "vault-agent.service"
+    state: restarted
+    enabled: yes
+    daemon_reload: yes

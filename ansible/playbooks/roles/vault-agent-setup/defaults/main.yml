@@ -3,9 +3,9 @@
 ansible_python_interpreter: /usr/bin/python3
 deploy_vault_secret_dir: "{{ secrets_dir }}/vault"
 vault_secrets_path: "/etc/vault.d/secrets"
-role_id_file_path: "/etc/vault.d/role_id"
-secret_id_file_path: "/etc/vault.d/secret_id"
-sink_path: "/etc/vault.d/agent-token"
+role_id_file_path: "/etc/vault.d/secrets/role_id"
+secret_id_file_path: "/etc/vault.d/secrets/secret_id"
+sink_path: "/etc/vault.d/secrets/agent-token"
 
 network_interface: "ens33"
 vault_api_port: "8200"

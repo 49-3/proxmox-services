@@ -32,9 +32,9 @@
     - active_vault_host is defined
     - approle_enabled.stdout == "0"
 
-- name: check if approle consul-template is already writed
+- name: check if approle vault-agent is already writed
   shell: |
-    vault read auth/approle/role/vault-agent-role | grep consul-template-policy | wc -l
+    vault read auth/approle/role/vault-agent-role | grep vault-agent-policy | wc -l
   register: approle_already_writed
   environment:
     VAULT_ADDR: "https://{{ hostvars[inventory_hostname]['ansible_'+network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
@@ -44,16 +44,16 @@
   when: active_vault_host is defined
   changed_when: false
 
-- name: Display AppRole consul-template status
+- name: Display AppRole vault_agent status
   debug:
     msg: >
-      AppRole consul-template is {{ 'already' if approle_already_writed.stdout == "1" else 'not' }} in Vault
+      AppRole vault_agent is {{ 'already' if approle_already_writed.stdout == "1" else 'not' }} in Vault
   when: active_vault_host is defined
 
-- name: Créer l'AppRole consul-template dans Vault
+- name: Créer l'AppRole vault-agent dans Vault
   shell: |
     vault write auth/approle/role/vault-agent-role \
-    token_policies="consul-template-policy" \
+    token_policies="vault-agent-policy" \
     token_ttl=24h \
     token_max_ttl=72h \
     secret_id_ttl=0

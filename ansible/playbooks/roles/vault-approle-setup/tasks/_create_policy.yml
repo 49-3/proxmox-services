@@ -1,20 +1,20 @@
 ---
 # playbooks/roles/vault_apprle_setup/tasks/_create_policy.yml
 
-- name: Copier la politique consul-template dans le répertoire temporaire
+- name: Copier la politique vault-agent dans le répertoire temporaire
   copy:
-    src: consul-template-policy.hcl
-    dest: /tmp/consul-template-policy.hcl
+    src: vault-agent-policy.hcl
+    dest: /tmp/vault-agent-policy.hcl
   when: active_vault_host is defined
 
-- name: Créer la politique consul-template dans Vault
+- name: Créer la politique vault-agent dans Vault
   shell: |
-    vault policy write consul-template-policy /tmp/consul-template-policy.hcl
+    vault policy write vault-agent-policy /tmp/vault-agent-policy.hcl
   environment:
     VAULT_ADDR: "https://{{ hostvars[inventory_hostname]['ansible_'+network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
     VAULT_CACERT: "{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   args:
     executable: /bin/bash
-    removes: /tmp/consul-template-policy.hcl
+    removes: /tmp/vault-agent-policy.hcl
   when: active_vault_host is defined

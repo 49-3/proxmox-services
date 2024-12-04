@@ -1,4 +1,4 @@
-# consul-template-policy.hcl
+# vault-agent-policy.hcl
 
 path "pki*" {
   capabilities = ["read", "list"]
