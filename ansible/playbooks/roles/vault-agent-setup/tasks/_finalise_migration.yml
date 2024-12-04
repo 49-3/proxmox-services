@@ -19,28 +19,20 @@
     executable: /bin/bash
   when: certs_status.stdout == "3"
 
-- name: Restart vault-agent.service
+- name: Reload consul
   systemd:
     name: "consul"
-    state: restarted
+    state: reloaded
     enabled: yes
     daemon_reload: yes
 
-- name: Restart vault serveur
+- name: Reload vault serveur
   systemd:
     name: "vault"
     state: reloaded
     enabled: yes
     daemon_reload: yes
   when: vault_mode == "server"
-
-- name: Déployer la configuration de Vault Agent finale
-  template:
-    src: "{{ vault_mode }}/vault-agent-approle.hcl.j2"
-    dest: "/etc/vault.d/vault-agent.hcl"
-    owner: root
-    group: root
-    mode: '0644'
 
 - name: Restart vault-agent.service
   systemd:
