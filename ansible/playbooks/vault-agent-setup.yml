@@ -2,6 +2,7 @@
   hosts: alls
   become: yes
   vars:
+    vaults_servers_group_name: "vaults"
     secrets_dir: "/home/evil/secret"
   roles:
     - vault-agent-setup

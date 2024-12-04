@@ -13,3 +13,6 @@ consul_tls_ca_file: 'consul-agent-ca.pem'
 consul_tls_cert_file: 'consul-agent.pem'
 consul_tls_key_file: 'consul-agent-key.pem'
 vault_principal_addr: "192.168.121.164:8200"
+
+
+vault_server_group: "{{ groups[vaults_servers_group_name] }}"
