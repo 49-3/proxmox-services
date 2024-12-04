@@ -1,3 +1,3 @@
-{{ '{{' }} with secret "pki/issue/consul-tls" "common_name={{ inventory_hostname }}.consul" "ttl=10m" {{ '}}' }}
+{{ '{{' }} with secret "pki/issue/consul-tls" "common_name={{ inventory_hostname }}.consul" "ip_sans={{ ansible_host }}" "ttl=10m" {{ '}}' }}
 {{ '{{' }} .Data.certificate {{ '}}' }}
 {{ '{{' }} end {{ '}}' }}
