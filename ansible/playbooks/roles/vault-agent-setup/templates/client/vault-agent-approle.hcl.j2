@@ -46,19 +46,19 @@ template {
   source      = "{{ vault_agent_templates_dir }}/consul-cert.ctmpl"
   destination = "{{ consul_tls_directory }}/{{ consul_tls_cert_file }}"
   perms       = 0750
-  command     = "chown -R root:consul {{ consul_tls_directory }}/*; systemctl restart consul; systemctl restart vault-agent.service;"
+  command     = "chown -R root:consul {{ consul_tls_directory }}/*; systemctl reload consul; systemctl reload vault-agent.service;"
 }
 
 template {
   source      = "{{ vault_agent_templates_dir }}/consul-key.ctmpl"
   destination = "{{ consul_tls_directory }}/{{ consul_tls_key_file }}"
   perms       = 0750
-  command     = "systemctl restart consul; systemctl restart vault-agent.service;"
+  command     = "chown -R root:consul {{ consul_tls_directory }}/*; systemctl reload consul; systemctl reload vault-agent.service;"
 }
 
 template {
   source      = "{{ vault_agent_templates_dir }}/consul-ca.ctmpl"
   destination = "{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
   perms       = 0750
-  command     = "systemctl restart consul; systemctl restart vault-agent.service;"
+  command     = "chown -R root:consul {{ consul_tls_directory }}/*; systemctl reload consul; systemctl reload vault-agent.service;"
 }

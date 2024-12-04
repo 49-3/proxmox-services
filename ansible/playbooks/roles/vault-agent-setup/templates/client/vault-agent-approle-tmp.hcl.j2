@@ -45,20 +45,20 @@ template_config {
 template {
   source      = "{{ vault_agent_templates_dir }}/consul-cert.ctmpl"
   destination = "{{ consul_tls_tmp_directory }}/{{ consul_tls_cert_file }}"
-  perms       = 0644
-  command     = "systemctl restart consul && ystemctl restart vault-agent.service"
+  perms       = 0750
+  command     = "chown -R root:consul {{ consul_tls_tmp_directory }}/*; systemctl reload consul; systemctl reload vault-agent.service;"
 }
 
 template {
   source      = "{{ vault_agent_templates_dir }}/consul-key.ctmpl"
   destination = "{{ consul_tls_tmp_directory }}/{{ consul_tls_key_file }}"
-  perms       = 0640
-  command     = "systemctl restart consul && ystemctl restart vault-agent.service"
+  perms       = 0750
+  command     = "chown -R root:consul {{ consul_tls_tmp_directory }}/*; systemctl reload consul; systemctl reload vault-agent.service;"
 }
 
 template {
   source      = "{{ vault_agent_templates_dir }}/consul-ca.ctmpl"
   destination = "{{ consul_tls_tmp_directory }}/{{ consul_tls_ca_file }}"
-  perms       = 0644
-  command     = "systemctl restart consul && ystemctl restart vault-agent.service"
+  perms       = 0750
+  command     = "chown -R root:consul {{ consul_tls_tmp_directory }}/*; systemctl reload consul; systemctl reload vault-agent.service;"
 }

@@ -1,4 +1,14 @@
 ---
+- name: Créer le répertoire de consul.d/tls/tmp
+  file:
+    path: "{{ item }}"
+    mode: 0750
+    owner: "root"
+    group: "consul"
+    state: directory
+  with_items:
+    - "{{ consul_tls_tmp_directory }}"
+
 - name: Créer les répertoire de vault_agent Template
   file:
     path: "{{ item }}"
@@ -8,8 +18,19 @@
     state: directory
   with_items:
     - "{{ vault_agent_templates_dir }}"
+    - "{{ consul_tls_tmp_directory }}"
 
-- name: Déployer le fichier consul-template
+- name: Créer les répertoire vault/secrets
+  file:
+    path: "{{ item }}"
+    mode: 0700
+    owner: "root"
+    group: "root"
+    state: directory
+  with_items:
+    - "{{ vault_secrets_path }}"
+
+- name: Déployer le fichier de templates
   template:
     src: "{{ item }}"
     dest: "{{ vault_agent_templates_dir }}/{{ item | regex_replace('\\.j2$', '') }}"
