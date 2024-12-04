@@ -6,6 +6,10 @@
     executable: /bin/bash
   register: certs_status
 
+- name: check certs_status
+  debug:
+    msg: "certs_status= {{ certs_status.stdout }}"
+
 - name: Remplacer les cerificats
   shell: |
     mv {{ consul_tls_tmp_directory }}/* {{ consul_tls_directory }}
@@ -25,7 +29,7 @@
 - name: Restart vault serveur
   systemd:
     name: "vault"
-    state: reload
+    state: reloaded
     enabled: yes
     daemon_reload: yes
   when: vault_mode == "server"
