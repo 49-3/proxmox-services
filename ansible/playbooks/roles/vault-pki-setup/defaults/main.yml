@@ -11,6 +11,6 @@ pki_role_max_ttl: "72h"
 ca_pki_common_name: "consul"
 ca_pki_ttl: "87600h"
 
-vault_proxy_addr: "http://127.0.0.1:8201"
+vault_proxy_addr: "https://127.0.0.1:8201"
 vault_tls_directory: '/etc/consul.d/tls'
 vault_tls_ca_file: 'consul-agent-ca.pem'

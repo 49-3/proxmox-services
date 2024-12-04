@@ -10,8 +10,8 @@
     VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   changed_when: false
-  when:
-    - active_vault_host is defined
+  delegate_to: deploy
+  run_once: true
 
 - name: Display Pki status
   debug:
@@ -23,8 +23,9 @@
   command: >
     vault secrets enable -path=pki pki
   when:
-    - active_vault_host is defined
     - pki_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
   environment:
     VAULT_ADDR: "{{ vault_proxy_addr }}"
     VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
@@ -35,7 +36,9 @@
   command: >
     vault secrets tune -max-lease-ttl={{ ca_pki_ttl }} pki
   when:
-    - active_vault_host is defined
+    - pki_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
   environment:
     VAULT_ADDR: "{{ vault_proxy_addr }}"
     VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
@@ -47,8 +50,9 @@
       issuing_certificates="{{ vault_proxy_addr }}/v1/pki/ca"
       crl_distribution_points="{{ vault_proxy_addr }}/v1/pki/crl"
   when:
-    - active_vault_host is defined
     - pki_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
   environment:
     VAULT_ADDR: "{{ vault_proxy_addr }}"
     VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
@@ -61,8 +65,9 @@
       ttl="{{ ca_pki_ttl }}"
   register: pki_root_cert
   when:
-    - active_vault_host is defined
     - pki_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
   environment:
     VAULT_ADDR: "{{ vault_proxy_addr }}"
     VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
@@ -72,8 +77,9 @@
   command: >
     vault write pki/config/ca pem_bundle="{{ pki_root_cert.stdout }}"
   when:
-    - active_vault_host is defined
     - pki_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
   environment:
     VAULT_ADDR: "{{ vault_proxy_addr }}"
     VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
@@ -84,8 +90,9 @@
     vault write -force pki/tidy tidy_cert_store=true tidy_revoked_certs=true
   register: pki_crl
   when:
-    - active_vault_host is defined
     - pki_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
   environment:
     VAULT_ADDR: "{{ vault_proxy_addr }}"
     VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
