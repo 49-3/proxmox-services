@@ -41,6 +41,16 @@
   with_items:
   - "{{ consul_tls_tmp_directory }}"
 
+- name: Supprimer le dossier de secret tls sur deploy
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+  - "{{ secrets_dir }}/tls"
+  delegate_to: deploy
+  run_once: true
+  become: true
+
 - name: Déployer la configuration de Vault Agent finale
   template:
     src: "{{ vault_mode }}/vault-agent-approle.hcl.j2"
