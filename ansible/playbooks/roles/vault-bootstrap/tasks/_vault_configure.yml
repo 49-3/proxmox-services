@@ -62,16 +62,6 @@
     mode: '0700'
   become: true
 
-- name: Templating out systemd unseal script
-  ansible.builtin.template:
-    src: vault-unseal.systemd.j2
-    dest: /lib/systemd/system/vault-unseal.service
-    owner: root
-    group: root
-    mode: '0644'
-  when:
-    - vault_mode == "server"
-
 - name: Starting and enabling Vault
   ansible.builtin.systemd:
     name: "{{ vault_service_name }}"
