@@ -93,7 +93,6 @@
     - name: Sauvegarder le token racine localement
       copy:
         content: |
-          Initial Root Token:
           {{ initial_root_token }}
         dest: "{{ vault_home_directory }}/vault_token.txt"
       run_once: true
