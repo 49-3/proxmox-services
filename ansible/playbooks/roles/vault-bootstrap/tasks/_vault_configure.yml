@@ -53,9 +53,9 @@
   when:
     - vault_mode == "server"
 
-- name: Copying Vault PostExec unseal script
+- name: Copying Vault unseal script
   ansible.builtin.copy:
-    src: 'script_vault_unseal.sh'
+    src: 'script_vault_unseal'
     dest: '/usr/local/bin/vault_unseal'
     owner: 'root'
     group: 'root'
