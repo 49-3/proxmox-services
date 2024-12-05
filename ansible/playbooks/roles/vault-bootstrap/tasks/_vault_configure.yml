@@ -72,14 +72,6 @@
   when:
     - vault_mode == "server"
 
-- name: Starting and enabling Vault-unseal
-  ansible.builtin.systemd:
-    name: "vault-unseal.service"
-    enabled: true
-    state: started
-  when:
-    - vault_mode == "server"
-
 - name: Starting and enabling Vault
   ansible.builtin.systemd:
     name: "{{ vault_service_name }}"
