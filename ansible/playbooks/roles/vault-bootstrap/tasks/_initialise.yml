@@ -73,7 +73,6 @@
     - name: Sauvegarder les clés unseal localement
       copy:
         content: |
-          Unseal Keys:
           {{ unseal_keys | join('\n') }}
         dest: "{{ vault_home_directory }}/unseal_keys.txt"
       run_once: true
