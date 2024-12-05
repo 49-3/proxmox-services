@@ -20,7 +20,7 @@ AmbientCapabilities=CAP_IPC_LOCK
 CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
 NoNewPrivileges=yes
 ExecStart={{ vault_install_directory }}/vault server -config={{ vault_home_directory }}
-ExecStartPost=/bin/systemctl restart vault-unseal.service
+ExecStartPost=/usr/local/bin/vault_unseal
 ExecReload=/bin/kill --signal HUP $MAINPID
 KillMode=process
 KillSignal=SIGINT

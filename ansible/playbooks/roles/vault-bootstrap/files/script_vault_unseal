@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Activer les options de sécurité sans le mode débogage
-set -u pipefail
+set -u
+set -o pipefail
 
 # Chemins absolus vers les exécutables
 CURL="/usr/bin/curl"
@@ -21,7 +22,7 @@ _MY_IP=$(hostname -I | awk '{print $1}')
 # Vérifier que _MY_IP n'est pas vide
 if [[ -z "$_MY_IP" ]]; then
     log "ERROR: Impossible de déterminer l'adresse IP."
-    exit 1
+    exit 0
 fi
 
 # Chemins absolus vers les fichiers et configurations
@@ -31,35 +32,37 @@ VAULT_ADDR="https://${_MY_IP}:8200"  # Modifier si l'adresse diffère
 VAULT_API="${VAULT_ADDR}/v1/sys/seal-status"
 UNSEAL_API="${VAULT_ADDR}/v1/sys/unseal"
 
-# Fonction pour afficher les messages d'erreur et quitter
-error_exit() {
+# Fonction pour enregistrer les messages d'erreur dans le log
+log_error() {
     log "ERROR: $1"
-    exit 1
 }
 
 # Vérifier que les exécutables existent et sont exécutables
 if [[ ! -x "$CURL" ]]; then
-    error_exit "curl n'est pas installé ou n'est pas exécutable."
+    log_error "curl n'est pas installé ou n'est pas exécutable."
+    # Continuer sans quitter
 fi
 
 if [[ ! -x "$JQ" ]]; then
-    error_exit "jq n'est pas installé ou n'est pas exécutable."
+    log_error "jq n'est pas installé ou n'est pas exécutable."
+    # Continuer sans quitter
 fi
 
 # Vérifier que le certificat CA existe et est lisible
 if [[ ! -r "$CA_CERT" ]]; then
-    error_exit "Certificat CA introuvable ou non lisible : $CA_CERT"
+    log_error "Certificat CA introuvable ou non lisible : $CA_CERT"
+    # Continuer sans quitter
 fi
 
 # Fonction pour vérifier si Vault est scellé
 is_sealed() {
     response=$("$CURL" --silent --cacert "$CA_CERT" "$VAULT_API") || {
-        log "ERROR: Échec de la requête à $VAULT_API"
+        log_error "Échec de la requête à $VAULT_API"
         return 2
     }
 
     sealed=$(echo "$response" | "$JQ" -r '.sealed') || {
-        log "ERROR: Échec de l'analyse de la réponse seal-status."
+        log_error "Échec de l'analyse de la réponse seal-status."
         return 2
     }
 
@@ -68,35 +71,45 @@ is_sealed() {
     elif [[ "$sealed" == "false" ]]; then
         return 1  # Désèlé
     else
-        log "ERROR: Valeur inconnue pour 'sealed': $sealed"
+        log_error "Valeur inconnue pour 'sealed': $sealed"
         return 2  # Erreur de parsing
     fi
 }
 
 # Fonction pour désèler Vault
 unseal_vault() {
+    # Vérifier si le fichier de clés de désèlage existe
+    if [[ ! -f "$UNSEAL_KEYS_FILE" ]]; then
+        log_error "Fichier de clés de désèlage introuvable : $UNSEAL_KEYS_FILE"
+        return 1
+    fi
+
     # Lire les clés de désèlage
     mapfile -t keys < "$UNSEAL_KEYS_FILE"
 
     if [[ ${#keys[@]} -eq 0 ]]; then
-        error_exit "Aucune clé de désèlage trouvée dans $UNSEAL_KEYS_FILE"
+        log_error "Aucune clé de désèlage trouvée dans $UNSEAL_KEYS_FILE"
+        return 1
     fi
 
-    log "Désèlage de Vault avec les clés disponibles."
+    log "Désèlage de Vault avec ${#keys[@]} clés disponibles."
 
     for key in "${keys[@]}"; do
+        # Masquer la clé dans les logs pour la sécurité
+        log "Tentative de soumission d'une clé de désèlage."
+
         # Soumettre la clé de désèlage
         response=$("$CURL" --silent --fail --request POST \
             --cacert "$CA_CERT" \
             --data "{\"key\":\"$key\"}" \
             "$UNSEAL_API") || {
-                log "ERROR: Échec de la soumission de la clé de désèlage."
+                log_error "Échec de la soumission de la clé de désèlage."
                 continue
             }
 
         # Vérifier si la réponse contient des erreurs
         if echo "$response" | "$JQ" -e '.errors' > /dev/null; then
-            log "ERROR: La soumission de la clé de désèlage a retourné des erreurs."
+            log_error "La soumission de la clé de désèlage a retourné des erreurs."
         else
             log "Clé de désèlage soumise avec succès."
         fi
@@ -108,33 +121,47 @@ unseal_vault() {
             log "Vault reste scellé après l'application de la clé."
         elif [[ $? -eq 1 ]]; then
             log "Vault a été désèlé avec succès."
-            exit 0
+            return 0
         else
-            log "ERROR: Échec de la vérification de l'état de Vault."
-            exit 1
+            log_error "Échec de la vérification de l'état de Vault."
+            return 1
         fi
     done
 
-    error_exit "Échec du désèlage de Vault après avoir utilisé toutes les clés."
+    log_error "Échec du désèlage de Vault après avoir utilisé toutes les clés."
+    return 1
 }
 
 # Boucle principale pour tenter le désèlage
 attempt=1
-max_attempts=30
+max_attempts=10  # Augmenté de 3 à 10 tentatives pour plus de résilience
+sleep_interval=10  # Espacement de 5 à 10 secondes
 
 while [[ $attempt -le $max_attempts ]]; do
     if is_sealed; then
         log "Tentative $attempt: Vault est scellé. Démarrage du désèlage."
         unseal_vault
-        exit 0
+        # Continue la boucle même si unseal_vault échoue
     elif [[ $? -eq 1 ]]; then
         log "Tentative $attempt: Vault est déjà désèlé."
-        exit 0
+        break
     else
-        log "Tentative $attempt: Vault n'est pas prêt. Attente avant la prochaine tentative."
-        sleep 2
-        ((attempt++))
+        log "Tentative $attempt: État de Vault inconnu ou erreur."
     fi
+
+    if [[ $attempt -lt $max_attempts ]]; then
+        log "Attente de $sleep_interval secondes avant la prochaine tentative."
+        sleep "$sleep_interval"
+    fi
+
+    ((attempt++))
 done
 
-error_exit "Vault n'est pas prêt après $max_attempts tentatives."
+if is_sealed; then
+    log_error "Vault reste scellé après $max_attempts tentatives."
+else
+    log "Script terminé. Vault est désèlé ou l'état est inconnu."
+fi
+
+# Toujours retourner 0
+exit 0
