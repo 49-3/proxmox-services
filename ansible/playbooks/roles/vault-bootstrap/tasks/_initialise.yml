@@ -37,20 +37,6 @@
       register: vault_init_result
       changed_when: true  # Marque un changement en cas d'initialisation réussie
 
-    - name: Extraire les clés unseal dans unseal_keys.txt
-      shell: |
-        grep 'Unseal Key' {{ vault_home_directory }}/init.file | awk '{print $4}' > {{ vault_home_directory }}/unseal_keys.txt
-      delegate_to: vault-1
-      run_once: true
-      when: vault_init_result.changed
-
-    - name: Extraire le master token dans vault_token.txt
-      shell: |
-        grep 'Initial Root Token:' {{ vault_home_directory }}/init.file | awk '{print $4}' > {{ vault_home_directory }}/vault_token.txt
-      delegate_to: vault-1
-      run_once: true
-      when: vault_init_result.changed
-
     - name: Créer le répertoire de vault secrets
       file:
         path: "{{ item }}"
@@ -61,14 +47,23 @@
       with_items:
         - "{{ vault_home_directory }}/secrets"
 
-    - name: Upload files from deploy to all vaults secret dir
-      copy:
-        src: "{{ item }}"
-        dest: "{{ vault_home_directory }}/secrets/"
-        mode: 0700
-        owner: "root"
-        group: "root"
-      with_items:
-        - "{{ vault_home_directory }}/unseal_keys.txtt"
-      become: yes
+    - name: Extraire les clés unseal dans unseal_keys.txt
+      shell: |
+        grep 'Unseal Key' {{ vault_home_directory }}/init.file | awk '{print $4}' > {{ vault_home_directory }}/unseal_keys.txt
+      delegate_to: vault-1
+      run_once: true
+      when: vault_init_result.changed
+
+    - name: Extraire les clés unseal dans /etc/vault.d/secrets/unseal_keys.txt
+      shell: |
+        grep 'Unseal Key' {{ vault_home_directory }}/init.file | awk '{print $4}' > {{ vault_home_directory }}/secrets/unseal_keys.txt
+      become: true
+      when: vault_init_result.changed
+
+    - name: Extraire le master token dans vault_token.txt
+      shell: |
+        grep 'Initial Root Token:' {{ vault_home_directory }}/init.file | awk '{print $4}' > {{ vault_home_directory }}/vault_token.txt
+      delegate_to: vault-1
+      run_once: true
+      when: vault_init_result.changed
   when: vault1_initialized.stdout != "true"
