@@ -6,8 +6,8 @@ After=network.target
 User=root
 Group=root
 Environment="VAULT_ADDR=https://{{ vault_principal_addr }}"
-Environment="VAULT_CACERT={{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
-ExecStart=/usr/bin/vault agent -config=/etc/vault.d/vault-agent.hcl
+Environment="VAULT_CACERT={{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+ExecStart=/usr/bin/vault agent -config={{ vault_agent_dir }}
 Restart=on-failure
 
 [Install]

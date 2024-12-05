@@ -19,6 +19,7 @@
   with_items:
     - "{{ vault_agent_templates_dir }}"
     - "{{ consul_tls_tmp_directory }}"
+    - "{{ vault_agent_dir }}"
 
 - name: Créer les répertoire vault/secrets
   file:

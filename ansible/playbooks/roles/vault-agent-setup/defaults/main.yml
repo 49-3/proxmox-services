@@ -9,12 +9,17 @@ sink_path: "/etc/vault.d/secrets/agent-token"
 
 network_interface: "ens33"
 vault_api_port: "8200"
+vault_agent_dir: "/etc/vault.d/agent/"
 vault_agent_templates_dir: "/etc/vault.d/templates"
+
 consul_tls_tmp_directory: '/etc/consul.d/tls/tmp'
 consul_tls_directory: '/etc/consul.d/tls'
 consul_tls_ca_file: 'consul-agent-ca.pem'
 consul_tls_cert_file: 'consul-agent.pem'
 consul_tls_key_file: 'consul-agent-key.pem'
+
 vault_principal_addr: "192.168.121.164:8200"
+vault_tls_directory: '/etc/consul.d/tls'
+vault_tls_ca_file: 'consul-agent-ca.pem'
 
 vault_server_group: "{{ groups[vaults_servers_group_name] }}"
