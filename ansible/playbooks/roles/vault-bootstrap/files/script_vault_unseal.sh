@@ -7,10 +7,19 @@ set -euo pipefail
 CURL="/usr/bin/curl"
 JQ="/usr/bin/jq"
 
+# Obtenir la première adresse IP de l'hôte
+_MyIP=$(hostname -I | awk '{print $1}')
+
+# Vérifier que _MyIP n'est pas vide
+if [[ -z "$_MyIP" ]]; then
+  echo "Erreur: Impossible de déterminer l'adresse IP."
+  exit 1
+fi
+
 # Chemins absolus vers les fichiers et configurations
 UNSEAL_KEYS_FILE="/etc/vault.d/secrets/unseal_keys.txt"
 CA_CERT="/etc/consul.d/tls/consul-agent-ca.pem"
-VAULT_ADDR="https://127.0.0.1:8200"  # Modifier si l'adresse diffère
+VAULT_ADDR="https://${_MyIP}:8200"  # Modifier si l'adresse diffère
 VAULT_API="${VAULT_ADDR}/v1/sys/seal-status"
 UNSEAL_API="${VAULT_ADDR}/v1/sys/unseal"
 
