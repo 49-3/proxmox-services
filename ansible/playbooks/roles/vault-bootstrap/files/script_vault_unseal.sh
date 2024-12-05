@@ -9,7 +9,7 @@ JQ="/usr/bin/jq"
 
 # Chemins absolus vers les fichiers et configurations
 UNSEAL_KEYS_FILE="/etc/vault.d/secrets/unseal_keyx.txt"
-CA_CERT="/etc/consul.d/consul-agent-ca.pem"
+CA_CERT="/etc/consul.d/tls/consul-agent-ca.pem"
 VAULT_ADDR="https://127.0.0.1:8200"  # Modifier si l'adresse diffère
 VAULT_API="${VAULT_ADDR}/v1/sys/seal-status"
 UNSEAL_API="${VAULT_ADDR}/v1/sys/unseal"
