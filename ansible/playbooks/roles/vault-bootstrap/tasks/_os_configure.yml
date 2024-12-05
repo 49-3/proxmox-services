@@ -25,15 +25,6 @@
   when:
     - vault_create_account
 
-- name: Add vault to sudoers
-  shell: |
-    echo "vault ALL=NOPASSWD: /bin/systemctl restart vault-unseal.service" >> /etc/sudoers
-  args:
-    executable: /bin/bash
-  become: true
-  when:
-    - vault_create_account
-
 - name: Creating Vault directories
   ansible.builtin.file:
     state: directory
