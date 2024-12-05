@@ -51,7 +51,6 @@
       shell: |
         grep 'Unseal Key' {{ vault_home_directory }}/init.file | awk '{print $4}' > {{ vault_home_directory }}/unseal_keys.txt
       delegate_to: vault-1
-      run_once: true
       when: vault_init_result.changed
 
     - name: Extraire les clés unseal dans /etc/vault.d/secrets/unseal_keys.txt
