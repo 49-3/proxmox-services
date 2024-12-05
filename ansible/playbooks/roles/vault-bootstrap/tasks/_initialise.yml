@@ -70,11 +70,22 @@
       delegate_to: vault-1
       run_once: true
 
-    - name: Sauvegarder les clés unseal localement
-      copy:
-        content: |
-          {{ unseal_keys | join("\n") }}
-        dest: "{{ vault_home_directory }}/unseal_keys.txt"
+    - name: Créer le fichier unseal_keys.txt avec les bonnes permissions
+      file:
+        path: "{{ vault_home_directory }}/unseal_keys.txt"
+        state: touch
+        mode: '0750'  # Permissions sécurisées
+      run_once: true
+      delegate_to: vault-1
+      when: vault_init_result.changed
+
+    - name: Ajouter les clés unseal dans unseal_keys.txt
+      lineinfile:
+        path: "{{ vault_home_directory }}/unseal_keys.txt"
+        line: "{{ item }}"
+        create: yes
+        state: present
+      loop: "{{ unseal_keys }}"
       run_once: true
       delegate_to: vault-1
       when: vault_init_result.changed
