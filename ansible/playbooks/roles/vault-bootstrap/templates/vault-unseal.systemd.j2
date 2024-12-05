@@ -1,0 +1,14 @@
+[Unit]
+Description=Désèlage automatique de HashiCorp Vault
+After=vault.service
+Requires=vault.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/vault_unseal.sh
+RemainAfterExit=true
+User=root
+Group=root
+
+[Install]
+WantedBy=vault.service
