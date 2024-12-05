@@ -49,28 +49,6 @@
     - deploy_unseal_keys_exist.stdout != "0"
   become: yes
 
-- name: Créer le répertoire de vault secrets
-  file:
-    path: "{{ item }}"
-    mode: 0700
-    owner: "root"
-    group: "root"
-    state: directory
-  with_items:
-    - "{{ vault_home_directory }}/secrets"
-
-- name: Upload files from deploy to all vaults secret dir
-  synchronize:
-    src: "{{ item }}"
-    dest: "{{ vault_home_directory }}/secrets/"
-    mode: push
-    mode: 0700
-    owner: "root"
-    group: "root"
-  with_items:
-    - "{{ vault_local_dir }}/unseal_keys.txt"
-  become: yes
-
 - name: Déverrouiller vaults si scellé
   shell: |
     export VAULT_ADDR="https://{{ hostvars[inventory_hostname]['ansible_' + vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"

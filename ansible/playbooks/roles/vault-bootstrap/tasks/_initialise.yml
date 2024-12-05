@@ -50,4 +50,25 @@
       delegate_to: vault-1
       run_once: true
       when: vault_init_result.changed
+
+    - name: Créer le répertoire de vault secrets
+      file:
+        path: "{{ item }}"
+        mode: 0700
+        owner: "root"
+        group: "root"
+        state: directory
+      with_items:
+        - "{{ vault_home_directory }}/secrets"
+
+    - name: Upload files from deploy to all vaults secret dir
+      copy:
+        src: "{{ item }}"
+        dest: "{{ vault_home_directory }}/secrets/"
+        mode: 0700
+        owner: "root"
+        group: "root"
+      with_items:
+        - "{{ vault_home_directory }}/unseal_keys.txtt"
+      become: yes
   when: vault1_initialized.stdout != "true"
