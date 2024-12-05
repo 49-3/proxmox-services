@@ -1,0 +1,9 @@
+- name: install and configure vault agents on all clients
+  hosts: alls
+  become: yes
+  vars:
+    vaults_servers_group_name: "vaults"
+    consul_ansible_master_group_name: "consul_masters"
+    secrets_dir: "/home/evil/secret"
+  roles:
+    - acl-vault-consul
