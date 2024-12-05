@@ -6,7 +6,7 @@
   register: found_certs
   retries: 10
   delay: 15
-  until: found_certs.matched != 3
+  until: found_certs.matched == 3
 
 - name: Affiche le nombre de certificats trouvés
   debug:
