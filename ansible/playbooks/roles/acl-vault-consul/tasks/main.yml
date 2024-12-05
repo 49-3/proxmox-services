@@ -1,84 +1,49 @@
+
 ---
-# 1. Configurer les permissions pour /etc/vault.d
-- name: Assurer que /etc/vault.d existe
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    owner: "{{ vault_user }}"
-    group: "{{ vault_group }}"
-    mode: '0755'
-  loop: "{{ vault_dirs }}"
+- name: Chown vault
+  shell: |
+    chown -R {{ vault_user }}:{{ vault_group }} {{ vault_dir }}
+  args:
+    executable: /bin/bash
 
-- name: Assurer que /etc/vault.d/secrets existe
-  ansible.builtin.file:
-    path: "{{ item }}/secrets"
-    state: directory
-    owner: root
-    group: root
-    mode: '0700'
-  loop: "{{ vault_dirs }}"
+- name: Chmod vault
+  shell: |
+    chmod -R 0750 {{ vault_dir }}
+  args:
+    executable: /bin/bash
 
-- name: Définir permissions 0600 pour les fichiers dans /etc/vault.d/secrets
-  ansible.builtin.find:
-    paths: "{{ item }}/secrets"
-    file_type: file
-  register: vault_secrets_files
-  loop: "{{ vault_dirs }}"
+- name: Chown consul
+  shell: |
+    chown -R {{ consul_user }}:{{ consul_group }} {{ consul_dir }}
+  args:
+    executable: /bin/bash
 
-- name: Appliquer permissions 0600 aux fichiers de /etc/vault.d/secrets
-  ansible.builtin.file:
-    path: "{{ item.path }}"
-    owner: root
-    group: root
-    mode: '0600'
-  loop: "{{ vault_secrets_files.results | map(attribute='files') | list | flatten(levels=1) }}"
-  when: vault_secrets_files is defined and vault_secrets_files.results | selectattr('files', 'defined') | list | length > 0
+- name: Chmod consul
+  shell: |
+    chmod -R 0750 {{ consul_dir }}
+  args:
+    executable: /bin/bash
 
-# 2. Configurer les permissions pour /etc/consul.d
-- name: Assurer que /etc/consul.d existe
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    owner: "{{ consul_user }}"
-    group: "{{ consul_group }}"
-    mode: '0755'
-  loop: "{{ consul_dirs }}"
+- name: Chown vault secret
+  shell: |
+    chown -R root:root {{ vault_dir }}/secrets
+  args:
+    executable: /bin/bash
 
-- name: Assurer que /etc/consul.d/secrets existe
-  ansible.builtin.file:
-    path: "{{ item }}/secrets"
-    state: directory
-    owner: root
-    group: root
-    mode: '0700'
-  loop: "{{ consul_dirs }}"
+- name: Chmod vault secret
+  shell: |
+    chmod -R 0700 {{ vault_dir }}/secrets
+  args:
+    executable: /bin/bash
 
-- name: Définir permissions 0600 pour les fichiers dans /etc/consul.d/secrets
-  ansible.builtin.find:
-    paths: "{{ item }}/secrets"
-    file_type: file
-  register: consul_secrets_files
-  loop: "{{ consul_dirs }}"
+- name: Chown consul secret
+  shell: |
+    chown -R root:root {{ consul_dir }}/secrets
+  args:
+    executable: /bin/bash
 
-- name: Appliquer permissions 0600 aux fichiers de /etc/consul.d/secrets
-  ansible.builtin.file:
-    path: "{{ item.path }}"
-    owner: root
-    group: root
-    mode: '0600'
-  loop: "{{ consul_secrets_files.results | map(attribute='files') | list | flatten(levels=1) }}"
-  when: consul_secrets_files is defined and consul_secrets_files.results | selectattr('files', 'defined') | list | length > 0
-
-# 3. Configurer les permissions pour les scripts dans /usr/local/bin
-- name: Vérifier si /usr/local/bin/vault_unseal.sh existe
-  ansible.builtin.stat:
-    path: /usr/local/bin/vault_unseal.sh
-  register: vault_unseal_script
-
-- name: Définir propriétaire et permissions pour /usr/local/bin/vault_unseal.sh
-  ansible.builtin.file:
-    path: /usr/local/bin/vault_unseal.sh
-    owner: root
-    group: root
-    mode: '0700'
-  when: vault_unseal_script.stat.exists
+- name: Chmod consul secret
+  shell: |
+    chmod -R 0700 {{ consul_dir }}/secrets
+  args:
+    executable: /bin/bash

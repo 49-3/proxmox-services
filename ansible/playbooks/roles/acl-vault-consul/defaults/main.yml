@@ -9,7 +9,5 @@ consul_user: consul
 consul_group: consul
 
 # Répertoires à configurer
-vault_dirs:
-  - /etc/vault.d
-consul_dirs:
-  - /etc/consul.d
+vault_dir: "/etc/vault.d"
+consul_dir: "/etc/consul.d"
