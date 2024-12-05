@@ -57,9 +57,9 @@
   ansible.builtin.copy:
     src: 'script_vault_unseal'
     dest: '/usr/local/bin/vault_unseal'
-    owner: 'root'
-    group: 'root'
-    mode: '0700'
+    owner: 'vault'
+    group: 'vault'
+    mode: '0755'
   become: true
 
 - name: Starting and enabling Vault
