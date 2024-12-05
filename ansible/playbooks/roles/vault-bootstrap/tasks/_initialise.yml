@@ -91,7 +91,6 @@
 
     - name: Sauvegarder les clés unseal localement dans secrets
       shell: |
-        cp "{{ vault_home_directory }}/vault_token.txt" {{ vault_home_directory }}/secrets
         cp "{{ vault_home_directory }}/unseal_keys.txt" {{ vault_home_directory }}/secrets
         chown -R root:root {{ vault_home_directory }}/secrets
         chmod -R 0600 {{ vault_home_directory }}/secrets
