@@ -47,22 +47,95 @@
       with_items:
         - "{{ vault_home_directory }}/secrets"
 
-    - name: Extraire les clés unseal dans unseal_keys.txt
+    - name: Extraire les clés unseal depuis init.file
       shell: |
-        grep 'Unseal Key' {{ vault_home_directory }}/init.file | awk '{print $4}' > {{ vault_home_directory }}/unseal_keys.txt
+        grep 'Unseal Key' {{ vault_home_directory }}/init.file | awk '{print $4}'
+      register: unseal_keys_output
       delegate_to: vault-1
       when: vault_init_result.changed
 
-    - name: Extraire les clés unseal dans /etc/vault.d/secrets/unseal_keys.txt
+    - name: Extraire le master token
       shell: |
-        grep 'Unseal Key' {{ vault_home_directory }}/init.file | awk '{print $4}' > {{ vault_home_directory }}/secrets/unseal_keys.txt
-      become: true
+        grep 'Initial Root Token:' {{ vault_home_directory }}/init.file | awk '{print $4}'
+      register: vault_token
+      delegate_to: vault-1
       when: vault_init_result.changed
 
-    - name: Extraire le master token dans vault_token.txt
-      shell: |
-        grep 'Initial Root Token:' {{ vault_home_directory }}/init.file | awk '{print $4}' > {{ vault_home_directory }}/vault_token.txt
+    - name: Enregistrer les clés unseal dans une variable
+      set_fact:
+        unseal_keys: "{{ unseal_keys_output.stdout_lines }}"
+        initial_root_token: "{{ vault_token.stdout }}"
       delegate_to: vault-1
+
+    - name: Sauvegarder les clés unseal localement
+      copy:
+        content: |
+          Unseal Keys:
+          {{ unseal_keys | join('\n') }}
+        dest: "{{ vault_home_directory }}/unseal_keys.txt"
       run_once: true
+      delegate_to: vault-1
       when: vault_init_result.changed
+
+    - name: Sauvegarder le token racine localement
+      copy:
+        content: |
+          Initial Root Token:
+          {{ initial_root_token }}
+        dest: "{{ vault_home_directory }}/vault_token.txt"
+      run_once: true
+      delegate_to: vault-1
+      when: vault_init_result.changed
+
+    - name: Sauvegarder les clés unseal localement
+      copy:
+        content: |
+          Unseal Keys:
+          {{ unseal_keys | join('\n') }}
+        dest: "{{ vault_home_directory }}/secrets/unseal_keys.txt"
+        mode: 0700
+        owner: "root"
+        group: "root"
+      run_once: true
+      become: true
+      delegate_to: vault-1
+      when: vault_init_result.changed
+
+    - name: Sauvegarder le token racine localement
+      copy:
+        content: |
+          Initial Root Token:
+          {{ initial_root_token }}
+        dest: "{{ vault_home_directory }}/secrets/vault_token.txt"
+        mode: 0700
+        owner: "root"
+        group: "root"
+      run_once: true
+      become: true
+      delegate_to: vault-1
+      when: vault_init_result.changed
+
+    - name: Copier les clés unseal depuis vault-1 vers vault-2
+      copy:
+        content: |
+          {{ hostvars['vault-1'].unseal_keys | join('\n') }}
+        dest: "{{ vault_home_directory }}/secrets/unseal_keys.txt"
+        mode: '0600'
+        owner: 'root'
+        group: 'root'
+      become: true
+      delegate_to: vault-2
+      when: hostvars['vault-1'].vault_init_result.changed
+
+    - name: Copier le token racine depuis vault-1 vers vault-2 (optionnel)
+      copy:
+        content: "{{ hostvars['vault-1'].initial_root_token }}"
+        dest: "{{ vault_home_directory }}/secrets/vault_token.txt"
+        mode: '0600'
+        owner: 'root'
+        group: 'root'
+      become: true
+      delegate_to: vault-2
+      when: hostvars['vault-1'].vault_init_result.changed
+
   when: vault1_initialized.stdout != "true"

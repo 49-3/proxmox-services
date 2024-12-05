@@ -1,0 +1,130 @@
+#!/bin/bash
+
+# Activer les options de sécurité
+set -euo pipefail
+
+# Chemins absolus vers les exécutables
+CURL="/usr/bin/curl"
+JQ="/usr/bin/jq"
+
+# Chemins vers les logs
+LOG_FILE="/var/log/vault_unseal.log"
+
+# Fonction pour enregistrer les messages dans le log
+log() {
+    echo "$(date) - $1" >> "$LOG_FILE"
+}
+
+# Obtenir la première adresse IP de l'hôte
+_MyIP=$(hostname -I | awk '{print $1}')
+
+# Vérifier que _MyIP n'est pas vide
+if [[ -z "$_MyIP" ]]; then
+  log "Erreur: Impossible de déterminer l'adresse IP."
+  exit 1
+fi
+
+# Chemins absolus vers les fichiers et configurations
+UNSEAL_KEYS_FILE="/etc/vault.d/secrets/unseal_keys.txt"
+CA_CERT="/etc/consul.d/tls/consul-agent-ca.pem"
+VAULT_ADDR="https://${_MyIP}:8200"  # Modifier si l'adresse diffère
+VAULT_API="${VAULT_ADDR}/v1/sys/seal-status"
+UNSEAL_API="${VAULT_ADDR}/v1/sys/unseal"
+
+# Fonction pour afficher les messages d'erreur
+error_exit() {
+    log "Erreur : $1"
+    exit 1
+}
+
+# Vérifier que les exécutables existent et sont exécutables
+[ -x "$CURL" ] || error_exit "curl n'est pas installé ou n'est pas exécutable."
+[ -x "$JQ" ] || error_exit "jq n'est pas installé ou n'est pas exécutable."
+
+# Vérifier que le certificat CA existe et est lisible
+[ -r "$CA_CERT" ] || error_exit "Certificat CA introuvable ou non lisible : $CA_CERT"
+
+# Fonction pour vérifier si Vault est scellé
+is_sealed() {
+    response=$("$CURL" --silent --cacert "$CA_CERT" "$VAULT_API") || return 2
+    if echo "$response" | "$JQ" -e '.sealed' >/dev/null 2>&1; then
+        seal_status=$(echo "$response" | "$JQ" -r '.sealed')
+        if [ "$seal_status" == "true" ]; then
+            return 0  # Scellé
+        else
+            return 1  # Désèlé
+        fi
+    else
+        return 2  # Erreur de connexion ou de parsing
+    fi
+}
+
+# Fonction pour désèler Vault
+unseal_vault() {
+    # Lire les clés de désèlage en évitant les problèmes de globbing et word splitting
+    mapfile -t keys < "$UNSEAL_KEYS_FILE"
+
+    key_count=${#keys[@]}
+
+    if [ "$key_count" -eq 0 ]; then
+        error_exit "Aucune clé de désèlage trouvée dans $UNSEAL_KEYS_FILE"
+    fi
+
+    log "Désèlage de Vault avec les clés disponibles..."
+
+    for key in "${keys[@]}"; do
+        # Utiliser des guillemets pour éviter les injections
+        response=$("$CURL" --silent --fail --request POST \
+            --cacert "$CA_CERT" \
+            --data "{\"key\":\"$key\"}" \
+            "$UNSEAL_API") || {
+                log "Erreur lors de la requête de désèlage avec la clé."
+                continue
+            }
+
+        # Vérifier si la réponse contient des erreurs
+        if echo "$response" | "$JQ" -e '.errors' > /dev/null; then
+            log "Erreur lors du désèlage avec une clé."
+        else
+            log "Clé de désèlage appliquée avec succès."
+        fi
+
+        # Vérifier si Vault est désèlé après chaque clé
+        is_sealed
+        sealed_status=$?
+        if [ $sealed_status -eq 1 ]; then
+            log "Vault a été désèlé avec succès."
+            exit 0
+        elif [ $sealed_status -eq 2 ]; then
+            log "Erreur lors de la vérification de l'état de Vault."
+            exit 2
+        fi
+    done
+
+    error_exit "Échec du désèlage de Vault après avoir utilisé toutes les clés."
+}
+
+# Attendre que Vault soit prêt (max 30 tentatives avec intervalle de 2 secondes)
+attempt=1
+max_attempts=30
+while [ $attempt -le $max_attempts ]; do
+    is_sealed
+    sealed_status=$?
+    if [ $sealed_status -eq 0 ]; then
+        # Vault est scellé, on peut procéder au désèlage
+        log "Tentative $attempt: Vault est scellé. Procédons au désèlage."
+        unseal_vault
+        exit 0
+    elif [ $sealed_status -eq 1 ]; then
+        # Vault est déjà désèlé
+        log "Tentative $attempt: Vault est déjà désèlé. Aucune action nécessaire."
+        exit 0
+    else
+        # Vault n'est pas prêt
+        log "Tentative $attempt: Vault n'est pas prêt. Attente avant nouvelle tentative..."
+        sleep 2
+        ((attempt++))
+    fi
+done
+
+error_exit "Vault n'est pas prêt après $max_attempts tentatives."

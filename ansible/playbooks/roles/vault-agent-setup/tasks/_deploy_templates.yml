@@ -33,7 +33,7 @@
 
 - name: Déployer le fichier de templates
   template:
-    src: "{{ item }}"
+    src: "{{ vault_mode }}/{{ item }}"
     dest: "{{ vault_agent_templates_dir }}/{{ item | regex_replace('\\.j2$', '') }}"
     owner: "root"
     group: "vault"
