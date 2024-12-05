@@ -113,16 +113,4 @@
       delegate_to: vault-2
       when: hostvars['vault-1'].vault_init_result.changed
 
-    - name: Copier le token racine depuis vault-1 vers vault-2 (optionnel)
-      copy:
-        content: "{{ hostvars['vault-1'].initial_root_token }}"
-        dest: "{{ vault_home_directory }}/secrets/vault_token.txt"
-        mode: '0600'
-        owner: 'root'
-        group: 'root'
-      become: true
-      run_once: true
-      delegate_to: vault-2
-      when: hostvars['vault-1'].vault_init_result.changed
-
   when: vault1_initialized.stdout != "true"
