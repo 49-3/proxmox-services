@@ -1,5 +1,7 @@
 ---
 # defaults file for acl-vault-consul
+ansible_python_interpreter: /usr/bin/python3
+
 # Utilisateurs et groupes des services
 vault_user: vault
 vault_group: vault
