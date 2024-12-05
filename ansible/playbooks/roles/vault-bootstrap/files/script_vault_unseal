@@ -8,7 +8,7 @@ CURL="/usr/bin/curl"
 JQ="/usr/bin/jq"
 
 # Chemins vers les logs
-LOG_FILE="/var/log/vault_unseal.log"
+LOG_FILE="/var/log/vault/vault_unseal.log"
 
 # Fonction pour enregistrer les messages dans le log
 log() {
