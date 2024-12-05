@@ -134,7 +134,7 @@ unseal_vault() {
 
 # Boucle principale pour tenter le désèlage
 attempt=1
-max_attempts=5  # Augmenté de 3 à 10 tentatives pour plus de résilience
+max_attempts=3  # Augmenté de 3 à 10 tentatives pour plus de résilience
 sleep_interval=5  # Espacement de 5 à 10 secondes
 
 while [[ $attempt -le $max_attempts ]]; do

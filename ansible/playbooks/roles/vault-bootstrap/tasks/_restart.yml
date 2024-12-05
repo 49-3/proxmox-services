@@ -1,12 +1,4 @@
 ---
-- name: Enabling Vault-unseal
-  ansible.builtin.systemd:
-    name: "vault-unseal.service"
-    enabled: true
-    state: stopped
-  when:
-    - vault_mode == "server"
-
 - name: Vérifier si Vault est en cours d'exécution
   shell: |
     systemctl is-active --quiet "{{ vault_service_name }}"
