@@ -7,6 +7,7 @@ vault-1 ansible_host=192.168.121.164
 vault-2 ansible_host=192.168.121.165
 traefik ansible_host=192.168.121.170
 teleport ansible_host=192.168.121.100
+boundary ansible_host=192.168.121.10
 
 [promtails]
 ; loki ansible_host=10.0.30.22  => to be installed on loki playbook or not ??
@@ -17,7 +18,7 @@ vault-1 ansible_host=192.168.121.164
 vault-2 ansible_host=192.168.121.165
 traefik ansible_host=192.168.121.170
 teleport ansible_host=192.168.121.100
-; runner ansible_host=192.168.121.166
+boundary ansible_host=192.168.121.1021.166
 ; staging ansible_host=192.168.121.167
 
 [k3ds]
@@ -43,6 +44,7 @@ vault-2 ansible_host=192.168.121.165
 deploy  ansible_host=192.168.121.177
 traefik ansible_host=192.168.121.170
 teleport ansible_host=192.168.121.100
+boundary ansible_host=192.168.121.10
 ; runner ansible_host=192.168.121.166
 ; staging ansible_host=192.168.121.167
 
