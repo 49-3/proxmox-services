@@ -31,9 +31,9 @@
   with_items:
     - "{{ vault_secrets_path }}"
 
-- name: Déployer le fichier de templates
+- name: Déployer le fichier de templates consul-tls
   template:
-    src: "{{ vault_mode }}/{{ item }}"
+    src: "{{ consul_mode }}/{{ item }}"
     dest: "{{ vault_agent_templates_dir }}/{{ item | regex_replace('\\.j2$', '') }}"
     owner: "root"
     group: "vault"

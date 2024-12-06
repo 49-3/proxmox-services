@@ -23,3 +23,4 @@ vault_tls_directory: '/etc/consul.d/tls'
 vault_tls_ca_file: 'consul-agent-ca.pem'
 
 vault_server_group: "{{ groups[vaults_servers_group_name] }}"
+consul_ansible_bootstrap_group: "{{ groups[consul_ansible_master_group_name] }}"

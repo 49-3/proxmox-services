@@ -2,6 +2,7 @@
   hosts: alls
   become: yes
   vars:
+    consul_ansible_master_group_name: "consul_masters"
     vaults_servers_group_name: "vaults"
     secrets_dir: "/home/evil/secret"
   roles:

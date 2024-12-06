@@ -5,6 +5,7 @@
       allowed_domains="{{ pki_allowed_domains }}"
       allow_subdomains=true
       allow_ip_sans=true
+      allowed_common_names="server.dc1.consul,client.dc1.consul"
       max_ttl="{{ consul_tls_ttl }}"
   environment:
     VAULT_ADDR: "{{ vault_proxy_addr }}"
@@ -26,6 +27,7 @@
       allowed_domains="{{ pki_allowed_domains }}"
       allow_subdomains=true
       allow_ip_sans=true
+      allowed_common_names="server.dc1.consul,client.dc1.consul"
       max_ttl="{{ vault_tls_ttl }}"
   environment:
     VAULT_ADDR: "{{ vault_proxy_addr }}"
@@ -47,6 +49,7 @@
       allowed_domains="{{ pki_allowed_domains }}"
       allow_subdomains=true
       allow_ip_sans=true
+      allowed_common_names="server.dc1.consul,client.dc1.consul"
       max_ttl="{{ vault_agent_auth_ttl }}"
   environment:
     VAULT_ADDR: "{{ vault_proxy_addr }}"
