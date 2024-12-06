@@ -10,7 +10,7 @@
 - import_playbook: ./playbooks/vault-agent-setup.yml
 - import_playbook: ./playbooks/acl-vault-consul.yml
 - import_playbook: ./playbooks/vault-restart-unsealed.yml
-- import_playbook: ./playbooks/display_secrets.yml
+- import_playbook: ./playbooks/display-secrets.yml
 # - import_playbook: ./playbooks/consul-template-setup.yml
 # - import_playbook: ./playbooks/consul-vault-migration.yml
 # - import_playbook: ./playbooks/consul-template-activation.yml
