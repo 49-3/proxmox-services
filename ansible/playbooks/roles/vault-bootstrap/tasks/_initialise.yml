@@ -110,16 +110,24 @@
       when: vault_init_result.changed
 
     - name: Copier les clés unseal depuis vault-1 vers vault-2
-      copy:
-        content: |
-          {{ hostvars['vault-1'].unseal_keys | join('\n') }}
-        dest: "{{ vault_home_directory }}/secrets/unseal_keys.txt"
-        mode: '0600'
-        owner: 'vault'
-        group: 'vault'
+      lineinfile:
+        path: "{{ vault_home_directory }}/secrets/unseal_keys.txt"
+        line: "{{ item }}"
+        create: yes
+        state: present
+      loop: "{{ hostvars['vault-1'].unseal_keys }}"
       become: true
       run_once: true
       delegate_to: vault-2
       when: hostvars['vault-1'].vault_init_result.changed
+
+    - name: Update les acl des secrets
+      shell: |
+        chown -R vault:vault {{ vault_home_directory }}/secrets
+        chmod -R 0600 {{ vault_home_directory }}/secrets
+      run_once: true
+      become: true
+      delegate_to: vault-2
+      when: vault_init_result.changed
 
   when: vault1_initialized.stdout != "true"
