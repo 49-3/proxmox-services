@@ -1,0 +1,36 @@
+---
+# tasks file for display-secrets
+- name: Load Vault Unseal Keys
+  ansible.builtin.slurp:
+    src: "{{ secrets_dir }}/vault/unseal_keys.txt"
+  register: vault_unseal_keys
+
+- name: Load Consul Master Token
+  ansible.builtin.slurp:
+    src: "{{ secrets_dir }}/consul/acl-token-bootstrap.json"
+  register: consul_master_token
+
+- name: Load Vault Master Token
+  ansible.builtin.slurp:
+    src: "{{ secrets_dir }}/vault/vault_token.txt"
+  register: vault_master_token
+
+- name: Display Vault Unseal Key 1
+  ansible.builtin.debug:
+    msg: "Vault Unseal Key 1: {{ (vault_unseal_keys.content | b64decode).splitlines()[0] | trim }}"
+
+- name: Display Vault Unseal Key 2
+  ansible.builtin.debug:
+    msg: "Vault Unseal Key 2: {{ (vault_unseal_keys.content | b64decode).splitlines()[1] | trim }}"
+
+- name: Display Vault Unseal Key 3
+  ansible.builtin.debug:
+    msg: "Vault Unseal Key 3: {{ (vault_unseal_keys.content | b64decode).splitlines()[2] | trim }}"
+
+- name: Display Consul Master Token SecretID
+  ansible.builtin.debug:
+    msg: "Consul Master Token SecretID: {{ (consul_master_token.content | b64decode | from_json).SecretID | trim }}"
+
+- name: Display Vault Master Token
+  ansible.builtin.debug:
+    msg: "Vault Master Token: {{ vault_master_token.content | b64decode | trim }}"

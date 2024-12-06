@@ -1,65 +1,63 @@
-default: help
-
 .PHONY: help
-help: ## list makefile targets
+help: ## List all makefile targets with their descriptions
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: traefik
-traefik: ## Launch consul-bootstrap playbook
+traefik: ## Run the Traefik playbook
 	bash -c "time ansible-playbook playbooks/traefik.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
 .PHONY: consul_bootstrap
-consul_bootstrap: ## Launch consul-bootstrap playbook
+consul_bootstrap: ## Run the Consul bootstrap playbook
 	bash -c "time ansible-playbook playbooks/consul-bootstrap.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
 .PHONY: consul_template
-consul_template: ## Launch consul-template playbook
+consul_template: ## Run the Consul Template setup playbook
 	bash -c "time ansible-playbook playbooks/consul-template.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
 .PHONY: vault_bootstrap
-vault_bootstrap: ## Launch vault-bootstrap playbook
+vault_bootstrap: ## Run the Vault bootstrap playbook
 	bash -c "time ansible-playbook playbooks/vault-bootstrap.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
 .PHONY: vault_restart_unsealed
-vault_restart_unsealed: ## Launch vault-bootstrap playbook
+vault_restart_unsealed: ## Restart Vault in unsealed mode
 	bash -c "time ansible-playbook playbooks/vault-restart-unsealed.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
 .PHONY: vault_key_value
-vault_key_value: ## Launch vault-key-value playbook
+vault_key_value: ## Set up key-value secrets in Vault
 	bash -c "time ansible-playbook playbooks/vault-key-value.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
 .PHONY: vault_agent_autauth
-vault_agent_autauth: ## Launch vault-key-value playbook
+vault_agent_autauth: ## Configure Vault Agent with auto-authentication
 	bash -c "time ansible-playbook playbooks/vault-agent-autauth.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
 .PHONY: vault_consul_migration
-vault_consul_migration: ## Launch vault-key-value playbook
+vault_consul_migration: ## Migrate Consul certificates and CA to Vault
 	bash -c "time ansible-playbook playbooks/vault-consul-migration.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
 .PHONY: consul_renew_certs
-consul_renew_certs: ## Launch vault-key-value playbook
+consul_renew_certs: ## Renew Consul certificates using Vault
 	bash -c "time ansible-playbook playbooks/consul-restart-renew-certs.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
 .PHONY: vault_approle_setup
-vault_approle_setup: ## Launch vault-key-value playbook
+vault_approle_setup: ## Configure Vault AppRole authentication
 	bash -c "time ansible-playbook playbooks/vault-approle-setup.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
 .PHONY: vault_pki_setup
-vault_pki_setup: ## Launch vault-key-value playbook
+vault_pki_setup: ## Set up PKI (Public Key Infrastructure) in Vault
 	bash -c "time ansible-playbook playbooks/vault-pki-setup.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
 .PHONY: vault_agent_setup
-vault_agent_setup: ## Launch vault-key-value playbook
+vault_agent_setup: ## Deploy and configure Vault Agent
 	bash -c "time ansible-playbook playbooks/vault-agent-setup.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
-.PHONY: consul-template
-consul-template: ## Launch vault-key-value playbook
-	bash -c "time ansible-playbook playbooks/consul-template.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
-
 .PHONY: acl-vault-consul
-acl-vault-consul: ## Restaure acl for consul and vault folders
+acl-vault-consul: ## Restore ACLs for Consul and Vault data directories
 	bash -c "time ansible-playbook playbooks/acl-vault-consul.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
+.PHONY: display-secrets
+display-secrets: ## Display the secrets stored in the secrets directory
+	bash -c "time ansible-playbook playbooks/display-secrets.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
+
 .PHONY: re
-re: ## clear secret and run ansible on site.yml
+re: ## Clear secrets and run the main playbook (site.yml)
 	rm -rf ~/secret/* ; bash -c "time ansible-playbook site.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
