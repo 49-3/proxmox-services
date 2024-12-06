@@ -26,7 +26,7 @@
 
 - name: Chown vault secret
   shell: |
-    chown -R root:root {{ vault_dir }}/secrets
+    chown -R vault:vault {{ vault_dir }}/secrets
   args:
     executable: /bin/bash
 
@@ -38,7 +38,7 @@
 
 - name: Chown consul secret
   shell: |
-    chown -R root:root {{ consul_dir }}/secrets
+    chown -R consul:consul {{ consul_dir }}/secrets
   args:
     executable: /bin/bash
 
