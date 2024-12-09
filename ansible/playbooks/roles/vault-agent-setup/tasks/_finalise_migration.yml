@@ -12,28 +12,31 @@
   debug:
     msg: "Nombre de certificats : {{ found_certs.matched }}"
 
-- name: Remplacer les cerificats
-  shell: |
-    mv {{ consul_tls_tmp_directory }}/* {{ consul_tls_directory }}
-    chown -R root:consul {{ consul_tls_directory }}
-    chmod -R 750 {{ consul_tls_directory }}
-  args:
-    executable: /bin/bash
+# - name: Remplacer les cerificats
+#   shell: |
+#     mv {{ consul_tls_tmp_directory }}/* {{ consul_tls_directory }}
+#     chown -R root:consul {{ consul_tls_directory }}
+#     chmod -R 750 {{ consul_tls_directory }}
+#   args:
+#     executable: /bin/bash
 
-- name: Déployer la configuration de Vault Agent finale
-  template:
-    src: "{{ vault_mode }}/vault-agent-approle.hcl.j2"
-    dest: "{{ vault_agent_dir }}/vault-agent.hcl"
-    owner: root
-    group: root
-    mode: '0644'
+# - name: Déployer la configuration de Vault Agent finale
+#   template:
+#     src: "{{ vault_mode }}/vault-agent-approle.hcl.j2"
+#     dest: "{{ vault_agent_dir }}/vault-agent.hcl"
+#     owner: root
+#     group: root
+#     mode: '0644'
 
-- name: Restart vault-agent.service
-  systemd:
-    name: "vault-agent.service"
-    state: restarted
-    enabled: yes
-    daemon_reload: yes
+# - name: Restart vault-agent.service
+#   systemd:
+#     name: "vault-agent.service"
+#     state: restarted
+#     enabled: yes
+#     daemon_reload: yes
+
+
+
 
 # - name: Reload consul
 #   systemd:
