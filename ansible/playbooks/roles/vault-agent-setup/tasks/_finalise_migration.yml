@@ -14,11 +14,15 @@
 
 - name: Remplacer les cerificats
   shell: |
+    cp {{ consul_tls_tmp_directory }}/* {{ vault_tls_directory }}
     mv {{ consul_tls_tmp_directory }}/* {{ consul_tls_directory }}
     chown -R root:consul {{ consul_tls_directory }}
     chmod -R 750 {{ consul_tls_directory }}
+    chown -R root:vault {{ vault_tls_directory }}
+    chmod -R 750 {{ vault_tls_directory }}
   args:
     executable: /bin/bash
+
 
 - name: Déployer la configuration de Vault Agent finale
   template:
