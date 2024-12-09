@@ -61,3 +61,7 @@ display-secrets: ## Display the secrets stored in the secrets directory
 .PHONY: re
 re: ## Clear secrets and run the main playbook (site.yml)
 	rm -rf ~/secret/* ; bash -c "time ansible-playbook site.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
+
+.PHONY: migration
+migration: ## Clear secrets and run the main playbook (site.yml)
+	bash -c "time ansible-playbook ca-migration.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
