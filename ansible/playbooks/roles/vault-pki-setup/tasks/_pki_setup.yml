@@ -109,6 +109,8 @@
     VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   run_once: true
+  retries: 3
+  delay: 5
   register: crl_status
 
 - name: Vérifier la génération du CRL
