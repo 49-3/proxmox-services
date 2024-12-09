@@ -16,6 +16,7 @@
   shell: |
     cp {{ consul_tls_tmp_directory }}/* {{ vault_tls_directory }}
     mv {{ consul_tls_tmp_directory }}/* {{ consul_tls_directory }}
+    mv {{ vault_tls_directory }}/{{ consul_tls_ca_file }} {{ vault_tls_directory }}/{{ vault_tls_ca_file }}
     chown -R root:consul {{ consul_tls_directory }}
     chmod -R 750 {{ consul_tls_directory }}
     chown -R root:vault {{ vault_tls_directory }}
