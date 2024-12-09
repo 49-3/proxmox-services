@@ -42,6 +42,8 @@
     enabled: yes
     daemon_reload: yes
 
+# flush vault configuration
+
 - name: Reload vault serveur
   systemd:
     name: "vault"
