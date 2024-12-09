@@ -1,3 +1,3 @@
-{{ '{{' }} with secret "pki/issue/consul-tls" "common_name={{ inventory_hostname }}.dc1.consul" "alt_names=client.dc1.consul" "ip_sans={{ ansible_host }}, 127.0.0.1" "ttl=24h" {{ '}}' }}
+{{ '{{' }} with secret "pki/issue/consul-tls" "common_name={{ inventory_hostname }}.dc1.consul" "alt_names=client.dc1.consul" "ip_sans={{ ansible_host }}, 127.0.0.1" "ttl=24h" "key_type=ec" "format=pem" {{ '}}' }}
 {{ '{{' }} .Data.certificate {{ '}}' }}
 {{ '{{' }} end {{ '}}' }}

@@ -4,7 +4,7 @@
 - import_playbook: ./playbooks/traefik.yml
 - import_playbook: ./playbooks/vault-bootstrap.yml
 - import_playbook: ./playbooks/vault-key-value.yml
-- import_playbook: ./playbooks/display_secrets.yml
+- import_playbook: ./playbooks/display-secrets.yml
 # - import_playbook: ./playbooks/consul-template-setup.yml
 # - import_playbook: ./playbooks/consul-vault-migration.yml
 # - import_playbook: ./playbooks/consul-template-activation.yml
