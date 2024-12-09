@@ -19,6 +19,8 @@ consul_tls_cert_file: 'consul-agent.pem'
 consul_tls_key_file: 'consul-agent-key.pem'
 
 vault_principal_addr: "192.168.121.164:8200"
+vault_1: "192.168.121.164:8200"
+vault_2: "192.168.121.165:8200"
 vault_tls_directory: '/etc/consul.d/tls'
 vault_tls_ca_file: 'consul-agent-ca.pem'
 

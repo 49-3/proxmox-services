@@ -12,60 +12,57 @@
   debug:
     msg: "Nombre de certificats : {{ found_certs.matched }}"
 
-# - name: Remplacer les cerificats
-#   shell: |
-#     mv {{ consul_tls_tmp_directory }}/* {{ consul_tls_directory }}
-#     chown -R root:consul {{ consul_tls_directory }}
-#     chmod -R 750 {{ consul_tls_directory }}
-#   args:
-#     executable: /bin/bash
+- name: Remplacer les cerificats
+  shell: |
+    mv {{ consul_tls_tmp_directory }}/* {{ consul_tls_directory }}
+    chown -R root:consul {{ consul_tls_directory }}
+    chmod -R 750 {{ consul_tls_directory }}
+  args:
+    executable: /bin/bash
 
-# - name: Déployer la configuration de Vault Agent finale
-#   template:
-#     src: "{{ vault_mode }}/vault-agent-approle.hcl.j2"
-#     dest: "{{ vault_agent_dir }}/vault-agent.hcl"
-#     owner: root
-#     group: root
-#     mode: '0644'
+- name: Déployer la configuration de Vault Agent finale
+  template:
+    src: "{{ vault_mode }}/vault-agent-approle.hcl.j2"
+    dest: "{{ vault_agent_dir }}/vault-agent.hcl"
+    owner: root
+    group: root
+    mode: '0644'
 
-# - name: Restart vault-agent.service
-#   systemd:
-#     name: "vault-agent.service"
-#     state: restarted
-#     enabled: yes
-#     daemon_reload: yes
+- name: Restart vault-agent.service
+  systemd:
+    name: "vault-agent.service"
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
 
+- name: Reload consul
+  systemd:
+    name: "consul"
+    state: reloaded
+    enabled: yes
+    daemon_reload: yes
 
+- name: Reload vault serveur
+  systemd:
+    name: "vault"
+    state: reloaded
+    enabled: yes
+    daemon_reload: yes
+  when: vault_mode == "server"
 
+- name: Supprimer le dossier de Certificats temporaire
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+  - "{{ consul_tls_tmp_directory }}"
 
-# - name: Reload consul
-#   systemd:
-#     name: "consul"
-#     state: reloaded
-#     enabled: yes
-#     daemon_reload: yes
-
-# - name: Reload vault serveur
-#   systemd:
-#     name: "vault"
-#     state: reloaded
-#     enabled: yes
-#     daemon_reload: yes
-#   when: vault_mode == "server"
-
-# - name: Supprimer le dossier de Certificats temporaire
-#   ansible.builtin.file:
-#     path: '{{ item }}'
-#     state: absent
-#   with_items:
-#   - "{{ consul_tls_tmp_directory }}"
-
-# - name: Supprimer le dossier de secret tls sur deploy
-#   ansible.builtin.file:
-#     path: '{{ item }}'
-#     state: absent
-#   with_items:
-#   - "{{ secrets_dir }}/tls"
-#   delegate_to: deploy
-#   run_once: true
-#   become: true
+- name: Supprimer le dossier de secret tls sur deploy
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+  - "{{ secrets_dir }}/tls"
+  delegate_to: deploy
+  run_once: true
+  become: true

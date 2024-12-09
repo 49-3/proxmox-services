@@ -32,7 +32,11 @@ cache {
 proxy {
   upstreams = [
     {
-      destination = "{{ vault_principal_addr }}"  # Adresse de votre serveur Vault principal
+      destination = "{{ vault_1 }}"  # Adresse de votre serveur Vault principal
+      prefix      = "/"
+    },
+    {
+      destination = "{{ vault_2 }}"  # Adresse de votre serveur Vault principal
       prefix      = "/"
     }
   ]
