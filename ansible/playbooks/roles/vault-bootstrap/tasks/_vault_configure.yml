@@ -24,14 +24,13 @@
 - name: Templating out Vault configuration
   ansible.builtin.template:
     src: "{{ item }}"
-    dest: '{{ vault_home_directory }}/{{ item | regex_replace('\\.j2$', '') }}'
+    dest: "{{ vault_home_directory }}/{{ item | regex_replace('\\.j2$', '') }}"
     owner: 'root'
     group: '{{ vault_group }}'
     mode: '0750'
   with_items:
     - vault.hcl.j2
     - vault-network.hcl.j2
-
   when:
     - vault_mode == "server"
 
