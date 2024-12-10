@@ -131,7 +131,6 @@
       -additional-ipaddress=192.168.121.34 \
       -additional-ipaddress=192.168.121.40 \
       -additional-ipaddress=192.168.121.50 \
-
       -additional-dnsname=*.service.consul
   args:
     executable: /bin/bash
