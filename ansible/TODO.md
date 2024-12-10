@@ -1,3 +1,4 @@
+# fixer le resolv des consul server
 ```bash
 ❯ sudo resolvectl dns ens33 127.0.0.1:8600
 ❯ sudo resolvectl domain ens33 '~consul'
@@ -59,3 +60,10 @@ consul.                 0       IN      SOA     ns.consul. hostmaster.consul. 17
 ;; WHEN: Thu Nov 21 18:14:12 CET 2024
 ;; MSG SIZE  rcvd: 99
 ```
+
+
+
+# check les destination mul;tiple des vault-agent ou mettre en plave une VIP
+
+# hook le ifup des vault serveur pour redemareer vault apres 2 min au demarage
+

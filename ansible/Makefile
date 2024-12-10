@@ -58,10 +58,12 @@ acl-vault-consul: ## Restore ACLs for Consul and Vault data directories
 display-secrets: ## Display the secrets stored in the secrets directory
 	bash -c "time ansible-playbook playbooks/display-secrets.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
-.PHONY: re
-re: ## Clear secrets and run the main playbook (site.yml)
-	rm -rf ~/secret/* ; bash -c "time ansible-playbook site.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
-
 .PHONY: migration
 migration: ## Clear secrets and run the main playbook (site.yml)
+	bash -c "time ansible-playbook ca-migration.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
+
+.PHONY: re
+re: ## Clear secrets and run the main playbook (site.yml)
+	rm -rf ~/secret/* ; \
+	bash -c "time ansible-playbook consul-vault.yml --ssh-common-args='-o StrictHostKeyChecking=no'" \
 	bash -c "time ansible-playbook ca-migration.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
