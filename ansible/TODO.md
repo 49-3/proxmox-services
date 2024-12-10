@@ -67,3 +67,4 @@ consul.                 0       IN      SOA     ns.consul. hostmaster.consul. 17
 
 # hook le ifup des vault serveur pour redemareer vault apres 2 min au demarage
 
+# si on relance le full ansible , ne pas refaire les cert consul si il sont deja present
