@@ -24,7 +24,7 @@
 - name: Templating out Vault configuration
   ansible.builtin.template:
     src: "{{ item }}"
-    dest: '{{ vault_config_file }}'
+    dest: '{{ vault_home_directory }}/{{ item | regex_replace('\\.j2$', '') }}'
     owner: 'root'
     group: '{{ vault_group }}'
     mode: '0750'
