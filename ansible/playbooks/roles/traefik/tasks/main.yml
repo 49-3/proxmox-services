@@ -1,132 +1,162 @@
 ---
-- name: Install Traefik
-  ansible.builtin.unarchive:
-    src: https://github.com/traefik/traefik/releases/download/v3.2.0-rc2/traefik_v3.2.0-rc2_linux_amd64.tar.gz
-    dest: /usr/local/bin
-    remote_src: true
-  notify:
-    - Restart Traefik
+- name: Traefik tasks block
+  block:
+    - name: Install Traefik
+      ansible.builtin.unarchive:
+        src: https://github.com/traefik/traefik/releases/download/v3.2.0-rc2/traefik_v3.2.0-rc2_linux_amd64.tar.gz
+        dest: /usr/local/bin
+        remote_src: true
+      notify:
+        - Restart Traefik
 
-- name: Create Traefik group
-  ansible.builtin.group:
-    name: traefik
-    state: present
+    - name: Create Traefik group
+      ansible.builtin.group:
+        name: traefik
+        state: present
 
-- name: Create Traefik user
-  ansible.builtin.user:
-    name: traefik
-    group: traefik
-    shell: /sbin/nologin
-    state: present
-    create_home: false
+    - name: Create Traefik user
+      ansible.builtin.user:
+        name: traefik
+        group: traefik
+        shell: /sbin/nologin
+        state: present
+        create_home: false
 
-- name: Set port binding capability on Traefik
-  community.general.capabilities:
-    path: /usr/local/bin/traefik
-    capability: cap_net_bind_service+ep
-    state: present
+    - name: Set port binding capability on Traefik
+      community.general.capabilities:
+        path: /usr/local/bin/traefik
+        capability: cap_net_bind_service+ep
+        state: present
 
-- name: Copy Traefik config
-  ansible.builtin.copy:
-    src: traefik
-    dest: /etc
-    mode: "0755"
-  notify:
-    - Restart Traefik
+    - name: Create directories
+      shell: |
+        mkdir -p /etc/traefik/config/rules
+        chown -R traefik:traefik /etc/traefik
+        chmod -R 0755 /etc/traefik/
+      args:
+        executable: /bin/bash
+      become: true
 
-- name: Copy Auth Credentials
-  ansible.builtin.copy:
-    src: basic_auth_credentials
-    dest: /etc/traefik/
-    mode: "0755"
-  notify:
-    - Restart Traefik
+    - name: Trouve les fichiers de rules
+      set_fact:
+        found_rules: "{{ lookup('ansible.builtin.fileglob', role_path + '/templates/rules/*.j2', wantlist=True) }}"
 
-- name: Copy Acme Token
-  ansible.builtin.copy:
-    src: acme/acme.json
-    dest: /etc/traefik/
-    owner: traefik
-    group: traefik
-    mode: "0600"
-  notify:
-    - Restart Traefik
+    - name: Déployer les rules
+      template:
+        src: "{{ item }}"
+        dest: "/etc/traefik/config/rules/{{ item | basename | regex_replace('\\.j2$', '') }}"
+        owner: "traefik"
+        group: "traefik"
+        mode: '0750'
+      loop: "{{ found_rules }}"
 
-- name: Check if consul_http_token is here
-  shell: cat /etc/environment | grep "CONSUL_HTTP_TOKEN" | wc -l
-  args:
-    executable: /bin/bash
-  register: consul_http_token_exist
-  changed_when: false
-  become: no
+    - name: Trouve les fichiers de config
+      set_fact:
+        found_configs: "{{ lookup('ansible.builtin.fileglob', role_path + '/templates/config/*.j2', wantlist=True) }}"
 
-- debug: msg="consul_http_token exist = {{ consul_http_token_exist.stdout }}"
-  when:
-    - consul_http_token_exist.stdout == "1"
+    - name: Déployer les fichiers de config
+      template:
+        src: "{{ item }}"
+        dest: "/etc/traefik/config/{{ item | basename | regex_replace('\\.j2$', '') }}"
+        owner: "traefik"
+        group: "traefik"
+        mode: '0750'
+      loop: "{{ found_configs }}"
 
-- name: Create Traefik config file whitout consul
-  ansible.builtin.template:
-    src: traefik.yml.j2
-    dest: /etc/traefik/traefik.yml
-    mode: "0644"
-  when:
-    - consul_http_token_exist.stdout == "0"
-  notify:
-    - Restart Traefik
+    - name: Copy Auth Credentials
+      ansible.builtin.copy:
+        src: basic_auth_credentials
+        dest: /etc/traefik/
+        mode: "0755"
+      notify:
+        - Restart Traefik
 
-- name: Get consul_http_token from /etc/environment
-  shell: cat /etc/environment | grep "CONSUL_HTTP_TOKEN" | cut -d '=' -f 2
-  register: consul_http_token
+    - name: Copy Acme Token
+      ansible.builtin.copy:
+        src: acme/acme.json
+        dest: /etc/traefik/
+        owner: traefik
+        group: traefik
+        mode: "0600"
+      notify:
+        - Restart Traefik
 
-- name: Add traefik user to consul group
-  shell: |
-    usermod -aG consul traefik
-  args:
-    executable: /bin/bash
-  become: true
-  when:
-    - consul_http_token_exist.stdout == "1"
+    - name: Check if consul_http_token is here
+      shell: cat /etc/environment | grep "CONSUL_HTTP_TOKEN" | wc -l
+      args:
+        executable: /bin/bash
+      register: consul_http_token_exist
+      changed_when: false
+      become: no
 
-- name: Create Traefik config file with consul
-  ansible.builtin.template:
-    src: traefik-consul.yml.j2
-    dest: /etc/traefik/traefik.yml
-    mode: "0644"
-  when:
-    - consul_http_token_exist.stdout == "1"
-  notify:
-    - Restart Traefik
+    - debug: msg="consul_http_token exist = {{ consul_http_token_exist.stdout }}"
+      when:
+        - consul_http_token_exist.stdout == "1"
 
-- name: Create Log Folder
-  ansible.builtin.file:
-    path: /var/log/traefik
-    state: directory
-    owner: traefik
-    group: traefik
-    mode: "0744"
+    - name: Create Traefik config file whitout consul
+      ansible.builtin.template:
+        src: traefik.yml.j2
+        dest: /etc/traefik/traefik.yml
+        mode: "0644"
+      when:
+        - consul_http_token_exist.stdout == "0"
+      notify:
+        - Restart Traefik
 
-- name: Create Plugin-Folder
-  ansible.builtin.file:
-    path: /etc/traefik/plugins-storage
-    state: directory
-    owner: traefik
-    group: traefik
-    mode: "0744"
+    - name: Get consul_http_token from /etc/environment
+      shell: cat /etc/environment | grep "CONSUL_HTTP_TOKEN" | cut -d '=' -f 2
+      register: consul_http_token
 
-- name: Copy .ens file to server
-  ansible.builtin.copy:
-    src: .envs
-    dest: /etc/traefik
-    owner: traefik
-    group: traefik
-    mode: "0744"
+    - name: Add traefik user to consul group
+      shell: |
+        usermod -aG consul traefik
+      args:
+        executable: /bin/bash
+      become: true
+      when:
+        - consul_http_token_exist.stdout == "1"
 
-- name: Copy systemd service file to server
-  ansible.builtin.copy:
-    src: traefik.service
-    dest: /etc/systemd/system
-    owner: root
-    group: root
-    mode: "0644"
-  notify:
-    - Start Traefik
+    - name: Create Traefik config file with consul
+      ansible.builtin.template:
+        src: traefik-consul.yml.j2
+        dest: /etc/traefik/traefik.yml
+        mode: "0644"
+      when:
+        - consul_http_token_exist.stdout == "1"
+      notify:
+        - Restart Traefik
+
+    - name: Create Log Folder
+      ansible.builtin.file:
+        path: /var/log/traefik
+        state: directory
+        owner: traefik
+        group: traefik
+        mode: "0744"
+
+    - name: Create Plugin-Folder
+      ansible.builtin.file:
+        path: /etc/traefik/plugins-storage
+        state: directory
+        owner: traefik
+        group: traefik
+        mode: "0744"
+
+    - name: Copy .ens file to server
+      ansible.builtin.copy:
+        src: .envs
+        dest: /etc/traefik
+        owner: traefik
+        group: traefik
+        mode: "0744"
+
+    - name: Copy systemd service file to server
+      ansible.builtin.copy:
+        src: traefik.service
+        dest: /etc/systemd/system
+        owner: root
+        group: root
+        mode: "0644"
+      notify:
+        - Start Traefik
+  when: inventory_hostname == "traefik"

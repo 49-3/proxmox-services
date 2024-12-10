@@ -18,9 +18,6 @@ http:
     consul:
       loadBalancer:
         servers:
-          - url: https://192.168.121.161:8443
-          - url: https://192.168.121.162:8443
-          - url: https://192.168.121.163:8443
-          # - url: http://10.0.20.1:8500
-          # - url: http://10.0.20.2:8500
-          # - url: http://10.0.20.3:8500
+          - url: https://{{ hostvars['consul-1']['ansible_'+network_interface]['ipv4']['address'] }}:{{ consul_port }}
+          - url: https://{{ hostvars['consul-2']['ansible_'+network_interface]['ipv4']['address'] }}:{{ consul_port }}
+          - url: https://{{ hostvars['consul-3']['ansible_'+network_interface]['ipv4']['address'] }}:{{ consul_port }}

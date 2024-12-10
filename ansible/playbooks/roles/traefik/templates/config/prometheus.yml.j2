@@ -11,4 +11,4 @@ http:
     prometheus:
       loadBalancer:
         servers:
-          - url: 	http://10.0.30.21:9090
+          - url: http://{{ hostvars['prometheus']['ansible_'+network_interface]['ipv4']['address'] }}:{{ prometheus_port }}

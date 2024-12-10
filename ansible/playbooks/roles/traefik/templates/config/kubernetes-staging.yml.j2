@@ -11,4 +11,4 @@ http:
     staging:
       loadBalancer:
         servers:
-          - url: https://10.0.50.21:6443
+          - url: https://{{ hostvars['staging']['ansible_'+network_interface]['ipv4']['address'] }}:{{ kube_staging_port }}

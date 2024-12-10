@@ -11,4 +11,4 @@ http:
     rancher-staging:
       loadBalancer:
         servers:
-          - url: https://10.0.50.21:8443
+          - url: https://{{ hostvars['staging']['ansible_'+network_interface]['ipv4']['address'] }}:{{ rancher_staging_port }}

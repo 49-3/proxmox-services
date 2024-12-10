@@ -11,4 +11,4 @@ http:
     rancher-runners:
       loadBalancer:
         servers:
-          - url: https://10.0.20.26:8443
+          - url: https://{{ hostvars['runners']['ansible_'+network_interface]['ipv4']['address'] }}:{{ rancher_runners_port }}

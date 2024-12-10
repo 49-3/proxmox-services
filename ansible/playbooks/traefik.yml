@@ -1,6 +1,6 @@
 ---
 - name: Install traefik on lxc container
-  hosts: traefiks
+  hosts: alls
   roles:
     - common
     - traefik

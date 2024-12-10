@@ -11,4 +11,4 @@ http:
     argocd:
       loadBalancer:
         servers:
-          - url: https://10.0.50.21:8443
+          - url: http://{{ hostvars['staging']['ansible_'+network_interface]['ipv4']['address'] }}:{{ argocd_staging_port }}

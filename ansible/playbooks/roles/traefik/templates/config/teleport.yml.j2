@@ -11,4 +11,4 @@ http:
     teleport:
       loadBalancer:
         servers:
-          - url: https://10.0.10.10:3080
+          - url: https://{{ hostvars['teleport']['ansible_'+network_interface]['ipv4']['address'] }}:{{ teleport_port }}

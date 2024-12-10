@@ -11,4 +11,4 @@ http:
     sonarqube:
       loadBalancer:
         servers:
-          - url: 	http://10.0.20.22:9001
+          - url: http://{{ hostvars['sonarqube']['ansible_'+network_interface]['ipv4']['address'] }}:{{ sonnarqube_port }}

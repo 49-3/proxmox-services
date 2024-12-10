@@ -11,4 +11,4 @@ http:
     grafana:
       loadBalancer:
         servers:
-          - url: http://10.0.30.20:3000
+          - url: http://https://{{ hostvars['grafana']['ansible_'+network_interface]['ipv4']['address'] }}:{{ grafane_port }}

@@ -11,4 +11,4 @@ http:
     influxdb:
       loadBalancer:
         servers:
-          - url: 	http://10.0.30.24:8086
+          - url: http://{{ hostvars['influxdb']['ansible_'+network_interface]['ipv4']['address'] }}:{{ influxdb_port }}
