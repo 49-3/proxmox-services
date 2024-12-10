@@ -23,11 +23,15 @@
 
 - name: Templating out Vault configuration
   ansible.builtin.template:
-    src: vault.hcl.j2
+    src: {{ item }}
     dest: '{{ vault_config_file }}'
     owner: 'root'
     group: '{{ vault_group }}'
     mode: '0750'
+  with_items:
+    - vault.hcl.j2
+    - vault-network.hcl.j2
+
   when:
     - vault_mode == "server"
 

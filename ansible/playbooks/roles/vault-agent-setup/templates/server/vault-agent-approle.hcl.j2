@@ -1,30 +1,5 @@
 pid_file = "/var/run/vault-agent.pid"
 
-listener "tcp" {
-  address       = "127.0.0.1:8200"
-  tls_ca_file   = "{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
-  tls_cert_file = "{{ consul_tls_directory }}/{{ consul_tls_cert_file }}"
-  tls_key_file  = "{{ consul_tls_directory }}/{{ consul_tls_key_file }}"
-  tls_disable   = false
-}
-
-auto_auth {
-  method "approle" {
-    mount_path = "auth/approle"
-    config = {
-      role_id_file_path = "{{ role_id_file_path }}"
-      secret_id_file_path = "{{ secret_id_file_path }}"
-      remove_secret_id_file_after_reading = false
-    }
-  }
-
-  sink "file" {
-    config = {
-      path = "{{ sink_path }}"
-    }
-  }
-}
-
 cache {
   use_auto_auth_token = true
 }

@@ -26,11 +26,15 @@
 
 - name: Déployer la configuration de Vault Agent finale
   template:
-    src: "{{ vault_mode }}/vault-agent-approle.hcl.j2"
+    src: "{{ item }}"
     dest: "{{ vault_agent_dir }}/vault-agent.hcl"
     owner: root
     group: root
     mode: '0644'
+  with_items:
+    - "{{ vault_mode }}/vault-agent-approle.hcl.j2"
+    - vault-auth.hcl.j2
+    - vault-network.hcl.j2
 
 - name: Restart vault-agent.service
   systemd:
