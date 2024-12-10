@@ -24,10 +24,10 @@
   args:
     executable: /bin/bash
 
-- name: Déployer la configuration de Vault Agent finale
+- name: Déployer la configuration de Vault Agent final
   template:
     src: "{{ item }}"
-    dest: "{{ vault_agent_dir }}/vault-agent.hcl"
+    dest: "{{ vault_agent_dir }}/{{ item | regex_replace('^' + vault_mode + '/', '') | regex_replace('\\.j2$', '') }}"
     owner: root
     group: root
     mode: '0644'

@@ -26,6 +26,8 @@
     - pki_status.stdout == "0"
   delegate_to: deploy
   run_once: true
+  retries: 3         # Nombre de tentatives
+  delay: 15           # Délai entre chaque tentative en secondes
   environment:
     VAULT_ADDR: "{{ vault_proxy_addr }}"
     VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
