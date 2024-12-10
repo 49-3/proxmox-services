@@ -1,3 +1,9 @@
+{% if (vault_tls_cert_file is defined or vault_tls_cert_string is defined) and (vault_tls_key_file is defined or vault_tls_key_string is defined) %}
+{% set proto="https" %}
+{% else %}
+{% set proto="http" %}
+{% endif %}
+
 {% if vault_storage_backend == "integrated" %}
 storage "raft" {
   path    = "{{ vault_data_directory }}/data"
