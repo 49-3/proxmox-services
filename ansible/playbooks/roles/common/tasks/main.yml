@@ -23,6 +23,18 @@
       - yq
     state: present
 
+- name: Install apt-transport-https
+  ansible.builtin.apt:
+    pkg:
+      - apt-transport-https
+    state: present
+
+- name: Install software-properties-common
+  ansible.builtin.apt:
+    pkg:
+      - software-properties-common
+    state: present
+
 - name: Install systemd-resolved
   ansible.builtin.apt:
     pkg:
@@ -103,8 +115,8 @@
 - name: Get envoy keering
   shell: |
     set -o pipefail
-    wget -O- https://apt.envoyproxy.io/signing.key | sudo gpg --dearmor -o /etc/apt/keyrings/envoy-keyring.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/envoy-keyring.gpg] https://apt.envoyproxy.io bookworm main" | sudo tee /etc/apt/sources.list.d/envoy.list
+    wget -q -O - https://apt.envoyproxy.io/signing.key | gpg --dearmor | tee /etc/apt/keyrings/envoy-keyring.gpg >/dev/null
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/envoy-keyring.gpg] https://apt.envoyproxy.io bookworm main" | tee -a /etc/apt/sources.list.d/envoy.list
     apt-get update
   args:
     executable: /bin/bash

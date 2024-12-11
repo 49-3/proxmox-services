@@ -12,5 +12,4 @@
       O: "splitfire"
 
   roles:
-    - common
     - consul-bootstrap

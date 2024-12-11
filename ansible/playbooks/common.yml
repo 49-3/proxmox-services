@@ -1,0 +1,5 @@
+---
+- name: Install common apps
+  hosts: alls
+  roles:
+    - common
