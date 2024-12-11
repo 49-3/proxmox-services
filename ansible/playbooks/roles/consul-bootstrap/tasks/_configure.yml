@@ -82,8 +82,9 @@
       -additional-dnsname=influxdb.dc1.consul \
       -additional-dnsname=alertmanager.dc1.consul \
       -additional-dnsname=loki.dc1.consul \
+      -additional-dnsname=influxdb.dc1.consul \
       -additional-dnsname=prometheus.dc1.consul \
-      -additional-dnsname=grafane.dc1.consul \
+      -additional-dnsname=grafana.dc1.consul \
       -additional-dnsname=runners.dc1.consul \
       -additional-dnsname=staging.dc1.consul \
       -additional-dnsname=vault-1.dc1.consul \
@@ -115,9 +116,10 @@
       -additional-dnsname=alertmanager.dc1.consul \
       -additional-dnsname=loki.dc1.consul \
       -additional-dnsname=prometheus.dc1.consul \
-      -additional-dnsname=grafane.dc1.consul \
+      -additional-dnsname=grafana.dc1.consul \
       -additional-dnsname=runners.dc1.consul \
       -additional-dnsname=staging.dc1.consul \
+      -additional-dnsname=influxdb.dc1.consul \
       -additional-ipaddress=192.168.121.177 \
       -additional-ipaddress=192.168.121.170 \
       -additional-ipaddress=192.168.121.164 \
