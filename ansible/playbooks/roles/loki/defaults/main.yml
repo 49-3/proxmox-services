@@ -1,3 +1,5 @@
 ---
 # defaults file for loki
 ansible_python_interpreter: /usr/bin/python3
+alertmanager_port: "9093"
+alertmanager_ip: "192.168.121.31"

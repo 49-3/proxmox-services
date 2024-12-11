@@ -3,4 +3,6 @@
 ansible_python_interpreter: /usr/bin/python3
 network_interface: "ens33"
 alertmanager_port: "9093"
+alertmanager_ip: "192.168.121.31"
 loki_port: "3100"
+loki_ip: "192.168.121.34"

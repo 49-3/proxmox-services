@@ -20,6 +20,14 @@
     state: latest
     update_cache: yes
 
+- name: Generate loki configuration
+  template:
+    src: "config.yml.j2"
+    dest: "/etc/loki/config.yml"
+    owner: loki
+    group: loki
+    mode: "0755"
+
 - name: Ensure Loki service is enabled and started
   ansible.builtin.systemd:
     name: loki

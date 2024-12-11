@@ -66,6 +66,10 @@ migration: ##Run the migration playbook (site.yml)
 monitoring: ## Run the monitoring playbook (site.yml)
 	bash -c "time ansible-playbook monitoring.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
+.PHONY: promtail
+promtail: ## Run the promtail playbook (site.yml)
+	bash -c "time ansible-playbook playbooks/promtail.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
+
 .PHONY: re
 re: ## Clear secrets and run the alls playbooks (site.yml)
 	rm -rf ~/secret/* ; \

@@ -1,0 +1,14 @@
+---
+http:
+  routers:
+    to-loki:
+      rule: "Host(`loki.korporate.org`)"
+      service: loki
+      middlewares:
+        - "chain-no-auth"
+
+  services:
+    loki:
+      loadBalancer:
+        servers:
+          - url: http://{{ hostvars['loki']['ansible_'+network_interface]['ipv4']['address'] }}:{{ loki_port }}
