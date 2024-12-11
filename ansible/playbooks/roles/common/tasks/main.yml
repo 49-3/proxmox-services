@@ -11,6 +11,12 @@
       - curl
     state: present
 
+- name: Install gnupg2
+  ansible.builtin.apt:
+    pkg:
+      - gnupg2
+    state: present
+
 - name: Install yq
   ansible.builtin.apt:
     pkg:
@@ -21,7 +27,24 @@
   ansible.builtin.apt:
     pkg:
       - systemd-resolved
-    state: present
+
+- name: Get envoy keering
+  shell: |
+    set -o pipefail
+    wget -O- https://apt.envoyproxy.io/signing.key | sudo gpg --dearmor -o /etc/apt/keyrings/envoy-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/envoy-keyring.gpg] https://apt.envoyproxy.io bookworm main" | sudo tee /etc/apt/sources.list.d/envoy.list
+    apt-get update
+  args:
+    executable: /bin/bash
+  become: true
+
+- name: Install envoy proxy
+  shell: |
+    set -o pipefail
+    apt-get install envoy=1.31.4
+  args:
+    executable: /bin/bash
+  become: true
 
 - name: Créer le fichier 60-custom.conf
   copy:
