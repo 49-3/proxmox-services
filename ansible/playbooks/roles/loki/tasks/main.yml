@@ -25,7 +25,7 @@
     src: "config.yml.j2"
     dest: "/etc/loki/config.yml"
     owner: loki
-    group: loki
+    group: root
     mode: "0755"
 
 - name: Ensure Loki service is enabled and started
