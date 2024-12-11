@@ -6,8 +6,50 @@
     state: latest
     update_cache: yes
 
-- name: Ensure Prometheus service is enabled and started
-  ansible.builtin.systemd:
+- name: Generate prometheus configuration
+  template:
+    src: "prometheus.yml.j2.j2"
+    dest: "/etc/prometheus/prometheus.yml"
+    owner: prometheus
+    group: prometheus
+    mode: "0755"
+
+- name: Copy rules files
+  copy:
+    src: "alert_rules.yml"
+    dest: "/etc/prometheus/alerts_rules.yml"
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+
+- name: Create systemd service for Prometheus
+  copy:
+    dest: /etc/systemd/system/prometheus.service
+    content: |
+      [Unit]
+      Description=Prometheus Monitoring
+      Wants=network-online.target
+      After=network-online.target
+
+      [Service]
+      User=prometheus
+      Group=prometheus
+      Type=simple
+      ExecStart=/usr/local/bin/prometheus \
+        --config.file /etc/prometheus/prometheus.yml \
+        --storage.tsdb.path /var/lib/prometheus/ \
+        --web.console.templates=/etc/prometheus/consoles \
+        --web.console.libraries=/etc/prometheus/console_libraries
+
+      [Install]
+      WantedBy=multi-user.target
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Enable and start alertmanager service
+  systemd:
     name: prometheus
     enabled: yes
     state: started
+    daemon_reload: yes

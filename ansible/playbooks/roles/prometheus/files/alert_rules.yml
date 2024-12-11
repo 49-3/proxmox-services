@@ -1,0 +1,11 @@
+---
+groups:
+- name: prometheus_alerts
+  rules:
+  - alert: loki down
+    expr: up{job="loki"}
+    for: 10s
+    labels:
+      severity: critical
+    annotations:
+      description: "Our loki server is down."
