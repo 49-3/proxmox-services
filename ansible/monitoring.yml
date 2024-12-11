@@ -1,0 +1,7 @@
+---
+- import_playbook: ./playbooks/prometheus.yml
+- import_playbook: ./playbooks/grafana.yml
+- import_playbook: ./playbooks/loki.yml
+- import_playbook: ./playbooks/influxdb.yml
+- import_playbook: ./playbooks/alertmanager.yml
+# - import_playbook: ./playbooks/promtail.yml

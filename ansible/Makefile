@@ -59,18 +59,22 @@ display-secrets: ## Display the secrets stored in the secrets directory
 	bash -c "time ansible-playbook playbooks/display-secrets.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
 .PHONY: migration
-migration: ## Clear secrets and run the main playbook (site.yml)
+migration: ##Run the migration playbook (site.yml)
 	bash -c "time ansible-playbook ca-migration.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
+.PHONY: monitoring
+monitoring: ## Run the monitoring playbook (site.yml)
+	bash -c "time ansible-playbook monitoring.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
+
 .PHONY: re
-re: ## Clear secrets and run the main playbook (site.yml)
+re: ## Clear secrets and run the alls playbooks (site.yml)
 	rm -rf ~/secret/* ; \
-	bash -c "time ansible-playbook consul-vault.yml --ssh-common-args='-o StrictHostKeyChecking=no'" \
+	bash -c "time ansible-playbook consul-vault.yml --ssh-common-args='-o StrictHostKeyChecking=no'" && \
 	bash -c "time ansible-playbook ca-migration.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
 .PHONY: re_no_rm
-re_no_rm: ## Run the main playbook without clearing secrets
-	bash -c "time ansible-playbook consul-vault.yml --ssh-common-args='-o StrictHostKeyChecking=no'" \
+re_no_rm: ## Run all playbooks without clearing secrets
+	bash -c "time ansible-playbook consul-vault.yml --ssh-common-args='-o StrictHostKeyChecking=no'" && \
 	bash -c "time ansible-playbook ca-migration.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
 # Default target

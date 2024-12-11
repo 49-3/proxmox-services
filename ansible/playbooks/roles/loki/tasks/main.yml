@@ -1,0 +1,27 @@
+---
+# tasks file for loki
+- name: Add Grafana GPG key and repository
+  shell: |
+    set -o pipefail
+    # Télécharger et ajouter la clé GPG de Grafana
+    wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor > /usr/share/keyrings/grafana.gpg
+  args:
+    executable: /bin/bash
+  become: true
+
+- name: Add the Grafana APT repository
+  shell: |
+    echo "deb [signed-by=/usr/share/keyrings/grafana.gpg] https://apt.grafana.com stable main" | tee /etc/apt/sources.list.d/grafana.list
+  args:
+    executable: /bin/bash
+- name: Install Loki
+  ansible.builtin.apt:
+    name: loki
+    state: latest
+    update_cache: yes
+
+- name: Ensure Loki service is enabled and started
+  ansible.builtin.systemd:
+    name: loki
+    enabled: yes
+    state: started

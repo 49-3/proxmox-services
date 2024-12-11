@@ -1,0 +1,13 @@
+---
+# tasks file for alertmanager
+- name: Install Alertmanager
+  ansible.builtin.apt:
+    name: prometheus-alertmanager
+    state: latest
+    update_cache: yes
+
+- name: Ensure Alertmanager service is enabled and started
+  ansible.builtin.systemd:
+    name: prometheus-alertmanager
+    enabled: yes
+    state: started

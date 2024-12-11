@@ -1,0 +1,7 @@
+---
+- name: Install and configure alertmanager
+  hosts: alertmanager
+  become: yes
+
+  roles:
+    - alertmanager

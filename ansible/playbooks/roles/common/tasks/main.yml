@@ -116,17 +116,20 @@
 - name: Get envoy keering
   shell: |
     set -o pipefail
-    wget -q -O - https://apt.envoyproxy.io/signing.key | gpg --dearmor | tee /etc/apt/keyrings/envoy-keyring.gpg >/dev/null
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/envoy-keyring.gpg] https://apt.envoyproxy.io bookworm main" | tee -a /etc/apt/sources.list.d/envoy.list
-    apt-get update
+    wget -q -O - https://apt.envoyproxy.io/signing.key | gpg --dearmor > /etc/apt/keyrings/envoy-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/envoy-keyring.gpg] https://apt.envoyproxy.io bookworm main" > /etc/apt/sources.list.d/envoy.list
   args:
     executable: /bin/bash
   become: true
 
+- name: Run the equivalent of "apt-get update" as a separate step
+  ansible.builtin.apt:
+    update_cache: yes
+
 - name: Install Envoy
   ansible.builtin.apt:
-    pkg:
-      - envoy={{ envoy_version }}
+    name: envoy={{ envoy_version }}
+    allow_downgrade: yes
     state: present
 
 - name: Set SSH authorized key

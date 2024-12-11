@@ -1,0 +1,13 @@
+---
+# tasks file for prometheus
+- name: Install Prometheus
+  ansible.builtin.apt:
+    name: prometheus
+    state: latest
+    update_cache: yes
+
+- name: Ensure Prometheus service is enabled and started
+  ansible.builtin.systemd:
+    name: prometheus
+    enabled: yes
+    state: started

@@ -1,0 +1,7 @@
+---
+- name: Install and configure influxdb
+  hosts: influxdb
+  become: yes
+
+  roles:
+    - influxdb
