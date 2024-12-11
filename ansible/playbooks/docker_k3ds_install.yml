@@ -1,0 +1,7 @@
+---
+- name: Install and configure influxdb
+  hosts: k3ds
+  become: yes
+
+  roles:
+    - docker_k3ds_install

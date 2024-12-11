@@ -70,16 +70,18 @@ monitoring: ## Run the monitoring playbook (site.yml)
 promtail: ## Run the promtail playbook (site.yml)
 	bash -c "time ansible-playbook playbooks/promtail.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
+.PHONY: kubes
+kubes: ## Run the kubes playbook (site.yml)
+	bash -c "time ansible-playbook kubes.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
+
+
 .PHONY: re
 re: ## Clear secrets and run the alls playbooks (site.yml)
 	rm -rf ~/secret/* ; \
 	bash -c "time ansible-playbook consul-vault.yml --ssh-common-args='-o StrictHostKeyChecking=no'" && \
-	bash -c "time ansible-playbook ca-migration.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
-
-.PHONY: re_no_rm
-re_no_rm: ## Run all playbooks without clearing secrets
-	bash -c "time ansible-playbook consul-vault.yml --ssh-common-args='-o StrictHostKeyChecking=no'" && \
-	bash -c "time ansible-playbook ca-migration.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
+	bash -c "time ansible-playbook ca-migration.yml --ssh-common-args='-o StrictHostKeyChecking=no'" && \
+	bash -c "time ansible-playbook monitoring.yml --ssh-common-args='-o StrictHostKeyChecking=no'" && \
+	bash -c "time ansible-playbook kubes.ynl --ssh-common-args='-o StrictHostKeyChecking=no'"
 
 # Default target
 .DEFAULT_GOAL := re_no_rm

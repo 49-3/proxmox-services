@@ -1,6 +1,6 @@
 ---
-- name: Include my vars
-  ansible.builtin.include_vars: /home/evil/proxmox-services/ansible/host_vars/ansible_vars.yml
+# - name: Include my vars
+#   ansible.builtin.include_vars: /home/evil/proxmox-services/ansible/host_vars/ansible_vars.yml
 
 - name: Check if cluster runners exist
   shell: |
@@ -18,7 +18,7 @@
 - name: Install runners cluster
   shell: k3d cluster create runners \
         -p "8080:80@loadbalancer" \
-        -p "8443:443@loadbalancer" \
+        -p "7443:443@loadbalancer" \
         --api-port 6443 \
         --agents 3 \
         --verbose
@@ -66,6 +66,7 @@
   args:
     executable: /bin/bash
   register: arc_system_namespace
+  ignore_errors: true
 
 - when: arc_system_namespace.stdout != "Error"
   block:

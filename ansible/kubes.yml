@@ -1,0 +1,5 @@
+---
+- import_playbook: ./playbooks/docker_k3ds_install.yml
+- import_playbook: ./playbooks/k3d.yml
+- import_playbook: ./playbooks/runners.yml
+- import_playbook: ./playbooks/staging.yml

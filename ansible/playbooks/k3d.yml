@@ -1,6 +1,6 @@
 ---
-- name: Install github self hosted runners
-  hosts: k3d
+- name: Install k3d clusters
+  hosts: k3ds
   roles:
     - kubectl
     - helm

@@ -1,0 +1,51 @@
+---
+# tasks file for docker_k3ds_install
+- name: Mettre à jour les dépôts APT
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  become: yes
+
+- name: Installer les dépendances nécessaires
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+  become: yes
+
+- name: Ajouter la clé GPG officielle de Docker
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+  become: yes
+
+- name: Ajouter le dépôt Docker
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release | lower }} stable"
+    state: present
+  become: yes
+
+- name: Installer Docker
+  apt:
+    name: docker-ce
+    state: latest
+    update_cache: yes
+  become: yes
+
+- name: S'assurer que le service Docker est démarré et activé
+  service:
+    name: docker
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Ajouter l'utilisateur 'evil' au groupe 'docker'
+  user:
+    name: "{{ main_user }}"
+    group: docker
+    append: yes
+  become: yes

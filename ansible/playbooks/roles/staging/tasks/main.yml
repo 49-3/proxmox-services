@@ -1,6 +1,6 @@
 ---
-- name: Include my vars
-  ansible.builtin.include_vars: /home/evil/proxmox-services/ansible/host_vars/ansible_vars.yml
+# - name: Include my vars
+#   ansible.builtin.include_vars: /home/evil/proxmox-services/ansible/host_vars/ansible_vars.yml
 
 - name: Check if cluster staging exist
   shell: |
@@ -18,7 +18,7 @@
 - name: Install staging cluster
   shell: k3d cluster create staging \
         -p "8080:80@loadbalancer" \
-        -p "8443:443@loadbalancer" \
+        -p "7443:443@loadbalancer" \
         --api-port 6443 \
         --agents 3 \
         --verbose

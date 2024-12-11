@@ -20,7 +20,7 @@ promtail_binary_path: "{{ promtail_binary_basedir }}/promtail"
 http_listen_port: "9080"
 grpc_listen_port: "0"
 
-loki_ip: "10.0.30.22"
+loki_ip: "192.168.121.34"
 loki_port: "3100"
 
 promtail_user_name: "promtail"

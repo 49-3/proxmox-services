@@ -1,0 +1,4 @@
+---
+# defaults file for docker_k3ds_install
+ansible_python_interpreter: /usr/bin/python3
+main_user: "evil"
