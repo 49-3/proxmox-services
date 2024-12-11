@@ -1,13 +1,101 @@
 ---
 # tasks file for alertmanager
-- name: Install Alertmanager
-  ansible.builtin.apt:
-    name: prometheus-alertmanager
-    state: latest
-    update_cache: yes
+- name: Create alertmanager user
+  user:
+    name: alertmanager
+    system: yes
+    shell: /bin/false
+    create_home: no
 
-- name: Ensure Alertmanager service is enabled and started
-  ansible.builtin.systemd:
-    name: prometheus-alertmanager
+- name: Download Alertmanager tarball
+  get_url:
+    url: "{{ am_tarball }}"
+    dest: "/tmp/alertmanager-{{ am_version }}.linux-amd64.tar.gz"
+    checksum: "sha256:{{ am_checksum }}"
+
+- name: Extract Alertmanager
+  unarchive:
+    src: "/tmp/alertmanager-{{ am_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/"
+    remote_src: yes
+
+- name: Copy alertmanager binary to /usr/local/bin
+  copy:
+    src: "/tmp/alertmanager-{{ am_version }}.linux-amd64/alertmanager"
+    dest: "/usr/local/bin/alertmanager"
+    owner: alertmanager
+    group: alertmanager
+    mode: '0755'
+
+- name: Copy alertmanager.yml configuration
+  copy:
+    src: "/tmp/alertmanager-{{ am_version }}.linux-amd64/alertmanager.yml"
+    dest: "/etc/alertmanager/alertmanager.yml"
+    owner: alertmanager
+    group: alertmanager
+    mode: '0644'
+
+- name: Create necessary directories for Alertmanager
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: alertmanager
+    group: alertmanager
+    mode: '0755'
+  with_items:
+    - /var/lib/alertmanager
+    - /etc/alertmanager
+
+- name: Create systemd service for Alertmanager
+  copy:
+    dest: /etc/systemd/system/alertmanager.service
+    content: |
+      [Unit]
+      Description=Prometheus Alertmanager
+      Wants=network-online.target
+      After=network-online.target
+
+      [Service]
+      User=alertmanager
+      Group=alertmanager
+      Type=simple
+      ExecStart=/usr/local/bin/alertmanager \
+        --config.file /etc/alertmanager/alertmanager.yml \
+        --storage.path /var/lib/alertmanager/
+
+      [Install]
+      WantedBy=multi-user.target
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Enable and start alertmanager service
+  systemd:
+    name: alertmanager
     enabled: yes
     state: started
+
+- name: Copy amtool binary to /usr/local/bin
+  copy:
+    src: "/tmp/alertmanager-{{ am_version }}.linux-amd64/amtool"
+    dest: "/usr/local/bin/amtool"
+    owner: alertmanager
+    group: alertmanager
+    mode: '0755'
+
+- name: Create amtool config directory
+  file:
+    path: /etc/amtool
+    state: directory
+    owner: alertmanager
+    group: alertmanager
+    mode: '0755'
+
+- name: Configure amtool
+  copy:
+    dest: /etc/amtool/config.yml
+    content: |
+      alertmanager.url: http://localhost:9093
+    owner: alertmanager
+    group: alertmanager
+    mode: '0644'

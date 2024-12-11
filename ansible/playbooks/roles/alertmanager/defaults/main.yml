@@ -1,3 +1,6 @@
 ---
 # defaults file for alertmanager
 ansible_python_interpreter: /usr/bin/python3
+am_version: "0.28.0-rc.0"
+am_tarball: "https://github.com/prometheus/alertmanager/releases/download/v{{ am_version }}/alertmanager-{{ am_version }}.linux-amd64.tar.gz"
+am_checksum: "68295918792e9a52998ff687c7bd3e38e78bce120ecd1806c1d0d224f078d16c"
