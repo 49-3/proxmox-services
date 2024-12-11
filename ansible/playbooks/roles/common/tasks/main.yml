@@ -39,6 +39,7 @@
   ansible.builtin.apt:
     pkg:
       - systemd-resolved
+    state: present
 
 - name: Créer le fichier 60-custom.conf
   copy:
@@ -122,13 +123,11 @@
     executable: /bin/bash
   become: true
 
-- name: Install envoy proxy
-  shell: |
-    set -o pipefail
-    apt-get install envoy=1.31.4
-  args:
-    executable: /bin/bash
-  become: true
+- name: Install Envoy
+  ansible.builtin.apt:
+    pkg:
+      - envoy={{ envoy_version }}
+    state: present
 
 - name: Set SSH authorized key
   ansible.posix.authorized_key:

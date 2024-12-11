@@ -1,3 +1,4 @@
 ---
 ansible_python_interpreter: /usr/bin/python3
 network_interface: "ens33"
+envoy_version: "1.31.4"
