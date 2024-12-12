@@ -11,9 +11,11 @@ vault_tls_ttl: "72h"
 vault_agent_auth_ttl: "72h"
 
 
-ca_pki_common_name: "consul"
+ca_pki_common_name: "dc1.consul"
 ca_pki_ttl: "87600h"
+pki_int_ttl: "43800h"
 
 vault_proxy_addr: "https://192.168.121.164:8200"
+vault_policies_directorie: "/etc/vault.d/policies"
 vault_tls_directory: '/etc/consul.d/tls'
 vault_tls_ca_file: 'consul-agent-ca.pem'

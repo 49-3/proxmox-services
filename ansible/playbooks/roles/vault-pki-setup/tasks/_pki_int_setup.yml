@@ -1,0 +1,82 @@
+---
+# playbooks/roles/vault_apprle_setup/tasks/_pki_setup.yml
+
+- name: Vérifier si le moteur PKI est déjà activé
+  shell: |
+    vault secrets list | grep pki_int/ | wc -l
+  register: pki_int_status
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+  changed_when: false
+  delegate_to: deploy
+  run_once: true
+
+- name: Display Pki status
+  debug:
+    msg: >
+      Pki_int is {{ 'enabled' if pki_int_status.stdout == "1" else 'not enabled' }} in Vault
+  when: active_vault_host is defined
+
+- name: Activer le moteur PKI sur Vault actif si non activé
+  command: >
+    vault secrets enable -path=pki_int pki
+  when:
+    - pki_int_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
+  retries: 5         # Nombre de tentatives
+  delay: 20           # Délai entre chaque tentative en secondes
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+  register: pki_int_enable_output
+
+- name: Configuration du ttl max pour le pki_int
+  command: >
+    vault secrets tune -max-lease-ttl={{ pki_int_ttl }} pki_int
+  when:
+    - pki_int_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Request an intermediate certificate signing request (CSR) and save request as
+  command: >
+    vault write -format=json pki_int/intermediate/generate/internal \
+        common_name="{{ ca_pki_common_name }} Intermediate Authority" \
+        | jq -r '.data.csr'
+  register: pki_int_csr
+  when:
+    - pki_int_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Once the CSR is signed, and the root CA returns a certificate, it can be imported back into Vault
+  command: >
+    vault write pki_int/intermediate/set-signed certificate="{{ pki_int_csr.stdout }}"
+  when:
+    - pki_int_status.stdout == "0"
+  register: pki_int_csr_status
+  delegate_to: deploy
+  run_once: true
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Status de la signature du CSR
+  debug:
+    msg: "{{ pki_int_status.stdout  }}"
+  when:
+    - pki_int_status.stdout == "0"
+
