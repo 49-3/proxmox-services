@@ -76,45 +76,46 @@
     mode: '0755'
   become: yes
 
-- name: Create vault policie to allows Consul to use pre-existing PKI paths in Vault
+- name: Create vault policy to allow Consul to use pre-existing PKI paths in Vault
   copy:
-    dest: "{{ vault_policies_directorie }}/vault-policy-connect-ca.hcl"
+    dest: "{{ vault_policies_directory }}/vault-policy-connect-ca.hcl"
     content: |
       path "/sys/mounts/connect_root" {
-  capabilities = [ "read" ]
-}
+        capabilities = [ "read" ]
+      }
 
-path "/sys/mounts/connect_dc1_inter" {
-  capabilities = [ "read" ]
-}
+      path "/sys/mounts/connect_dc1_inter" {
+        capabilities = [ "read" ]
+      }
 
-path "/sys/mounts/connect_dc1_inter/tune" {
-  capabilities = [ "update" ]
-}
+      path "/sys/mounts/connect_dc1_inter/tune" {
+        capabilities = [ "update" ]
+      }
 
-path "/connect_root/" {
-  capabilities = [ "read" ]
-}
+      path "/connect_root/" {
+        capabilities = [ "read" ]
+      }
 
-path "/connect_root/root/sign-intermediate" {
-  capabilities = [ "update" ]
-}
+      path "/connect_root/root/sign-intermediate" {
+        capabilities = [ "update" ]
+      }
 
-path "/connect_dc1_inter/*" {
-  capabilities = [ "create", "read", "update", "delete", "list" ]
-}
+      path "/connect_dc1_inter/*" {
+        capabilities = [ "create", "read", "update", "delete", "list" ]
+      }
 
-path "auth/token/renew-self" {
-  capabilities = [ "update" ]
-}
+      path "auth/token/renew-self" {
+        capabilities = [ "update" ]
+      }
 
-path "auth/token/lookup-self" {
-  capabilities = [ "read" ]
-}
+      path "auth/token/lookup-self" {
+        capabilities = [ "read" ]
+      }
     owner: vault
     group: vault
     mode: '0750'
   become: true
+
 
 - name: Create the policie
   command: >
