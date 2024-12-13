@@ -74,11 +74,12 @@
     owner: vault
     group: vault
     mode: '0755'
+  delegate_to: deploy
   become: yes
 
 - name: Create vault policy to allow Consul to use pre-existing PKI paths in Vault
   copy:
-    dest: "{{ vault_policies_directory }}/vault-policy-connect-ca.hcl"
+    dest: "{{ vault_policies_directorie }}/vault-policy-connect-ca.hcl"
     content: |
       path "/sys/mounts/connect_root" {
         capabilities = [ "read" ]
@@ -114,25 +115,38 @@
     owner: vault
     group: vault
     mode: '0750'
+  delegate_to: deploy
   become: true
 
+
+- name: Vérifier si la conect policie déjà activé dans vault
+  shell: |
+    vault policy list | grep connect-ca | wc -l
+  register: connect_ca_status
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+  changed_when: false
+  delegate_to: deploy
+  run_once: true
 
 - name: Create the policie
   command: >
     vault policy write connect-ca {{ vault_policies_directorie }}/vault-policy-connect-ca.hcl
-  when:
-    - pki_status.stdout == "0"
   delegate_to: deploy
+  when:
+    - connect_ca_status.stdout == "0"
   run_once: true
   environment:
     VAULT_ADDR: "{{ vault_proxy_addr }}"
     VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
-  ignore_errors: true
 
 - name: Create a Vault token to use for the integration
   command: >
-    vault token create -policy=connect-ca > {{ deploy_vault_secret_dir }}/connect-ca.token
+    vault token create -policy=connect-ca
+  register: connect_ca_token
   delegate_to: deploy
   run_once: true
   environment:
@@ -140,7 +154,16 @@
     VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
 
-
+- name: Store vault token on deploy secret dir
+  copy:
+    dest: "{{ vault_secrets_directorie }}/connect_ca.token"
+    content: |
+      {{ connect_ca_token.stdout }}
+    owner: vault
+    group: vault
+    mode: '0750'
+  delegate_to: deploy
+  become: true
 
 
 
