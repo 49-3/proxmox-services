@@ -2,11 +2,11 @@
 ansible_python_interpreter: /usr/bin/python3
 consul_cache_dir: "/var/cache/ansible"
 
-consul_version: "1.20.1"
-consul_archive_sum: "d38e7571177909d437a9cbcc62fb65083bc567266b74a62d02c6abe783951648"
+# consul_version: "1.20.1"
+# consul_archive_sum: "d38e7571177909d437a9cbcc62fb65083bc567266b74a62d02c6abe783951648"
 
-# consul_version: "1.20.0"
-# consul_archive_sum: "da7a71476f8a83f69853c95316518b888d5863ce3b326523bb8e3ad1a302ed64"
+consul_version: "1.20.0"
+consul_archive_sum: "da7a71476f8a83f69853c95316518b888d5863ce3b326523bb8e3ad1a302ed64"
 
 # consul_version: "1.19.2"
 # consul_archive_sum: "9315d95b19cf851f8fb0013b583ede6f61d591a9024a7dbb9b37eee45270abd2"
