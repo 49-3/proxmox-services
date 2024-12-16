@@ -65,6 +65,12 @@ disable_remote_exec = true
 
 # TLS configuration
 tls {
+  defaults {
+    verify_incoming = true
+    verify_outgoing = true
+    verify_server_hostname = true
+    ca_file   = "{{ consul_config_dir }}/tls/consul-agent-ca.pem"
+  }
   https {
     verify_incoming = false     # N'exige pas de certificat client pour les connexions HTTPS
   }
@@ -76,10 +82,6 @@ tls {
   }
 }
 
-verify_incoming = true
-verify_outgoing = true
-verify_server_hostname = true
-ca_file   = "{{ consul_config_dir }}/tls/consul-agent-ca.pem"
 auto_encrypt {
   tls = true
 }
