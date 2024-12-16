@@ -40,6 +40,7 @@
     pkg:
       - systemd-resolved
     state: present
+  when: consul_mode == "node"
 
 - name: Créer le fichier 60-custom.conf
   copy:
