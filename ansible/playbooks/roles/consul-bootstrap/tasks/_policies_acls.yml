@@ -37,6 +37,7 @@
   shell: |
     set -o pipefail
     while read -r line; do export "$line"; done < /etc/environment
+    export CONSUL_HTTP_ADDR=https://{{ hostvars['consul-1']['ansible_'+consul_network_interface]['ipv4']['address'] }}:8443
     consul acl token create -description "Token for Agents" -policy-name agents-policy --format json > {{ consul_config_dir }}/tokens/agent-token.json
   args:
     executable: /bin/bash
@@ -73,6 +74,7 @@
   shell: |
     set -o pipefail
     while read -r line; do export "$line"; done < /etc/environment
+    export CONSUL_HTTP_ADDR=https://{{ hostvars['consul-1']['ansible_'+consul_network_interface]['ipv4']['address'] }}:8443
     consul acl set-agent-token agent {{ agent_token_fact }}
   args:
     executable: /bin/bash
