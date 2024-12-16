@@ -46,3 +46,11 @@
     path: "{{ consul_archive_dest }}"
     state: absent
   when: not consul_stat.stat.exists
+
+- name: Donner à Consul les permissions nécessaires pour le port 53
+  shell: |
+    setcap 'cap_net_bind_service=+ep' $(which consul)
+  args:
+    executable: /bin/bash
+  become: true
+  when: not consul_stat.stat.exists

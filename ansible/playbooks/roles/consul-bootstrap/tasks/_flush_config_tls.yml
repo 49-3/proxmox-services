@@ -28,7 +28,7 @@
             #grpc        = 8502
             grpc        = -1
             grpc_tls    = 8503
-            dns         = 8600
+            dns         = 53
           }
   when: consul_mode == "server"
   notify: Restart consul
@@ -45,7 +45,7 @@
         #grpc        = 8002
         grpc       = -1
         grpc_tls    = 8503
-        dns         = 8600
+        dns         = 53
       }
   when: consul_mode == "node"
   notify: Restart consul

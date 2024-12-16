@@ -1,5 +1,8 @@
 ---
 - name: Install common apps
   hosts: alls
+  become: yes
+  vars:
+    consul_ansible_master_group_name: "consul_masters"
   roles:
     - common

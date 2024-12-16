@@ -1,0 +1,3 @@
+---
+consul_mode: >-
+  {% if inventory_hostname in consul_ansible_bootstrap_group %}server{% else %}node{% endif %}

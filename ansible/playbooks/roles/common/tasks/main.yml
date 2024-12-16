@@ -73,27 +73,28 @@
     owner: "root"
     group: "root"
 
-- name: Créer le fichier consul.conf
-  copy:
-    content: |
-      [Resolve]
-      DNS=127.0.0.1:8600
-      DNSSEC=false
-      Domains=~consul
-    dest: "/etc/systemd/resolved.conf.d/consul.conf"
+# - name: Créer le fichier consul.conf
+#   copy:
+#     content: |
+#       [Resolve]
+#       DNS=127.0.0.1:8600
+#       DNSSEC=false
+#       Domains=~consul
+#     dest: "/etc/systemd/resolved.conf.d/consul.conf"
 
 - name: Remove /etc/systemd/resolved.conf
   ansible.builtin.file:
     path: "/etc/systemd/resolved.conf"
     state: absent
+  when: consul_mode == "node"
 
 - name: Créer le fichier resolved.conf
   copy:
     content: |
       [Resolve]
-      DNS=1.1.1.1 1.0.0.1
-      FallbackDNS=8.8.8.8 8.8.4.4
+      DNS={{ hostvars['consul-1']['ansible_'+network_interface]['ipv4']['address'] }} {{ hostvars['consul-2']['ansible_'+network_interface]['ipv4']['address'] }} {{ hostvars['consul-3']['ansible_'+network_interface]['ipv4']['address'] }} 1.1.1.1 1.0.0.1
     dest: "/etc/systemd/resolved.conf"
+  when: consul_mode == "node"
 
 - name: S'assurer que /etc/resolv.conf pointe vers le stub de systemd-resolved
   file:
@@ -101,17 +102,20 @@
     dest: "/etc/resolv.conf"
     state: link
     force: yes
+  when: consul_mode == "node"
 
 - name: Redémarrer systemd-resolved
   service:
     name: systemd-resolved
     state: restarted
+  when: consul_mode == "node"
 
 - name: Enable ans start systemd-resolved
   ansible.builtin.systemd_service:
     name: systemd-resolved
     state: started
     enabled: true
+  when: consul_mode == "node"
 
 - name: Get envoy keering
   shell: |
