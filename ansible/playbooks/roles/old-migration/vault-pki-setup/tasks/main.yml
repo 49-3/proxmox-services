@@ -1,0 +1,5 @@
+---
+# tasks file for vault-pki-setup
+- import_tasks: _get_master_vault_token.yml
+- import_tasks: _pki_setup.yml
+# - import_tasks: _pki_roles.yml

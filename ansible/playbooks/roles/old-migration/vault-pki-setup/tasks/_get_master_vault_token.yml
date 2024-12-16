@@ -1,0 +1,11 @@
+---
+# playbooks/roles/vault_apprle_setup/tasks/_detect_active_vault.yml
+- name: Get vault_token from deploy secrets
+  shell: |
+    cat {{ deploy_vault_secret_dir }}/vault_token.txt
+  args:
+    executable: /bin/bash
+  register: vault_parent_token
+  delegate_to: deploy
+  run_once: true
+  become: yes

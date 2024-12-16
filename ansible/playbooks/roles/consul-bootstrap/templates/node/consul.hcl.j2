@@ -21,6 +21,8 @@ encrypt = "{{ gossip.stdout }}"
 client_addr = "0.0.0.0"
 bind_addr   = "{{ ansible_default_ipv4.address }}"
 
+enable_central_service_config = true
+
 # Join other Consul agents
 retry_join = [
     {%- for host in consul_ansible_bootstrap_group -%}
@@ -63,14 +65,6 @@ disable_remote_exec = true
 
 # TLS configuration
 tls {
-  defaults {
-    ca_file   = "{{ consul_config_dir }}/tls/consul-agent-ca.pem"
-    cert_file = "{{ consul_config_dir }}/tls/consul-agent.pem"
-    key_file  = "{{ consul_config_dir }}/tls/consul-agent-key.pem"
-
-    verify_incoming = true
-    verify_outgoing = true
-  }
   https {
     verify_incoming = false     # N'exige pas de certificat client pour les connexions HTTPS
   }
@@ -80,4 +74,12 @@ tls {
   internal_rpc {
     verify_server_hostname = true
   }
+}
+
+verify_incoming = true
+verify_outgoing = true
+verify_server_hostname = true
+ca_file   = "{{ consul_config_dir }}/tls/consul-agent-ca.pem"
+auto_encrypt {
+  tls = true
 }

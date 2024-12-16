@@ -1,8 +1,2 @@
 ---
 - import_playbook: ./playbooks/vault-pki-setup.yml
-- import_playbook: ./playbooks/vault-approle-setup.yml
-- import_playbook: ./playbooks/acl-vault-consul.yml
-- import_playbook: ./playbooks/vault-agent-setup.yml
-- import_playbook: ./playbooks/acl-vault-consul.yml
-- import_playbook: ./playbooks/vault-restart-unsealed.yml
-- import_playbook: ./playbooks/display-secrets.yml
