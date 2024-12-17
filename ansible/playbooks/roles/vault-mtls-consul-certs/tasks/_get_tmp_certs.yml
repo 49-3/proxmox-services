@@ -85,9 +85,3 @@
   shell: |
     sleep 30
   run_once: yes
-
-- name: Reload tout les vaults
-  systemd:
-    name: vault
-    state: reloaded
-  become: true
