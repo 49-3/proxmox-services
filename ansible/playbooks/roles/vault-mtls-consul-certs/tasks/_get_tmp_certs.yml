@@ -46,7 +46,7 @@
     chdir: "{{ consul_tls_directory }}/tmp"
 
 - name: Set correct permissions for extracted files
-  ansible.builtin.file:
+  file:
     path: "{{ consul_tls_directory }}/tmp/{{ item.file }}"
     owner: consul
     group: consul
@@ -79,4 +79,15 @@
   systemd:
     name: consul
     state: restarted
+  become: true
+
+- name: Sleep 30s
+  shell: |
+    sleep 30
+  run_once: yes
+
+- name: Reload tout les vaults
+  systemd:
+    name: vault
+    state: reloaded
   become: true
