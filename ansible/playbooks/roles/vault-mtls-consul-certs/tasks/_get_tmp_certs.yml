@@ -58,7 +58,7 @@
 
 - name: Move files from tmp to parent directory
   ansible.builtin.shell: |
-    mv -f {{ consul_tls_directory }}/tmp/* {{ consul_tls_directory }}/
+    mv -f {{ consul_tls_directory }}/tmp/consul* {{ consul_tls_directory }}/
   args:
     executable: /bin/bash
 
@@ -75,15 +75,8 @@
   args:
     executable: /bin/bash
 
-- name: Redémaretout les consuls
+- name: Redémare tout les consuls
   systemd:
     name: consul
     state: restarted
   become: true
-
-- name: Redémare les server vault
-  systemd:
-    name: vault
-    state: restarted
-  become: true
-  when: vault_mode == "server"
