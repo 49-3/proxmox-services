@@ -81,7 +81,7 @@
     state: restarted
   become: true
 
-- name: Sleep 30s
+- name: Sleep 10s
   shell: |
-    sleep 30
+    sleep 10
   run_once: yes
