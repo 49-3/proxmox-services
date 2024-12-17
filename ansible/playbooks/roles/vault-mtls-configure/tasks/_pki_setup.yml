@@ -1,0 +1,204 @@
+---
+# playbooks/roles/vault_apprle_setup/tasks/_pki_setup.yml
+
+- name: Vérifier si le moteur PKI est déjà activé
+  shell: |
+    vault secrets list | grep pki/ | wc -l
+  register: pki_status
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+  changed_when: false
+  delegate_to: deploy
+  run_once: true
+
+- name: Display Pki status
+  debug:
+    msg: >
+      Pki is {{ 'enabled' if pki_status.stdout == "1" else 'not enabled' }} in Vault
+  when: active_vault_host is defined
+
+- name: Activer le moteur PKI sur Vault actif si non activé
+  command: >
+    vault secrets enable pki
+  when:
+    - pki_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
+  retries: 5         # Nombre de tentatives
+  delay: 20           # Délai entre chaque tentative en secondes
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+  register: pki_enable_output
+
+- name: Vérifier si le moteur pki_int est déjà activé
+  shell: |
+    vault secrets list | grep pki_int/ | wc -l
+  register: pki_int_status
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+  changed_when: false
+  delegate_to: deploy
+  run_once: true
+
+- name: Display connect_dc1_inter status
+  debug:
+    msg: >
+      pki_int is {{ 'enabled' if connect_dc1_inter_status.stdout == "1" else 'not enabled' }} in Vault
+  when: active_vault_host is defined
+
+- name: Activer le moteur PKI sur Vault actif si non activé
+  command: >
+    vault secrets enable -path=pki_int pki
+  when:
+    - pki_int_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
+  retries: 5         # Nombre de tentatives
+  delay: 20           # Délai entre chaque tentative en secondes
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+  register: pki_int_enable_output
+
+- name: Ensure {{ vault_policies_directorie }} directory exists
+  file:
+    path: "{{ vault_policies_directorie }}"
+    state: directory
+    owner: vault
+    group: vault
+    mode: '0755'
+  delegate_to: deploy
+  become: yes
+
+- name: Configuration du ttl max pour le pki
+  command: >
+    vault secrets tune -max-lease-ttl={{ ca_pki_ttl }} pki
+  when:
+    - pki_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Configurer les URLs du moteur PKI
+  command: >
+    vault write pki/config/urls
+      issuing_certificates="{{ vault_proxy_addr }}/v1/pki/ca"
+      crl_distribution_points="{{ vault_proxy_addr }}/v1/pki/crl"
+  when:
+    - pki_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Configuration du ttl max pour le pki_int
+  command: >
+    vault secrets tune -max-lease-ttl={{ pki_int_ttl }} pki_int
+  when:
+    - pki_int_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Générer le certificat CA racine
+  command: >
+    vault write -field=certificate pki/root/generate/internal
+      common_name="{{ ca_pki_common_name }}"
+      ttl="{{ ca_pki_ttl }}"
+  register: pki_root_cert
+  when:
+    - pki_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Générer le CSR pour le certificat Intermediaire
+  shell: |
+    vault write -format=json pki_int/intermediate/generate/internal \
+      common_name="dc1.consul Intermediate Authority"  | jq -r '.data.csr'
+  register: pki_intermediate_csr
+  delegate_to: deploy
+  run_once: true
+  args:
+    executable: /bin/bash
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Vérifier la création du CSR
+  debug:
+    msg: "CSR: {{ pki_intermediate_csr.stdout }}"
+  delegate_to: deploy
+  run_once: true
+
+- name: Signer le certificat Intermediaire
+  shell: |
+    vault write -format=json pki/root/sign-intermediate csr="{{ pki_intermediate_csr.stdout }}" \
+      format=pem_bundle ttl="{{ pki_int_ttl }}" | jq -r '.data.certificate'
+  register: intermediate
+  delegate_to: deploy
+  run_once: true
+  args:
+    executable: /bin/bash
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Vérifier la création du certificat intermediare
+  debug:
+    msg: "Cert: {{ intermediate }}"
+  delegate_to: deploy
+  run_once: true
+
+- name: Configurer le le certificat intermadiaire dans pki_int
+  command: >
+    vault write pki_int/intermediate/set-signed certificate="{{ intermediate.stdout }}"
+  delegate_to: deploy
+  run_once: true
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Create a Vault role
+  command: >
+    vault write pki_int/roles/consul-dc1
+      allowed_domains="{{ pki_allowed_domains }}"
+      allow_subdomains=true
+      allow_ip_sans=true
+      generate_lease=true
+      max_ttl="{{ vault_role_ttl }}"
+  register: pki_mtls_role_create
+  delegate_to: deploy
+  run_once: true
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Vérifier la création du rôle PKI
+  debug:
+    msg: "Rôle PKI pour vault mtls créé avec succès."
+  when: pki_mtls_role_create.changed
+  delegate_to: deploy
+  run_once: true

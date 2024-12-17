@@ -1,7 +1,7 @@
-- name: install and configure pki on Vault
+- name: install and configure mtls on Vault
   hosts: vaults
   become: yes
   vars:
     secrets_dir: "/home/evil/secret"
   roles:
-    - vault-pki-setup
+    - vault-mtls-configure

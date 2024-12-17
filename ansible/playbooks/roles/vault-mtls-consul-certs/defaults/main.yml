@@ -1,0 +1,17 @@
+---
+# defaults file for vault-mtls-consul-certs
+ansible_python_interpreter: /usr/bin/python3
+consul_tls_directory: '/etc/consul.d/tls'
+consul_tls_ca_file: 'consul-agent-ca.pem'
+consul_tls_cert: 'consul-agent.pem'
+consul_tls_key: 'consul-agent-key.pem'
+consul_ttl: "24h"
+
+vault_ansible_group: 'vaults'
+vault_server_group: "{{ groups[vault_ansible_group] }}"
+
+deploy_vault_secret_dir: "{{ secrets_dir }}/vault"
+vault_addr: "https://192.168.121.164:8200"
+vault_tls_directory: '/etc/consul.d/tls'
+vault_tls_ca_file: 'consul-agent-ca.pem'
+vault_dir: "/etc/vault.d"

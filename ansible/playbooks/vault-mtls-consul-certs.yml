@@ -1,0 +1,7 @@
+- name: install and configure mtls on Vault
+  hosts: alls
+  become: yes
+  vars:
+    secrets_dir: "/home/evil/secret"
+  roles:
+    - vault-mtls-consul-certs

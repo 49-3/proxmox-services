@@ -1,0 +1,3 @@
+---
+- import_playbook: ./playbooks/vault-mtls-configure.yml
+- import_playbook: ./playbooks/vault-mtls-consul-certs.yml

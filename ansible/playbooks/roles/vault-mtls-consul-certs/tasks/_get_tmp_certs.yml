@@ -1,0 +1,89 @@
+---
+# tasks file for vault-mtls-consul-certs
+- name: Creates tls tmp folder
+  ansible.builtin.file:
+    path: "{{ consul_tls_directory }}/tmp"
+    state: directory
+    owner: consul
+    group: consul
+    mode: 0775
+
+- name: Get /etc/consul.d/tls/tmp/certs.txt
+  shell: |
+     set -o pipefail
+     vault write pki_int/issue/consul-dc1 \
+        common_name="{{ inventory_hostname }}.dc1.consul" \
+        alt_names="server.dc1.consul" \
+        ip_sans="{{ ansible_host }}, 127.0.0.1" \
+        key_type="ec" \
+        format="pem" \
+        ttl="24h" > certs.txt
+  args:
+    executable: /bin/bash
+    chdir: "{{ consul_tls_directory }}/tmp"
+  environment:
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+  changed_when: false
+
+- name: Extract certificate
+  shell: |
+    grep -Pzo "(?s)(?<=certificate)[^\-]*.*?END CERTIFICATE[^\n]*\n" certs.txt | sed 's/^\s*-/-/g' > consul-agent.pem
+  args:
+    chdir: "{{ consul_tls_directory }}/tmp"
+
+- name: Extract issuing CA
+  shell: |
+    grep -Pzo "(?s)(?<=issuing_ca)[^\-]*.*?END CERTIFICATE[^\n]*\n" certs.txt | sed 's/^\s*-/-/g' > consul-agent-ca.pem
+  args:
+    chdir: "{{ consul_tls_directory }}/tmp"
+
+- name: Extract private key
+  shell: |
+    grep -Pzo "(?s)(?<=private_key)[^\-]*.*?END RSA PRIVATE KEY[^\n]*\n" certs.txt | sed 's/^\s*-/-/g' > consul-agent-key.pem
+  args:
+    chdir: "{{ consul_tls_directory }}/tmp"
+
+- name: Set correct permissions for extracted files
+  ansible.builtin.file:
+    path: "{{ consul_tls_directory }}/tmp/{{ item.file }}"
+    owner: consul
+    group: consul
+    mode: "{{ item.mode }}"
+  loop:
+    - { file: 'consul-agent.pem', mode: '0644' }
+    - { file: 'consul-agent-ca.pem', mode: '0644' }
+    - { file: 'consul-agent-key.pem', mode: '0600' }
+
+- name: Move files from tmp to parent directory
+  ansible.builtin.shell: |
+    mv -f {{ consul_tls_directory }}/tmp/* {{ consul_tls_directory }}/
+  args:
+    executable: /bin/bash
+
+- name: Remove tmp directory
+  ansible.builtin.file:
+    path: "{{ consul_tls_directory }}/tmp"
+    state: absent
+
+- name: Chown vault:vault /etc/vault.d
+  ansible.builtin.shell: |
+    chown -R vault:vault {{ vault_dir }}
+  when: vault_mode == "server"
+  become: yes
+  args:
+    executable: /bin/bash
+
+- name: Redémaretout les consuls
+  systemd:
+    name: consul
+    state: restarted
+  become: true
+
+- name: Redémare les server vault
+  systemd:
+    name: vault
+    state: restarted
+  become: true
+  when: vault_mode == "server"

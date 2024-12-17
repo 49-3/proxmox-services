@@ -5,15 +5,20 @@ ansible_python_interpreter: /usr/bin/python3
 deploy_vault_secret_dir: "{{ secrets_dir }}/vault"
 network_interface: "ens33"
 vault_api_port: "8200"
-pki_allowed_domains: "consul"
+pki_allowed_domains: "dc1.consul"
 consul_tls_ttl: "72h"
 vault_tls_ttl: "72h"
+vault_role_ttl: "720h"
 vault_agent_auth_ttl: "72h"
 
 
 ca_pki_common_name: "dc1.consul"
+pki_int_common_name: "dc1.consul Intermediate Authority"
 ca_pki_ttl: "87600h"
 pki_int_ttl: "43800h"
+
+vault_ansible_group: 'vaults'
+vault_server_group: "{{ groups[vault_ansible_group] }}"
 
 vault_proxy_addr: "https://192.168.121.164:8200"
 vault_policies_directorie: "/etc/vault.d/policies"
