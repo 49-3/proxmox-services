@@ -63,6 +63,8 @@
     owner: 'vault'
     group: 'vault'
     mode: '0755'
+  when:
+    - vault_mode == "server"
 
 - name: Starting and enabling Vault
   ansible.builtin.systemd:

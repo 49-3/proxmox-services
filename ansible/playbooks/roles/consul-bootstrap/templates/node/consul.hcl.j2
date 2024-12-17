@@ -84,4 +84,5 @@ tls {
 
 auto_encrypt {
   tls = true
+  tls_san = ["{{ inventory_hostname }}.dc1.consul", "{{ hostvars[inventory_hostname]['ansible_'+consul_network_interface]['ipv4']['address'] }}"]
 }
