@@ -70,6 +70,8 @@ tls {
     verify_outgoing = true
     verify_server_hostname = true
     ca_file   = "{{ consul_config_dir }}/tls/consul-agent-ca.pem"
+    cert_file = "{{ consul_config_dir }}/tls/consul-agent.pem"
+    key_file  = "{{ consul_config_dir }}/tls/consul-agent-key.pem"
   }
   https {
     verify_incoming = false     # N'exige pas de certificat client pour les connexions HTTPS
@@ -82,7 +84,7 @@ tls {
   }
 }
 
-auto_encrypt {
-  tls = true
-  tls_san = ["{{ inventory_hostname }}.dc1.consul", "{{ hostvars[inventory_hostname]['ansible_'+consul_network_interface]['ipv4']['address'] }}"]
-}
+#auto_encrypt {
+#  tls = true
+#  tls_san = ["{{ inventory_hostname }}.dc1.consul", "{{ hostvars[inventory_hostname]['ansible_'+consul_network_interface]['ipv4']['address'] }}"]
+#}
