@@ -25,6 +25,7 @@ consul_env_file: "/etc/default/consul"
 
 consul_tls_directory: "{{ consul_config_dir }}/tls"
 consul_tls_ca_file: "consul-agent-ca.pem"
+consul_tls_ca_key_file: "consul-agent-ca-key.pem"
 consul_dc_name: "dc1"
 
 consul_user_name: "consul"

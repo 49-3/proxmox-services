@@ -144,7 +144,6 @@
   shell: |
     mv dc1-server-consul-0.pem consul-agent.pem
     mv dc1-server-consul-0-key.pem consul-agent-key.pem
-    rm -rf consul-agent-ca-key.pem
     chown -R root:{{ consul_user_name }} ./
     chmod -R 0770 ./
   args:
@@ -157,7 +156,6 @@
   shell: |
     mv dc1-client-consul-0.pem consul-agent.pem
     mv dc1-client-consul-0-key.pem consul-agent-key.pem
-    rm -rf consul-agent-ca-key.pem
     chown -R root:{{ consul_user_name }} ./
     chmod -R 0770 ./
   args:

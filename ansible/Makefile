@@ -79,8 +79,8 @@ kubes: ## Run the kubes playbook (site.yml)
 re: ## Clear secrets and run the alls playbooks (site.yml)
 	rm -rf ~/secret/* ; \
 	bash -c "time ansible-playbook consul-vault.yml --ssh-common-args='-o StrictHostKeyChecking=no'" && \
-	bash -c "time ansible-playbook monitoring.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
-    bash -c "time ansible-playbook vault-mtls.yml --ssh-common-args='-o StrictHostKeyChecking=no'" &&
+	bash -c "time ansible-playbook monitoring.yml --ssh-common-args='-o StrictHostKeyChecking=no'" && \
+    bash -c "time ansible-playbook vault-mtls.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 # bash -c "time ansible-playbook kubes.ynl --ssh-common-args='-o StrictHostKeyChecking=no'"
 
 # Default target
