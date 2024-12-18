@@ -23,6 +23,7 @@
   with_items:
     - "{{ consul_config_dir }}"
     - "{{ consul_config_dir }}/certs"
+    - "{{ consul_config_dir }}/connect"
     - "{{ consul_config_dir }}/tls"
     - "{{ consul_config_dir }}/tokens"
     - "{{ consul_config_dir }}/policies"
