@@ -6,29 +6,31 @@
 connect {
   ca_provider = "consul"
   ca_config {
-      ## Default TTL 72h, minimum TTL 1h
-      leaf_cert_ttl = "72h"
-      ## Default period 2160h, minimum period 1h
-      rotation_period = "2160h"
-      ## Default TTL 8760h, minimum TTL 3h
-      intermediate_cert_ttl = "8760h"
-  }
-  # Configuration du CA local (optionnel si on souhaite personnaliser)
-  # Cela permet de spécifier où les certificats racine et intermédiaires sont stockés
-  # et éventuellement de fournir un certificat racine existant.
-  ca {
-    # Laisser consul générer sa propre autorité ou spécifier une CA externe
-    provider = "consul"
-    config = {
-      private_key_pem  = file("{{ consul_tls_directory }}/{{ consul_tls_ca_key_file }}")
-      root_cert_pem    = file("{{ consul_tls_directory }}/{{ consul_tls_ca_file }}")
-    }
+    leaf_cert_ttl        = "72h"
+    rotation_period       = "2160h"
+    intermediate_cert_ttl = "8760h"
+
+    # Contenu du certificat racine
+    root_cert_pem = <<EOF
+{{ lookup('file', '/etc/consul.d/tls/consul-agent-ca.pem') }}
+EOF
+
+    # Contenu de la clé privée
+    private_key_pem = <<EOF
+{{ lookup('file', '/etc/consul.d/tls/consul-agent-ca-key.pem') }}
+EOF
   }
 
-  # Configuration du mode de connect (Service Mesh)
-  # On force les proxys sidecar envoyés par Consul pour les services
+  verify_incoming        = true
+  verify_outgoing        = true
+  verify_server_hostname = true
+
+  auto_encrypt {
+    tls = true
+  }
+
   proxy {
     default_envoy_log_level = "info"
-    allow_missing_proxy      = false
+    allow_missing_proxy     = false
   }
 }
