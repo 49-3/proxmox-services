@@ -11,21 +11,12 @@ connect {
     intermediate_cert_ttl = "8760h"
 
     # Contenu du certificat racine
-    root_cert_pem = "{{ root_cert.content | b64decode }}"
+    root_cert_pem = <<EOF
+{{ root_cert.content | b64decode }}
+EOF
 
-    private_key_pem = "{{ private_key.content | b64decode }}"
-  }
-
-  verify_incoming        = true
-  verify_outgoing        = true
-  verify_server_hostname = true
-
-  auto_encrypt {
-    tls = true
-  }
-
-  proxy {
-    default_envoy_log_level = "info"
-    allow_missing_proxy     = false
+    private_key_pem = <<EOF
+{{ private_key.content | b64decode }}
+EOF
   }
 }
