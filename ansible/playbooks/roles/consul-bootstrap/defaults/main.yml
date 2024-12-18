@@ -40,6 +40,9 @@ consul_local_tls_dir: "{{ secrets_dir }}/consul/tls"
 
 consul_local_cluster_encrypt_key: "{{ secrets_dir }}/consul/encrypt.key"
 
+
+vault_addr: "https://192.168.121.164:8200"
+
 consul_ca_info:
   C: "FR"
   ST: "LORRAINE"

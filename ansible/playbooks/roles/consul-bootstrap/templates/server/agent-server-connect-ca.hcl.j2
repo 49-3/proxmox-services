@@ -3,14 +3,31 @@
 # -----------------------------+
 
 ## Service mesh CA configuration
+#connect {
+#  ca_provider = "consul"
+#  ca_config {
+#      ## Default TTL 72h, minimum TTL 1h
+#      leaf_cert_ttl = "72h"
+#      ## Default period 2160h, minimum period 1h
+#      rotation_period = "2160h"
+#      ## Default TTL 8760h, minimum TTL 3h
+#      intermediate_cert_ttl = "8760h"
+#  }
+#}
+
+## Service mesh CA configuration
 connect {
-  ca_provider = "consul"
-  ca_config {
-      ## Default TTL 72h, minimum TTL 1h
-      leaf_cert_ttl = "72h"
-      ## Default period 2160h, minimum period 1h
-      rotation_period = "2160h"
-      ## Default TTL 8760h, minimum TTL 3h
-      intermediate_cert_ttl = "8760h"
-  }
+  enabled = true
+  ca_provider = "vault"
+    ca_config {
+        address = "{{ vault_addr }}"
+        token = "<Your-Vault-token>"
+        root_pki_path = "pki"
+        intermediate_pki_path = "pki_int"
+        leaf_cert_ttl = "72h"
+        rotation_period = "2160h"
+        intermediate_cert_ttl = "8760h"
+        private_key_type = "rsa"
+        private_key_bits = 2048
+    }
 }
