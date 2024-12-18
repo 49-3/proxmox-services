@@ -58,7 +58,7 @@
 
 - name: Add ca to trusted ca
   shell: |
-    cp {{ consul_config_dir }}/tls/consul-agent-ca.pem /usr/local/share/ca-certificates/consul-agent-ca.cr
+    cp {{ consul_config_dir }}/tls/consul-agent-ca.pem /usr/local/share/ca-certificates/consul-agent-ca.crt
     update-ca-certificates
   args:
     executable: /bin/bash
@@ -233,6 +233,20 @@
     owner: root
     group: "{{ consul_user_name }}"
     mode: 0640
+  when: consul_mode == "server"
+
+- name: Charger le certificat racine
+  slurp:
+    src: /etc/consul.d/tls/consul-agent-ca.pem
+  register: root_cert
+  become: yes
+  when: consul_mode == "server"
+
+- name: Charger le certificat racine
+  slurp:
+    src: /etc/consul.d/tls/consul-agent-ca-key.pem
+  register: private_key
+  become: yes
   when: consul_mode == "server"
 
 - name: Generate agent-server-connect-ca.hcl configuration

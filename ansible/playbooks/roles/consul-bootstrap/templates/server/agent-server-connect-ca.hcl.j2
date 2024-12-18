@@ -11,14 +11,9 @@ connect {
     intermediate_cert_ttl = "8760h"
 
     # Contenu du certificat racine
-    root_cert_pem = <<EOF
-{{ lookup('file', '/etc/consul.d/tls/consul-agent-ca.pem') }}
-EOF
+    root_cert_pem = "{{ root_cert.content | b64decode }}"
 
-    # Contenu de la clé privée
-    private_key_pem = <<EOF
-{{ lookup('file', '/etc/consul.d/tls/consul-agent-ca-key.pem') }}
-EOF
+    private_key_pem = "{{ private_key.content | b64decode }}"
   }
 
   verify_incoming        = true
