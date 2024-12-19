@@ -37,3 +37,23 @@ path "auth/token/lookup-self" {
 path "pki_int/roles/*" {
   capabilities = ["create","update","read","delete","list"]
 }
+
+path "pki_int/intermediate/generate/internal" {
+  capabilities = ["update"]
+}
+
+path "pki_int/intermediate/set-signed" {
+  capabilities = ["update"]
+}
+
+path "pki_int/config/issuers" {
+  capabilities = ["read", "list"]
+}
+
+path "pki_int/config/issuers" {
+  capabilities = ["create", "read", "update", "delete", "list"]
+}
+
+path "pki_int/issuer/*" {
+  capabilities = ["read", "list"]
+}
