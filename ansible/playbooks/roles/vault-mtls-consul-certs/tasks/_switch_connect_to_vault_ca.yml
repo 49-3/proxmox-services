@@ -15,7 +15,7 @@
     vault policy list | grep connect-ca | wc -l
   register: connect_ca_status
   environment:
-    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_ADDR: "{{ vault_addr }}"
     VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   changed_when: false
@@ -24,24 +24,26 @@
 
 - name: Create the policie
   command: >
-    vault policy write connect-ca {{ vault_policies_directorie }}/vault-policy-connect-ca.hcl
+    vault policy write connect-ca {{ vault_policies_directory }}/vault-policy-connect-ca.hcl
   delegate_to: deploy
   when:
     - connect_ca_status.stdout == "0"
   run_once: true
   environment:
-    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_ADDR: "{{ vault_addr }}"
     VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
 
 - name: Create a Vault token to use for the integration
-  command: >
+  shell: |
     vault token create -policy=connect-ca -format=json  | jq -r ".auth.client_token"
-  register: connect_ca_token
+  args:
+    executable: /bin/bash
+  register: vault_connect_token
   delegate_to: deploy
   run_once: true
   environment:
-    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_ADDR: "{{ vault_addr }}"
     VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
 
@@ -58,7 +60,7 @@
 
 - name: Switch connect-ca to vault
   command: >
-    consul connect ca set-config -config-file {{ consul_connect_directory }}config-connect-ca-provider-vault.json
+    consul connect ca set-config -config-file {{ consul_connect_directory }}/config-connect-ca-provider-vault.json
   delegate_to: deploy
   run_once: true
   become: yes

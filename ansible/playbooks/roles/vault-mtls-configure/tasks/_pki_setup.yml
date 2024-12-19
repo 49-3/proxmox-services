@@ -34,6 +34,47 @@
     VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
   register: pki_enable_output
 
+- name: Configuration du ttl max pour le pki
+  command: >
+    vault secrets tune -max-lease-ttl={{ ca_pki_ttl }} pki
+  when:
+    - pki_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Générer le certificat CA racine
+  command: >
+    vault write -field=certificate pki/root/generate/internal
+      common_name="{{ ca_pki_common_name }}"
+      ttl="{{ ca_pki_ttl }}"
+  register: pki_root_cert
+  when:
+    - pki_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Configurer les URLs du moteur PKI
+  command: >
+    vault write pki/config/urls
+      issuing_certificates="{{ vault_proxy_addr }}/v1/pki/ca"
+      crl_distribution_points="{{ vault_proxy_addr }}/v1/pki/crl"
+  when:
+    - pki_status.stdout == "0"
+  delegate_to: deploy
+  run_once: true
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
 - name: Vérifier si le moteur pki_int est déjà activé
   shell: |
     vault secrets list | grep pki_int/ | wc -l
@@ -49,10 +90,10 @@
 - name: Display connect_dc1_inter status
   debug:
     msg: >
-      pki_int is {{ 'enabled' if connect_dc1_inter_status.stdout == "1" else 'not enabled' }} in Vault
+      pki_int is {{ 'enabled' if pki_int_status.stdout == "1" else 'not enabled' }} in Vault
   when: active_vault_host is defined
 
-- name: Activer le moteur PKI sur Vault actif si non activé
+- name: Activer pki_int sur Vault actif si non activé
   command: >
     vault secrets enable -path=pki_int pki
   when:
@@ -77,52 +118,11 @@
   delegate_to: deploy
   become: yes
 
-- name: Configuration du ttl max pour le pki
-  command: >
-    vault secrets tune -max-lease-ttl={{ ca_pki_ttl }} pki
-  when:
-    - pki_status.stdout == "0"
-  delegate_to: deploy
-  run_once: true
-  environment:
-    VAULT_ADDR: "{{ vault_proxy_addr }}"
-    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
-    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
-
-- name: Configurer les URLs du moteur PKI
-  command: >
-    vault write pki/config/urls
-      issuing_certificates="{{ vault_proxy_addr }}/v1/pki/ca"
-      crl_distribution_points="{{ vault_proxy_addr }}/v1/pki/crl"
-  when:
-    - pki_status.stdout == "0"
-  delegate_to: deploy
-  run_once: true
-  environment:
-    VAULT_ADDR: "{{ vault_proxy_addr }}"
-    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
-    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
-
 - name: Configuration du ttl max pour le pki_int
   command: >
     vault secrets tune -max-lease-ttl={{ pki_int_ttl }} pki_int
   when:
     - pki_int_status.stdout == "0"
-  delegate_to: deploy
-  run_once: true
-  environment:
-    VAULT_ADDR: "{{ vault_proxy_addr }}"
-    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
-    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
-
-- name: Générer le certificat CA racine
-  command: >
-    vault write -field=certificate pki/root/generate/internal
-      common_name="{{ ca_pki_common_name }}"
-      ttl="{{ ca_pki_ttl }}"
-  register: pki_root_cert
-  when:
-    - pki_status.stdout == "0"
   delegate_to: deploy
   run_once: true
   environment:

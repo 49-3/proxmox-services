@@ -10,7 +10,7 @@
   run_once: true
   become: yes
 
-  - name: Get consul_token from deploy secrets
+- name: Get consul_token from deploy secrets
   shell: |
     cat {{ deploy_consul_secret_dir }}/acl-token-bootstrap.json | jq -r ".SecretID"
   args:
