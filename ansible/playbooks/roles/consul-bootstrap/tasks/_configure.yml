@@ -250,14 +250,14 @@
   become: yes
   when: consul_mode == "server"
 
-# - name: Generate agent-server-connect-ca.hcl configuration
-#   template:
-#     src: "{{ consul_mode }}/agent-server-connect-ca.hcl.j2"
-#     dest: "{{ consul_config_dir }}/agent-server-connect-ca.hcl"
-#     owner: root
-#     group: "{{ consul_user_name }}"
-#     mode: 0640
-#   when: consul_mode == "server"
+- name: Generate agent-server-connect-ca.hcl configuration
+  template:
+    src: "{{ consul_mode }}/agent-server-connect-ca.hcl.j2"
+    dest: "{{ consul_config_dir }}/agent-server-connect-ca.hcl"
+    owner: root
+    group: "{{ consul_user_name }}"
+    mode: 0640
+  when: consul_mode == "server"
 
 - name: Generate consul.hcl configuration
   template:
