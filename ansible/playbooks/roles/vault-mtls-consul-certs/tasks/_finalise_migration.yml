@@ -1,0 +1,30 @@
+---
+- name: Move files from tmp to parent directory
+  ansible.builtin.shell: |
+    mv -f {{ consul_tls_directory }}/tmp/consul* {{ consul_tls_directory }}/
+  args:
+    executable: /bin/bash
+
+- name: Remove tmp directory
+  ansible.builtin.file:
+    path: "{{ consul_tls_directory }}/tmp"
+    state: absent
+
+- name: Chown vault:vault /etc/vault.d
+  ansible.builtin.shell: |
+    chown -R vault:vault {{ vault_dir }}
+  when: vault_mode == "server"
+  become: yes
+  args:
+    executable: /bin/bash
+
+- name: Redémare tout les consuls
+  systemd:
+    name: consul
+    state: restarted
+  become: true
+
+- name: Sleep 10s
+  shell: |
+    sleep 10
+  run_once: yes

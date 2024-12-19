@@ -1,0 +1,66 @@
+---
+- name: Générer le fichier de vault policies pour connect-ca
+  copy:
+    src: "vault-policy-connect-ca.hcl"
+    dest: "{{ vault_policies_directory }}/vault-policy-connect-ca.hcl"
+    owner: vault
+    group: vault
+    mode: '0755'
+  become: yes
+  delegate_to: deploy
+  run_once: true
+
+- name: Vérifier si la conect policie déjà activé dans vault
+  shell: |
+    vault policy list | grep connect-ca | wc -l
+  register: connect_ca_status
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+  changed_when: false
+  delegate_to: deploy
+  run_once: true
+
+- name: Create the policie
+  command: >
+    vault policy write connect-ca {{ vault_policies_directorie }}/vault-policy-connect-ca.hcl
+  delegate_to: deploy
+  when:
+    - connect_ca_status.stdout == "0"
+  run_once: true
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Create a Vault token to use for the integration
+  command: >
+    vault token create -policy=connect-ca -format=json  | jq -r ".auth.client_token"
+  register: connect_ca_token
+  delegate_to: deploy
+  run_once: true
+  environment:
+    VAULT_ADDR: "{{ vault_proxy_addr }}"
+    VAULT_CACERT: "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
+    VAULT_TOKEN: "{{ vault_parent_token.stdout }}"
+
+- name: Generate config-connect-ca-provider-vault.json
+  template:
+    src: "config-connect-ca-provider-vault.json.j2"
+    dest: "{{ consul_connect_directory }}/config-connect-ca-provider-vault.json"
+    owner: consul
+    group: "consul"
+    mode: 0750
+  delegate_to: deploy
+  become: yes
+  run_once: true
+
+- name: Switch connect-ca to vault
+  command: >
+    consul connect ca set-config -config-file {{ consul_connect_directory }}config-connect-ca-provider-vault.json
+  delegate_to: deploy
+  run_once: true
+  become: yes
+  environment:
+    CONSUL_HTTP_TOKEN: "{{ consul_parent_token.stdout }}"

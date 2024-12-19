@@ -2,4 +2,4 @@
 - import_playbook: ./playbooks/vault-mtls-configure.yml
 - import_playbook: ./playbooks/vault-mtls-consul-certs.yml
 - import_playbook: ./playbooks/acl-vault-consul.yml
-# - import_playbook: ./playbooks/vault-restart-unsealed.yml
+- import_playbook: ./playbooks/vault-restart-unsealed.yml
