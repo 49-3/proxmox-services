@@ -15,7 +15,7 @@
         common_name="{{ inventory_hostname }}.dc1.consul" \
         alt_names="server.dc1.consul" \
         ip_sans="{{ ansible_host }}, 127.0.0.1" \
-        format="pem" \
+        format="pem_bundle" \
         ttl="24h" > certs.txt
   args:
     executable: /bin/bash
@@ -34,7 +34,7 @@
 
 - name: Extract issuing CA
   shell: |
-    grep -Pzo "(?s)(?<=issuing_ca)[^\-]*.*?END CERTIFICATE[^\n]*\n" certs.txt | sed 's/^\s*-/-/g' > consul-agent-ca.pem
+    grep -Pzo "(?s)(?<=ca_chain)[^\-]*.*?END CERTIFICATE[^\n]*\n" certs.txt | sed 's/^\s*-/-/g' > consul-agent-ca.pem
   args:
     chdir: "{{ consul_tls_directory }}/tmp"
 
