@@ -12,6 +12,8 @@
     url: "{{ am_tarball }}"
     dest: "/tmp/alertmanager-{{ am_version }}.linux-amd64.tar.gz"
     checksum: "sha256:{{ am_checksum }}"
+  retries: 3
+  delay: 3
 
 - name: Extract Alertmanager
   unarchive:
