@@ -53,9 +53,9 @@
 
 - name: Format issuing CA
   shell: |
-    sed 's/-----END CERTIFICATE----- \+-----BEGIN CERTIFICATE-----/-----END CERTIFICATE-----\n-----BEGIN CERTIFICATE-----/g' consul-agent-key.pem
+    sed 's/-----END CERTIFICATE----- \+-----BEGIN CERTIFICATE-----/-----END CERTIFICATE-----\n-----BEGIN CERTIFICATE-----/g' consul-agent-ca.pem
   args:
-  chdir: "{{ consul_tls_directory }}/tmp"
+    chdir: "{{ consul_tls_directory }}/tmp"
 
 - name: Extract private key
   shell: |
