@@ -51,6 +51,12 @@
   args:
     chdir: "{{ consul_tls_directory }}/tmp"
 
+- name: Format issuing CA
+  shell: |
+    sed 's/-----END CERTIFICATE----- \+-----BEGIN CERTIFICATE-----/-----END CERTIFICATE-----\n-----BEGIN CERTIFICATE-----/g' consul-agent-key.pem
+  args:
+  chdir: "{{ consul_tls_directory }}/tmp"
+
 - name: Extract private key
   shell: |
     grep -Pzo "(?s)(?<=private_key)[^\-]*.*?END RSA PRIVATE KEY[^\n]*\n" certs.txt | sed 's/^\s*-/-/g' > consul-agent-key.pem
