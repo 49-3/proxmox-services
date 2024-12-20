@@ -15,7 +15,7 @@
         common_name="{{ inventory_hostname }}.dc1.consul" \
         alt_names="server.dc1.consul" \
         ip_sans="{{ ansible_host }}, 127.0.0.1" \
-        format="pem_bundle" \
+        format="pem" \
         ttl="24h" > certs.txt
   args:
     executable: /bin/bash
