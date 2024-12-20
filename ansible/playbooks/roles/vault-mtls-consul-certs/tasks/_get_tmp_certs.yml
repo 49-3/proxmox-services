@@ -34,7 +34,20 @@
 
 - name: Extract issuing CA
   shell: |
-    grep -Pzo "(?s)(?<=ca_chain)[^\-]*.*?END CERTIFICATE[^\n]*\n" certs.txt | sed 's/^\s*-/-/g' > consul-agent-ca.pem
+    # Extraire la chaîne de certificats depuis ca_chain
+    grep -Pzo '(?s)ca_chain.*?\]' certs.txt \
+      | sed -e 's/ca_chain.*\[//' -e 's/\]//' \
+      | sed 's/^\s*-/-/g' > chain_cert.pem
+
+    # Séparer la chaîne en certificats individuels
+    awk '/-----BEGIN CERTIFICATE-----/ {n++} {if(n>0) print > "cert_" n ".pem"}' chain_cert.pem
+
+    # Ajouter les deux certificats extraits à consul-agent-ca.pem
+    cat cert_1.pem > consul-agent-ca.pem
+    cat cert_2.pem >> consul-agent-ca.pem
+
+    # Nettoyage des fichiers temporaires
+    rm -f chain_cert.pem cert_1.pem cert_2.pem
   args:
     chdir: "{{ consul_tls_directory }}/tmp"
 
