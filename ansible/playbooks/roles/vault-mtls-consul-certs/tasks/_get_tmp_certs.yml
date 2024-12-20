@@ -32,7 +32,7 @@
   args:
     chdir: "{{ consul_tls_directory }}/tmp"
 
-- name: Extract issuing CA
+- name: Extract ca_chain
   shell: |
     # Extraire la chaîne de certificats depuis ca_chain
     grep -Pzo '(?s)ca_chain.*?\]' certs.txt \
@@ -51,9 +51,15 @@
   args:
     chdir: "{{ consul_tls_directory }}/tmp"
 
-- name: Format issuing CA
+- name: Format ca_chain
   shell: |
-    sed 's/-----END CERTIFICATE----- \+-----BEGIN CERTIFICATE-----/-----END CERTIFICATE-----\n-----BEGIN CERTIFICATE-----/g' consul-agent-ca.pem
+    sed 's/-----END CERTIFICATE----- \+-----BEGIN CERTIFICATE-----/-----END CERTIFICATE-----\n-----BEGIN CERTIFICATE-----/g' consul-agent-ca.pem > consul-agent-ca.pem.tmp
+  args:
+    chdir: "{{ consul_tls_directory }}/tmp"
+
+- name: Finalise ca_chain
+  shell: |
+    mv consul-agent-ca.pem.tmp consul-agent-ca.pem
   args:
     chdir: "{{ consul_tls_directory }}/tmp"
 
