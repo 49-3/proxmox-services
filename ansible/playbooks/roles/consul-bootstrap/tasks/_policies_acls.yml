@@ -81,7 +81,7 @@
   ignore_errors: true
 
 - name: Inject agent token on default service environment
-  sgell: |
+  shell: |
     echo "CONSUL_HTTP_TOKEN={{ agent_token_fact }}"" >> /etc/default/consul
   args:
     executable: /bin/bash
