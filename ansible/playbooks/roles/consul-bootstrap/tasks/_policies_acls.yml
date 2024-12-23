@@ -80,12 +80,6 @@
     executable: /bin/bash
   ignore_errors: true
 
-- name: Inject agent token on default service environment
-  shell: |
-    echo "CONSUL_HTTP_TOKEN={{ agent_token_fact }}" >> /etc/default/consul
-  args:
-    executable: /bin/bash
-
 - name: Remove agent-server-acl.hcl
   ansible.builtin.file:
     path: "{{ consul_config_dir }}/agent-server-acl.hcl"

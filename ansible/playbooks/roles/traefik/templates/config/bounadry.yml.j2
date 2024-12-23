@@ -1,0 +1,14 @@
+---
+http:
+  routers:
+    to-boundary:
+      rule: "Host(`boundary.korporate.org`)"
+      service: boundary
+      middlewares:
+        - "chain-no-auth"
+
+  services:
+    boundary:
+      loadBalancer:
+        servers:
+          - url: http://{{ hostvars['boundary']['ansible_'+network_interface]['ipv4']['address'] }}:{{ boundary_port }}
