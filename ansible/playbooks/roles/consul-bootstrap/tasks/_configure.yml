@@ -30,7 +30,7 @@
 
 - name: Generate root certificate for dc
   shell: |
-    consul tls ca create
+    consul tls ca create -days={{ ca_ttl }}
   args:
     executable: /bin/bash
     chdir: "{{ consul_config_dir }}/certs"

@@ -26,6 +26,15 @@ key_prefix "vault/" {
     policy = "write"
 }
 
+intentions {
+  policy = "read"
+}
+
+# Permettre l'accès à Connect CA pour signer les certificats
+path "connect/ca/sign" {
+  policy = "write"
+}
+
 acl = "write"
 mesh = "write"
 

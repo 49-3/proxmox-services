@@ -32,6 +32,8 @@ consul_user_name: "consul"
 
 consul_user_id: "801"
 
+ca_ttl: "3650"
+
 # consul_network_interface: eth0
 consul_network_interface: ens33
 
