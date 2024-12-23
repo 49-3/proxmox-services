@@ -82,7 +82,7 @@
 
 - name: Inject agent token on default service environment
   shell: |
-    echo "CONSUL_HTTP_TOKEN={{ agent_token_fact }}"" >> /etc/default/consul
+    echo "CONSUL_HTTP_TOKEN={{ agent_token_fact }}" >> /etc/default/consul
   args:
     executable: /bin/bash
 
