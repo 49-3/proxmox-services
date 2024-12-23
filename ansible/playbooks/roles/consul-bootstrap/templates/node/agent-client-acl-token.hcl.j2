@@ -5,6 +5,6 @@ acl {
   default_policy = "deny"
   enable_token_persistence = true
   tokens {
-    agent = "{{ hostvars[inventory_hostname]['agent_token_fact'] }}"
+    default = "{{ hostvars[inventory_hostname]['agent_token_fact'] }}"
   }
 }

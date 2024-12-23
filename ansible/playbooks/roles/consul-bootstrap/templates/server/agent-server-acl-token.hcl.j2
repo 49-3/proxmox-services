@@ -11,6 +11,6 @@ acl = {
   enable_token_replication = true
   down_policy = "extend-cache"
   tokens {
-    agent = "{{ hostvars[inventory_hostname]['agent_token_fact'] }}"
+    default = "{{ hostvars[inventory_hostname]['agent_token_fact'] }}"
   }
 }
