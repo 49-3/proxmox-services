@@ -42,6 +42,27 @@
     state: present
   when: consul_mode == "node"
 
+- name: Install systemd-networkd
+  ansible.builtin.apt:
+    pkg:
+      - systemd-networkd
+    state: present
+
+- name: Create /etc/systemd/network directory
+  shell: |
+    mkdir -p /etc/systemd/network
+  args:
+    executable: /bin/bash
+  become: true
+
+- name: Generate 10-ens33.network configuration
+  template:
+    src: "10-ens33.network.j2"
+    dest: "/etc/systemd/network/10-ens33.network"
+    owner: root
+    group: root
+    mode: 0640
+
 - name: Créer le fichier 60-custom.conf
   copy:
     content: |
@@ -66,26 +87,9 @@
     executable: /bin/bash
   become: true
 
-- name: Create resolved.conf.d directory
-  file:
-    path: "/etc/systemd/resolved.conf.d"
-    state: directory
-    mode: 0750
-    owner: "root"
-    group: "root"
-
-# - name: Créer le fichier consul.conf
-#   copy:
-#     content: |
-#       [Resolve]
-#       DNS=127.0.0.1:8600
-#       DNSSEC=false
-#       Domains=~consul
-#     dest: "/etc/systemd/resolved.conf.d/consul.conf"
-
-- name: Remove /etc/systemd/resolved.conf
+- name: Remove /etc/resolved.conf
   ansible.builtin.file:
-    path: "/etc/systemd/resolved.conf"
+    path: "/etc/resolved.conf"
     state: absent
   when: consul_mode == "node"
 
@@ -93,7 +97,8 @@
   copy:
     content: |
       [Resolve]
-      DNS=127.0.0.1 1.1.1.1 1.0.0.1
+      DNS=1.1.1.1 1.0.0.1
+      FallbackDNS=
     dest: "/etc/systemd/resolved.conf"
   when: consul_mode == "node"
 
@@ -105,11 +110,22 @@
     force: yes
   when: consul_mode == "node"
 
+- name: Redémarrer systemd-networkd
+  service:
+    name: systemd-networkd
+    state: restarted
+
 - name: Redémarrer systemd-resolved
   service:
     name: systemd-resolved
     state: restarted
   when: consul_mode == "node"
+
+- name: Enable ans start systemd-networkd
+  ansible.builtin.systemd_service:
+    name: systemd-networkd
+    state: started
+    enabled: true
 
 - name: Enable ans start systemd-resolved
   ansible.builtin.systemd_service:
