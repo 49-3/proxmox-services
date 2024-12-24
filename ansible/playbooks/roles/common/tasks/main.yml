@@ -93,7 +93,7 @@
   copy:
     content: |
       [Resolve]
-      DNS={{ hostvars['consul-1']['ansible_'+network_interface]['ipv4']['address'] }} {{ hostvars['consul-2']['ansible_'+network_interface]['ipv4']['address'] }} {{ hostvars['consul-3']['ansible_'+network_interface]['ipv4']['address'] }} 1.1.1.1 1.0.0.1
+      DNS=127.0.0.1 1.1.1.1 1.0.0.1
     dest: "/etc/systemd/resolved.conf"
   when: consul_mode == "node"
 
