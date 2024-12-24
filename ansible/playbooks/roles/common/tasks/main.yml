@@ -55,7 +55,7 @@
     dest: "/etc/systemd/network/10-ens33.network"
     owner: root
     group: root
-    mode: 0640
+    mode: 0644
 
 - name: Créer le fichier 60-custom.conf
   copy:
