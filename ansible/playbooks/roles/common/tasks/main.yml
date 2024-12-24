@@ -42,12 +42,6 @@
     state: present
   when: consul_mode == "node"
 
-- name: Install systemd-networkd
-  ansible.builtin.apt:
-    pkg:
-      - systemd-networkd
-    state: present
-
 - name: Create /etc/systemd/network directory
   shell: |
     mkdir -p /etc/systemd/network
