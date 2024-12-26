@@ -78,13 +78,17 @@ mesh: ## Run the mesh playbook (site.yml)
 kubes: ## Run the kubes playbook (site.yml)
 	bash -c "time ansible-playbook kubes.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
+.PHONY: secrets
+secrets: ## Run the secrets playbook (site.yml)
+	bash -c "time ansible-playbook secrets.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 
 .PHONY: re
 re: ## Clear secrets and run the alls playbooks (site.yml)
 	rm -rf ~/secret/* ; \
 	bash -c "time ansible-playbook consul-vault.yml --ssh-common-args='-o StrictHostKeyChecking=no'" && \
 	bash -c "time ansible-playbook monitoring.yml --ssh-common-args='-o StrictHostKeyChecking=no'" && \
-	bash -c "time ansible-playbook mesh.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
+	bash -c "time ansible-playbook mesh.yml --ssh-common-args='-o StrictHostKeyChecking=no'" && \
+	bash -c "time ansible-playbook secrets.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 # bash -c "time ansible-playbook vault-mtls.yml --ssh-common-args='-o StrictHostKeyChecking=no'"
 # bash -c "time ansible-playbook kubes.ynl --ssh-common-args='-o StrictHostKeyChecking=no'"
 

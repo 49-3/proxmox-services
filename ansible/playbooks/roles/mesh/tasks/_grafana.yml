@@ -1,1 +1,70 @@
 ---
+- name: Déployer service-grafana.hcl
+  copy:
+    src: service-grafana.hcl
+    dest: "{{ consul_dir }}/service-grafana.hcl"
+    owner: consul
+    group: consul
+    mode: '0750'
+  become: yes
+  delegate_to: grafana
+  run_once: yes
+
+- name: Generate systemd service
+  template:
+    src: "sidecar-grafana.service.j2"
+    dest: "/etc/systemd/system/sidecar-grafana.service"
+    mode: 0640
+  become: yes
+  delegate_to: grafana
+  run_once: yes
+
+- name: Make sidecar-grafana service available
+  service:
+    name: "sidecar-grafana.service"
+    state: started
+    enabled: yes
+  become: yes
+  delegate_to: grafana
+  run_once: yes
+
+- name: Reload Consul
+  systemd:
+    name: "consul"
+    state: reloaded
+    enabled: yes
+    daemon_reload: yes
+  delegate_to: grafana
+  run_once: yes
+  become: yes
+
+- name: Assurer que le répertoire de datasources existe
+  file:
+    path: "{{ grafana_datasource_dir }}"
+    state: directory
+    owner: grafana
+    group: grafana
+    mode: '0755'
+  delegate_to: grafana
+  run_once: yes
+  become: yes
+
+- name: Déployer le fichier de datasource Loki
+  template:
+    src: loki.yaml.j2
+    dest: "{{ grafana_datasource_dir }}/{{ grafana_datasource_file }}"
+    owner: grafana
+    group: grafana
+    mode: '0644'
+  delegate_to: grafana
+  run_once: yes
+  become: yes
+
+- name: Restart grafana service
+  ansible.builtin.systemd:
+    name: grafana-server
+    enabled: yes
+    state: restarted
+  delegate_to: grafana
+  run_once: yes
+  become: yes

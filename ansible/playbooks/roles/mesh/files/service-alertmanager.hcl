@@ -14,7 +14,20 @@ service {
 
   # Définition des connecteurs si vous utilisez Consul Connect
   connect {
-    sidecar_service {}
+    sidecar_service {
+      proxy {
+        config {
+          # Port 'applicatif' du sidecar
+          listener = [
+            {
+              port = 19001
+            }
+          ]
+          # Port admin Envoy (indispensable pour éviter 19000)
+          admin_bind_address = "127.0.0.1:19010"
+        }
+      }
+    }
   }
 
   # Définition des vérifications de santé

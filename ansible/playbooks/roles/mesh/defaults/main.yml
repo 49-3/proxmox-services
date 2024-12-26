@@ -17,6 +17,12 @@ position_filename: "/tmp/positions.yaml"
 promtail_config_dir: "/opt/promtail/"
 promtail_groups: "adm"
 
+grafana_datasource_dir: /etc/grafana/provisioning/datasources
+grafana_datasource_file: loki.yaml
+loki_url: "http://127.0.0.1:3100"
+loki_is_default: true
+loki_name: "Loki"
+
 consul_intentions:
   loki: alertmanager
   grafana: loki
@@ -34,3 +40,5 @@ consul_intentions:
   promtail-influxdb: loki
   promtail-runners: loki
   promtail-staging: loki
+  promtail-teleport: loki
+  promtail-loki: loki

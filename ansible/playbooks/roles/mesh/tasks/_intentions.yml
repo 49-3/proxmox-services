@@ -3,14 +3,9 @@
   command: >
     consul intention create {{ item.key }} {{ item.value }}
   delegate_to: deploy
-  register: resultat_intentions
   run_once: true
   become: yes
   environment:
     CONSUL_HTTP_TOKEN: "{{ consul_parent_token.stdout }}"
   loop: "{{ consul_intentions | dict2items }}"
   ignore_errors: true
-
-- name: Afficher les résultats des créations d'intentions
-  debug:
-    var: resultat_intentions
