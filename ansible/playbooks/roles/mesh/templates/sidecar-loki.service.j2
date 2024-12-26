@@ -1,0 +1,31 @@
+[Unit]
+Description=Envoy Sidecar pour loki via Consul Connect
+After=consul.service
+Requires=consul.service
+
+# Assure que Envoy est redémarré lors du rechargement de Consul
+PartOf=consul.service
+
+[Service]
+# Charger les variables d'environnement depuis /etc/environment
+EnvironmentFile=/etc/environment
+
+# Commande pour démarrer Envoy en mode sidecar via Consul Connect
+ExecStart=/usr/local/bin/consul connect envoy -sidecar-for loki
+
+# Redémarrage automatique en cas d'échec
+Restart=on-failure
+RestartSec=5
+StartLimitInterval=60
+StartLimitBurst=3
+
+# Limites des ressources (optionnel mais recommandé)
+LimitNOFILE=65536
+
+# Assurez-vous que les variables d'environnement sont exportées
+Environment="CONSUL_HTTP_ADDR=${CONSUL_HTTP_ADDR}"
+Environment="CONSUL_HTTP_TOKEN=${CONSUL_HTTP_TOKEN}"
+Environment="CONSUL_CACERT=${CONSUL_CACERT}"
+
+[Install]
+WantedBy=multi-user.target

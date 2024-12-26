@@ -1,0 +1,10 @@
+---
+- name: Get consul_token from deploy secrets
+  shell: |
+    cat {{ deploy_consul_secret_dir }}/acl-token-bootstrap.json | jq -r ".SecretID"
+  args:
+    executable: /bin/bash
+  register: consul_parent_token
+  delegate_to: deploy
+  run_once: true
+  become: yes

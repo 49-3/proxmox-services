@@ -1,0 +1,43 @@
+server:
+  http_listen_address: {{ http_listen_address }}
+  http_listen_port: {{ http_listen_port }}
+  grpc_listen_port: {{ grpc_listen_port }}
+
+positions:
+  filename: "{{ position_filename }}"
+
+clients:
+  - url: http://{{ loki_ip }}:{{ loki_port }}/loki/api/v1/push
+
+scrape_configs:
+  - job_name: {{inventory_hostname}}-journal
+    journal:
+      max_age: 12h
+      json: false
+      path: /var/log/journal
+      labels:
+        job: {{inventory_hostname}}-systemd-journal
+    relabel_configs:
+      - action: drop
+        source_labels: ["__journal__transport"]
+        regex: "kernel"
+      - source_labels: ["__journal_container_name"]
+        target_label: "container"
+      - source_labels: ["__journal__systemd_unit"]
+        target_label: "unit"
+      - source_labels: ["__journal__hostname"]
+        target_label: "host_name"
+      - source_labels: ["__journal__transport"]
+        target_label: "transport"
+      - source_labels: ["__journal__cmdline"]
+        target_label: "_cmdline"
+      - source_labels: ["__journal_priority"]
+        target_label: "_priority"
+      - source_labels: ["__journal_priority_keyword"]
+        target_label: "priority"
+      - source_labels: ["__journal_syslog_identifier"]
+        target_label: "syslog_identifier"
+      - source_labels: ["__journal_syslog_message_severity"]
+        target_label: "level"
+      - source_labels: ["__journal_syslog_message_facility"]
+        target_label: "syslog_facility"

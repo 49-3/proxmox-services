@@ -1,0 +1,36 @@
+---
+ansible_python_interpreter: /usr/bin/python3
+consul_dir: "/etc/consul.d"
+deploy_consul_secret_dir: "{{ secrets_dir }}/consul"
+
+http_listen_port: "9080"
+grpc_listen_port: "0"
+http_listen_address: "127.0.0.1"
+
+# loki_ip: "loki.service.consul"
+loki_ip: "127.0.0.1" # mesh
+loki_port: "3100"
+alertmanager_ip: "127.0.0.1" # mesh
+alertmanager_port: "9093"
+
+position_filename: "/tmp/positions.yaml"
+promtail_config_dir: "/opt/promtail/"
+promtail_groups: "adm"
+
+consul_intentions:
+  loki: alertmanager
+  grafana: loki
+  promtail-deploy: loki
+  promtail-consul-1: loki
+  promtail-consul-2: loki
+  promtail-consul-3: loki
+  promtail-vault-1: loki
+  promtail-vault-2: loki
+  promtail-traefik: loki
+  promtail-boundary: loki
+  promtail-grafana: loki
+  promtail-prometheus: loki
+  promtail-alertmanager: loki
+  promtail-influxdb: loki
+  promtail-runners: loki
+  promtail-staging: loki

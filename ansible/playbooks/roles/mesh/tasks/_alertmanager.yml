@@ -1,0 +1,39 @@
+---
+- name: Déployer service-alertmanager.hcl
+  copy:
+    src: service-alertmanager.hcl
+    dest: "{{ consul_dir }}/service-alertmanager.hcl"
+    owner: consul
+    group: consul
+    mode: '0750'
+  become: yes
+  delegate_to: alertmanager
+  run_once: yes
+
+- name: Generate systemd service
+  template:
+    src: "sidecar-alertmanager.service.j2"
+    dest: "/etc/systemd/system/sidecar-alertmanager.service"
+    mode: 0640
+  become: yes
+  delegate_to: alertmanager
+  run_once: yes
+
+- name: Make sidecar-alertmanager service available
+  service:
+    name: "sidecar-alertmanager.service"
+    state: started
+    enabled: yes
+  become: yes
+  delegate_to: alertmanager
+  run_once: yes
+
+- name: Reload Consul
+  systemd:
+    name: "consul"
+    state: reloaded
+    enabled: yes
+    daemon_reload: yes
+  delegate_to: alertmanager
+  run_once: yes
+  become: yes

@@ -1,0 +1,21 @@
+---
+- name: Restart promtail
+  systemd:
+    name: "{{ promtail_user_name }}"
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+
+- name: Reload Consul
+  systemd:
+    name: "consul"
+    state: reloaded
+    enabled: yes
+    daemon_reload: yes
+
+- name: Restart systemd-journald
+  systemd:
+    name: "{{ promtail_user_name }}"
+    state: restarted
+    enabled: yes
+    daemon_reload: yes

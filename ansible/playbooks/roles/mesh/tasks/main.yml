@@ -1,0 +1,50 @@
+---
+# tasks file for mesh
+- name: Call role _get_masters_token
+  import_tasks: _get_masters_token.yml
+
+- name: Call role _alertmanager
+  import_tasks: _alertmanager.yml
+
+- name: Call role _loki
+  import_tasks: _loki.yml
+
+- name: Call role _intentions
+  import_tasks: _intentions.yml
+
+# - name: Call role _grafana
+#   import_tasks: _grafana.yml
+
+# - name: Call role _promtail
+#   import_tasks: _promtail.yml
+
+# - name: Call role _intentions.yml
+#   include_tasks: _intentions.yml
+
+
+
+# - name: Install promtail sidecar service
+
+# - name: Create promtail-service.hcl
+
+# - name: Reload consul
+
+# - name: Start sidecar service
+
+# - name: Install loki sidecar service
+
+# - name: Create loki-service.hcl
+
+# - name: Install grafana sidecar service
+
+# - name: Create grafana-service.hcl
+
+
+# - name: Flush promtail configuration
+#   template:
+#     src: "config.yaml.j2"
+#     dest: "{{ promtail_config_dir }}/config.yaml"
+#     owner: root
+#     group: "{{ promtail_groups }}"
+#     mode: 0640
+#   notify: Restart promtail

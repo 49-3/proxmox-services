@@ -1,0 +1,8 @@
+---
+- name: Configure mesh
+  hosts: alls
+  become: yes
+  vars:
+    secrets_dir: "/home/evil/secret"
+  roles:
+    - mesh
