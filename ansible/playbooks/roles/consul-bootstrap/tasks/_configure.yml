@@ -79,7 +79,7 @@
       -additional-dnsname=deploy.dc1.consul \
       -additional-dnsname=traefik.dc1.consul \
       -additional-dnsname=teleport.dc1.consul \
-      -additional-dnsname=boundary.dc1.consul \
+      -additional-dnsname=sentry.dc1.consul \
       -additional-dnsname=influxdb.dc1.consul \
       -additional-dnsname=alertmanager.dc1.consul \
       -additional-dnsname=loki.dc1.consul \
@@ -113,7 +113,7 @@
       -additional-dnsname=vault-1.dc1.consul \
       -additional-dnsname=vault-2.dc1.consul \
       -additional-dnsname=teleport.dc1.consul \
-      -additional-dnsname=boundary.dc1.consul \
+      -additional-dnsname=sentry.dc1.consul \
       -additional-dnsname=alertmanager.dc1.consul \
       -additional-dnsname=loki.dc1.consul \
       -additional-dnsname=prometheus.dc1.consul \
