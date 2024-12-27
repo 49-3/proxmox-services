@@ -2,7 +2,7 @@
 http:
   routers:
     to-boundary:
-      rule: "Host(`boundary.korporate.org`)"
+      rule: "Host(`sentry.korporate.org`)"
       service: boundary
       middlewares:
         - "chain-no-auth"
@@ -11,4 +11,4 @@ http:
     boundary:
       loadBalancer:
         servers:
-          - url: http://{{ hostvars['boundary']['ansible_'+network_interface]['ipv4']['address'] }}:{{ boundary_port }}
+          - url: http://{{ hostvars['sentry']['ansible_'+network_interface]['ipv4']['address'] }}:{{ sentry_port }}
