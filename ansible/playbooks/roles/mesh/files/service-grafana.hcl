@@ -9,8 +9,9 @@ service {
     id       = "grafana-ready-check"
     name     = "Grafana Ready Check"
     http     = "http://localhost:3000/api/health"
-    interval = "10s"
-    timeout  = "2s"
+    interval = "120s"
+    timeout  = "20s"
+    deregister_critical_service_after = "5m"
   }
   connect {
     sidecar_service {

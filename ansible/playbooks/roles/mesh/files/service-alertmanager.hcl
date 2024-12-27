@@ -33,8 +33,9 @@ service {
   # Définition des vérifications de santé
   check {
     name     = "vérification de l'état de Alertmanager"
-    interval = "30s"
-    timeout  = "5s"
+    interval = "120s"
+    timeout  = "20s"
+    deregister_critical_service_after = "5m"
 
     # URL de la vérification de santé (readiness ou liveness)
     http = "http://localhost:9093/-/ready"
