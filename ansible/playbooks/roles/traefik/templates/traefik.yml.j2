@@ -23,6 +23,8 @@ entryPoints:
           - main: "{{ DOMAINNAME }}"
             sans:
               - "*.{{ DOMAINNAME }}"
+  metrics:
+    address: ":9100"
 serversTransport:
   insecureSkipVerify: true
 providers:
@@ -60,3 +62,8 @@ experimental:
     traefik-modsecurity-plugin:
       modulename: github.com/madebymode/traefik-modsecurity-plugin
       version: v1.5.0
+metrics:
+  prometheus:
+    entryPoint: metrics
+    addEntryPointsLabels: true
+    addServicesLabels: true

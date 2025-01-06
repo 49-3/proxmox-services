@@ -31,3 +31,43 @@ scrape_configs:
   - job_name: 'loki'
     static_configs:
       - targets: ["{{ loki_ip }}:{{ loki_port }}"] #loki addr
+
+  - job_name: 'consul_cluster'
+    scheme: 'https'
+    metrics_path: '/v1/agent/metrics'
+    params:
+      format: [ 'prometheus' ]
+    tls_config:
+      ca_file: '/etc/prometheus/tls/consul-agent-ca.pem'
+      cert_file: '/etc/prometheus/tls/consul-agent.pem'     # si vous utilisez la mTLS
+      key_file: '/etc/prometheus/tls/consul-agent-key.pem'
+      insecure_skip_verify: false  # à false en production si CA valide
+    authorization:
+      credentials_file: /etc/prometheus/prometheus-consul-token
+    static_configs:
+      - targets:
+          - '192.168.121.161:8443'
+          - '192.168.121.162:8443'
+          - '192.168.121.163:8443'
+
+  - job_name: 'vault_cluster'
+    scheme: 'https'
+    metrics_path: '/v1/sys/metrics'
+    params:
+      format: [ 'prometheus' ]
+    tls_config:
+      ca_file: '/etc/prometheus/tls/consul-agent-ca.pem'
+      cert_file: '/etc/prometheus/tls/consul-agent.pem'     # si vous utilisez la mTLS
+      key_file: '/etc/prometheus/tls/consul-agent-key.pem'
+      insecure_skip_verify: false
+    # Si vous avez besoin d'un token Vault (si pas d'accès anonyme)
+    authorization:
+      credentials_file: /etc/prometheus/prometheus-vault-token
+    static_configs:
+      - targets:
+          - '192.168.121.164:8200'
+          - '192.168.121.165:8200'
+
+  - job_name: 'traefik'
+    static_configs:
+      - targets: ['192.168.121.170:9100']
