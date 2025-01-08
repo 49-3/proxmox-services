@@ -5,7 +5,7 @@ listener "tcp" {
   cluster_address          = "0.0.0.0:{{ vault_cluster_port }}"
   tls_cert_file            = "{{ vault_tls_directory }}/{{ vault_tls_cert_file }}"
   tls_key_file             = "{{ vault_tls_directory }}/{{ vault_tls_key_file }}"
-  tls_client_ca_file       = "{{ vault_tls_directory }}/{{ vault_tls_ca_cert_file }}"
+  tls_client_ca_file       = "{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
   tls_disable_client_certs = {{ vault_tls_disable_client_certs | lower }}
   tls_disable              = false
 {% else %}

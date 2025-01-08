@@ -28,7 +28,6 @@ consul_http_addr: "{{ lookup('env', 'CONSUL_HTTP_ADDR') | default('', false) }}"
 
 consul_config_dir: '/etc/consul.d'
 
-
 # if Consul is used as storage backend
 consul_addr: '192.168.121.161'
 consul_http_port: '8443'
