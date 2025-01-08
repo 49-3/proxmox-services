@@ -16,15 +16,6 @@
   when:
     - vault_create_account
 
-- name: Add vault user to consul group
-  shell: |
-    usermod -aG consul vault
-  args:
-    executable: /bin/bash
-  become: true
-  when:
-    - vault_create_account
-
 - name: Creating Vault directories
   ansible.builtin.file:
     state: directory
@@ -38,6 +29,20 @@
     - '{{ vault_log_dir }}'
     - '{{ vault_license_directory }}'
     - '{{ vault_data_directory }}/data'
+    - '{{ vault_tls_directory }}'
+
+- name: Copy tls cert to /etc/vault.d/tls
+  shell: |
+    cp {{ consul_tls_directory }}/{{ consul_tls_ca_file }} {{ vault_tls_directory }}/{{ vault_tls_ca_file }}
+    cp {{ consul_tls_directory }}/{{ consul_tls_cert_file }} {{ vault_tls_directory }}/{{ vault_tls_cert_file }}
+    cp {{ consul_tls_directory }}/{{ consul_tls_key_file }} {{ vault_tls_directory }}/{{ vault_tls_cert_file }}
+    chown -R {{ vault_user }}:{{ vault_group }} {{ vault_home_directory }}
+    chmod 0640 {{ vault_tls_directory }}/{{ vault_tls_ca_file }}
+  args:
+    executable: /bin/bash
+  become: true
+  when:
+    - vault_create_account
 
 - name: Creating Vault plugin directory
   ansible.builtin.file:
