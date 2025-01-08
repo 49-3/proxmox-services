@@ -35,7 +35,7 @@
   shell: |
     cp {{ consul_tls_directory }}/{{ consul_tls_ca_file }} {{ vault_tls_directory }}/{{ vault_tls_ca_file }}
     cp {{ consul_tls_directory }}/{{ consul_tls_cert_file }} {{ vault_tls_directory }}/{{ vault_tls_cert_file }}
-    cp {{ consul_tls_directory }}/{{ consul_tls_key_file }} {{ vault_tls_directory }}/{{ vault_tls_cert_file }}
+    cp {{ consul_tls_directory }}/{{ consul_tls_key_file }} {{ vault_tls_directory }}/{{ vault_tls_key_file }}
     chown -R {{ vault_user }}:{{ vault_group }} {{ vault_home_directory }}
     chmod 0640 {{ vault_tls_directory }}/{{ vault_tls_ca_file }}
   args:

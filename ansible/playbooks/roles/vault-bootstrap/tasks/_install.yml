@@ -52,8 +52,9 @@
   tags: installation
   delegate_to: deploy
   when:
-    - not vault_package.stat.exists | bool
     - installation_required
+    - not vault_package.stat.exists | bool
+
 
 - name: Unarchive Vault (local)
   unarchive:
