@@ -1,0 +1,78 @@
+---
+- name: Déployer service-vault.hcl on vault-1
+  template:
+    src: service-vault.hcl.j2
+    dest: "{{ consul_dir }}/service-vault.hcl"
+    owner: consul
+    group: consul
+    mode: '0750'
+  become: yes
+  delegate_to: vault-1
+  run_once: yes
+
+- name: Déployer service-vault.hcl on vault-2
+  template:
+    src: service-vault.hcl.j2
+    dest: "{{ consul_dir }}/service-vault.hcl"
+    owner: consul
+    group: consul
+    mode: '0750'
+  become: yes
+  delegate_to: vault-2
+  run_once: yes
+
+- name: Generate systemd service on vault-1
+  template:
+    src: "sidecar-vault.service.j2"
+    dest: "/etc/systemd/system/sidecar-vault.service"
+    mode: 0640
+  become: yes
+  delegate_to: vault-1
+  run_once: yes
+
+- name: Generate systemd service on vault-2
+  template:
+    src: "sidecar-vault.service.j2"
+    dest: "/etc/systemd/system/sidecar-vault.service"
+    mode: 0640
+  become: yes
+  delegate_to: vault-2
+  run_once: yes
+
+- name: Make sidecar-vault service available on vault-1
+  service:
+    name: "sidecar-vault.service"
+    state: started
+    enabled: yes
+  become: yes
+  delegate_to: vault-1
+  run_once: yes
+
+- name: Make sidecar-vault service available on vault-2
+  service:
+    name: "sidecar-vault.service"
+    state: started
+    enabled: yes
+  become: yes
+  delegate_to: vault-2
+  run_once: yes
+
+- name: Reload Consul on vault-1
+  systemd:
+    name: "consul"
+    state: reloaded
+    enabled: yes
+    daemon_reload: yes
+  delegate_to: vault-1
+  run_once: yes
+  become: yes
+
+- name: Reload Consul on vault-2
+  systemd:
+    name: "consul"
+    state: reloaded
+    enabled: yes
+    daemon_reload: yes
+  delegate_to: vault-2
+  run_once: yes
+  become: yes

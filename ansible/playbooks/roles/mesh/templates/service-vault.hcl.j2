@@ -1,0 +1,40 @@
+# /etc/consul.d/service-alertmanager.hcl
+
+service {
+  name = "vault"
+  id   = "{{ inventory_hostname }}" # Un identifiant unique pour le service
+  port = 8200
+
+  # Tags facultatifs pour catégoriser le service
+  tags = [
+    "vault",
+    "proxy",
+    "mesh"
+  ]
+
+  # Définition des connecteurs si vous utilisez Consul Connect
+  connect {
+    sidecar_service {
+      proxy {
+        config {
+          # Port 'applicatif' du sidecar
+          listener = [
+            {
+              port = 19001
+            }
+          ]
+          # Port admin Envoy (indispensable pour éviter 19000)
+          admin_bind_address = "127.0.0.1:19010"
+        }
+      }
+    }
+  }
+
+  # Vérification de santé
+  check {
+    name     = "vault TCP check"
+    tcp      = "127.0.0.1:8200"
+    interval = "10s"
+    timeout  = "2s"
+  }
+}

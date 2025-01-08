@@ -3,6 +3,9 @@
 - name: Call role _get_masters_token
   import_tasks: _get_masters_token.yml
 
+- name: Call role _vaults
+  import_tasks: _vaults.yml
+
 - name: Call role _alertmanager
   import_tasks: _alertmanager.yml
 
