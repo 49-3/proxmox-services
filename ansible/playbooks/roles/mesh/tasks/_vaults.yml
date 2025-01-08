@@ -9,6 +9,14 @@
   become: yes
   when: "'vaults' in group_names"
 
+- name: Authorize consul user to use sudo for vault status
+  shell: |
+    echo "consul  ALL=NOPASSWD: /usr/bin/vault status" > /etc/sudoers.d/consul
+  args:
+    executable: /bin/bash
+  when: "'vaults' in group_names"
+  become: yes
+
 - name: Déployer vault-leader-check.sh on vaults
   template:
     src: vault-leader-check.sh.j2

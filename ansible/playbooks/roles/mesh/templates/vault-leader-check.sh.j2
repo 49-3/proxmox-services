@@ -5,13 +5,13 @@ export VAULT_ADDR='https://127.0.0.1:8200'
 export VAULT_CACERT='/etc/consul.d/tls/consul-agent-ca.pem'
 
 # Vérifier si Vault est initialisé et déverrouillé
-if ! vault status > /dev/null 2>&1; then
+if ! sudo /usr/bin/vault status > /dev/null 2>&1; then
   echo "Vault n'est pas initialisé ou est scellé."
   exit 1
 fi
 
 # Extraire le mode HA
-HAMODE=$(vault status | grep 'HA Mode' | awk '{print $3}')
+HAMODE=$(sudo /usr/bin/vault status | grep 'HA Mode' | awk '{print $3}')
 
 # Vérifier si le nœud est actif
 if [ "$HAMODE" == "active" ]; then
