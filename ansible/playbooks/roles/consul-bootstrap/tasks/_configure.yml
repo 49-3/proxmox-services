@@ -90,6 +90,7 @@
       -additional-dnsname=staging.dc1.consul \
       -additional-dnsname=vault-1.dc1.consul \
       -additional-dnsname=vault-2.dc1.consul \
+      -additional-dnsname=active.vault.service.consul \
       -additional-ipaddress=192.168.121.161 \
       -additional-ipaddress=192.168.121.162 \
       -additional-ipaddress=192.168.121.163 \
@@ -112,6 +113,7 @@
       -additional-dnsname=traefik.dc1.consul \
       -additional-dnsname=vault-1.dc1.consul \
       -additional-dnsname=vault-2.dc1.consul \
+      -additional-dnsname=active.vault.service.consul \
       -additional-dnsname=teleport.dc1.consul \
       -additional-dnsname=sentry.dc1.consul \
       -additional-dnsname=alertmanager.dc1.consul \
