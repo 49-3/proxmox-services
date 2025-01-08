@@ -2,7 +2,7 @@
 - name: Vérifier si local vault est scellé
   shell: |
     export VAULT_ADDR="https://{{ hostvars[inventory_hostname]['ansible_' + vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
-    export VAULT_CACERT="{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
+    export VAULT_CACERT="{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
     vault status | grep Sealed | awk '{print $2}'
   args:
     executable: /bin/bash
@@ -52,7 +52,7 @@
 - name: Déverrouiller vaults si scellé
   shell: |
     export VAULT_ADDR="https://{{ hostvars[inventory_hostname]['ansible_' + vault_network_interface]['ipv4']['address'] }}:{{ vault_api_port }}"
-    export VAULT_CACERT="{{ consul_tls_directory }}/{{ consul_tls_ca_file }}"
+    export VAULT_CACERT="{{ vault_tls_directory }}/{{ vault_tls_ca_file }}"
     while read -r key; do
       vault operator unseal "$key"
     done < "{{ vault_home_directory }}/unseal_keys.txt"
