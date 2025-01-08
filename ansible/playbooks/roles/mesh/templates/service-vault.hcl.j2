@@ -1,7 +1,7 @@
 # /etc/consul.d/service-alertmanager.hcl
 
 service {
-  name = "vault"
+  name = "vault-mesh"
   id   = "{{ inventory_hostname }}" # Un identifiant unique pour le service
   port = 8200
 
@@ -30,11 +30,19 @@ service {
     }
   }
 
-  # Vérification de santé
-  check {
-    name     = "vault TCP check"
-    tcp      = "127.0.0.1:8200"
-    interval = "10s"
-    timeout  = "2s"
-  }
+  # Définition des vérifications de santé
+  checks = [
+    {
+      name     = "Vault Leader Check"
+      args     = ["/usr/local/bin/vault-leader-check.sh"]
+      interval = "10s"
+      timeout  = "2s"
+    },
+    {
+      name     = "vault TCP check"
+      tcp      = "127.0.0.1:8200"
+      interval = "10s"
+      timeout  = "2s"
+    }
+  ]
 }

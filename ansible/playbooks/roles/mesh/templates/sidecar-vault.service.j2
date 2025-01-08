@@ -11,7 +11,7 @@ PartOf=consul.service
 EnvironmentFile=/etc/environment
 
 # Commande pour démarrer Envoy en mode sidecar via Consul Connect
-ExecStart=/usr/local/bin/consul connect envoy -sidecar-for vault -admin-bind 127.0.0.1:19010
+ExecStart=/usr/local/bin/consul connect envoy -sidecar-for vault-mesh -admin-bind 127.0.0.1:19010
 
 # Redémarrage automatique en cas d'échec
 Restart=on-failure
